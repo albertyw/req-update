@@ -1,0 +1,25 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@1.1.0
+
+jobs:
+  build-and-test:
+    resource_class: small
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pip-dependency-file: requirements-test.txt
+          pkg-manager: pip
+      - run:
+          command: flake8
+          name: Lint
+      - run:
+          command: python setup.py test
+          name: test
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
