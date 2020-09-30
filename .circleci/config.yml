@@ -16,8 +16,14 @@ jobs:
           command: flake8
           name: Lint
       - run:
-          command: python setup.py test
-          name: test
+          command: mypy . --strict --ignore-missing-imports
+          name: Type Checking
+      - run:
+          command: coverage run setup.py test
+          name: Test
+      - run:
+          command: coverage report -m
+          name: Test Coverage
 
 workflows:
   main:
