@@ -1,5 +1,9 @@
 # req-update
 
+[![PyPI](https://img.shields.io/pypi/v/req-update)](https://pypi.org/project/req-update/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/req-update)
+![PyPI - License](https://img.shields.io/pypi/l/req-update)
+
 [![Circle CI](https://circleci.com/gh/albertyw/req-update.svg?style=shield)](https://circleci.com/gh/albertyw/req-update)
 
 `req-update` is a CLI tool to automatically update dependencies listed in `requirements.txt`.
