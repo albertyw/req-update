@@ -13,19 +13,19 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 about: Dict[str, str] = {}
-with open(path.join(here, 'pip_update', '__version__.py')) as f:
+with open(path.join(here, 'req_update', '__version__.py')) as f:
     exec(f.read(), about)
 
 setup(
-    name='pip-update',
+    name='req-update',
 
     version=about['__version__'],
 
-    description='Pip Update',
+    description='Req Update',
     long_description=long_description,
     long_description_content_type='text/markdown',
 
-    url='https://github.com/albertyw/pip-update',
+    url='https://github.com/albertyw/req-update',
 
     author='Albert Wang',
     author_email='git@albertyw.com',
@@ -50,14 +50,14 @@ setup(
 
     keywords='',
 
-    package_data={"pip_update": ["py.typed"]},
+    package_data={"req_update": ["py.typed"]},
     packages=find_packages(exclude=["tests"]),
 
-    py_modules=["pip_update.pip_update"],
+    py_modules=["req_update.req_update"],
 
     install_requires=[],
 
-    test_suite="pip_update.tests",
+    test_suite="req_update.tests",
 
     # testing requires flake8 and coverage but they're listed separately
     # because they need to wrap setup.py
@@ -68,7 +68,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'pip_update=pip_update.pip_update:main',
+            'req_update=req_update.req_update:main',
         ],
     },
 )
