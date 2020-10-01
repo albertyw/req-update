@@ -5,6 +5,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/req-update)
 
 [![Circle CI](https://circleci.com/gh/albertyw/req-update.svg?style=shield)](https://circleci.com/gh/albertyw/req-update)
+[![Dependency Status](https://pyup.io/repos/github/albertyw/req-update/shield.svg)](https://pyup.io/repos/github/albertyw/req-update/)
 
 `req-update` is a CLI tool to automatically update dependencies listed in `requirements.txt`.
 
