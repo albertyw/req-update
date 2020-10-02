@@ -1,6 +1,13 @@
 # req-update
 
-[![Codeship Status for albertyw/req-update](https://app.codeship.com/projects/e3bbaae0-e4f2-0138-08ce-1e914e8879b6/status?branch=master)](https://app.codeship.com/projects/410831)
+[![PyPI](https://img.shields.io/pypi/v/req-update)](https://pypi.org/project/req-update/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/req-update)
+![PyPI - License](https://img.shields.io/pypi/l/req-update)
+
+[![Circle CI](https://circleci.com/gh/albertyw/req-update.svg?style=shield)](https://circleci.com/gh/albertyw/req-update)
+[![Dependency Status](https://pyup.io/repos/github/albertyw/req-update/shield.svg)](https://pyup.io/repos/github/albertyw/req-update/)
+[![Code Climate](https://codeclimate.com/github/albertyw/req-update/badges/gpa.svg)](https://codeclimate.com/github/albertyw/req-update)
+[![Test Coverage](https://codeclimate.com/github/albertyw/req-update/badges/coverage.svg)](https://codeclimate.com/github/albertyw/req-update/coverage)
 
 `req-update` is a CLI tool to automatically update dependencies listed in `requirements.txt`.
 
