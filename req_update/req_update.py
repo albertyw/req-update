@@ -12,7 +12,10 @@ def main() -> None:
 
 def check_repository_cleanliness() -> None:
     """ Check that the repository is ready for updating dependencies """
-    pass
+    command = ['git', 'status', '--porcelain']
+    result = execute_shell(command)
+    if not len(result.stdout) == 0:
+        raise RuntimeError('Repository not clean')
 
 
 def create_branch() -> None:
