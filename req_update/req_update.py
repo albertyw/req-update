@@ -1,4 +1,5 @@
 from __future__ import annotations
+import argparse
 import subprocess
 from typing import List, Tuple
 
@@ -6,11 +7,41 @@ VERSION = (0, 0, 1)
 __version__ = '.'.join(map(str, VERSION))
 
 
+DESCRIPTION = (
+    'Update python dependencies for your project with git integration\n'
+    'https://github.com/albertyw/req-update'
+)
+
+
 def main() -> None:
     """ Update all dependencies """
+    get_args()
     check_repository_cleanliness()
     create_branch()
     update_dependencies()
+
+
+def get_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser.add_argument(
+        '-d',
+        '--dryrun',
+        action='store_true',
+        help='Dry run',
+    )
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help='Verbose output',
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=__version__,
+    )
+    args = parser.parse_args()
+    return args
 
 
 def check_repository_cleanliness() -> None:

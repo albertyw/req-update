@@ -1,3 +1,7 @@
+import argparse
+import io
+import sys
+from typing import List
 import unittest
 from unittest.mock import MagicMock, Mock, patch
 
@@ -9,6 +13,36 @@ class TestMain(unittest.TestCase):
     def test_main(self, mock_check: Mock) -> None:
         req_update.main()
         self.assertTrue(mock_check.called)
+
+
+class TestGetArgs(unittest.TestCase):
+    def get_args_with_argv(self, argv: List[str]) -> argparse.Namespace:
+        argv = ['req_update.py'] + argv
+        with patch.object(sys, 'argv', argv):
+            args = req_update.get_args()
+        return args
+
+    def test_none(self) -> None:
+        args = self.get_args_with_argv([])
+        self.assertFalse(args.verbose)
+
+    def test_dryrun(self) -> None:
+        args = self.get_args_with_argv(['--dryrun'])
+        self.assertTrue(args.dryrun)
+        args = self.get_args_with_argv(['-d'])
+        self.assertTrue(args.dryrun)
+
+    def test_verbose(self) -> None:
+        args = self.get_args_with_argv(['--verbose'])
+        self.assertTrue(args.verbose)
+        args = self.get_args_with_argv(['-v'])
+        self.assertTrue(args.verbose)
+
+    def test_version(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            with self.assertRaises(SystemExit):
+                self.get_args_with_argv(['--version'])
+            self.assertTrue(len(mock_out.getvalue()) > 0)
 
 
 class TestCheckRepositoryCleanliness(unittest.TestCase):
