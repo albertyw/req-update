@@ -1,4 +1,5 @@
 import argparse
+import io
 import sys
 from typing import List
 import unittest
@@ -30,6 +31,12 @@ class TestGetArgs(unittest.TestCase):
         self.assertTrue(args.verbose)
         args = self.get_args_with_argv(['-v'])
         self.assertTrue(args.verbose)
+
+    def test_version(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            with self.assertRaises(SystemExit):
+                self.get_args_with_argv(['--version'])
+            self.assertTrue(len(mock_out.getvalue()) > 0)
 
 
 class TestCheckRepositoryCleanliness(unittest.TestCase):
