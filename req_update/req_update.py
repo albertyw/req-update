@@ -24,10 +24,16 @@ def main() -> None:
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument(
+        '-d',
+        '--dryrun',
+        action='store_true',
+        help='Dry run',
+    )
+    parser.add_argument(
         '-v',
         '--verbose',
         action='store_true',
-        help='Verbose output'
+        help='Verbose output',
     )
     parser.add_argument(
         '--version',
