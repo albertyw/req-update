@@ -29,6 +29,11 @@ def get_args() -> argparse.Namespace:
         action='store_true',
         help='Verbose output'
     )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=__version__,
+    )
     args = parser.parse_args()
     return args
 
