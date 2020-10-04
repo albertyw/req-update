@@ -52,5 +52,5 @@ def execute_shell(command: List[str]) -> subprocess.CompletedProcess[bytes]:
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
