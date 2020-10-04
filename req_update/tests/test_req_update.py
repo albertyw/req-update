@@ -1,17 +1,17 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from req_update import req_update
 
 
 class TestCheckRepositoryCleanliness(unittest.TestCase):
     @patch('req_update.req_update.execute_shell')
-    def test_clean(self, mock_execute_shell) -> None:
+    def test_clean(self, mock_execute_shell: Mock) -> None:
         mock_execute_shell.return_value = MagicMock(stdout='')
         req_update.check_repository_cleanliness()
 
     @patch('req_update.req_update.execute_shell')
-    def test_unclean(self, mock_execute_shell) -> None:
+    def test_unclean(self, mock_execute_shell: Mock) -> None:
         mock_execute_shell.return_value = MagicMock(
             stdout=' M req_update/req_update.py'
         )
