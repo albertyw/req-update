@@ -2,6 +2,9 @@ from __future__ import annotations
 import subprocess
 from typing import List, Tuple
 
+VERSION = (0, 0, 1)
+__version__ = '.'.join(map(str, VERSION))
+
 
 def main() -> None:
     """ Update all dependencies """
@@ -52,5 +55,5 @@ def execute_shell(command: List[str]) -> subprocess.CompletedProcess[bytes]:
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

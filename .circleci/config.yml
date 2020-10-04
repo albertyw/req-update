@@ -19,7 +19,7 @@ jobs:
           command: mypy . --strict --ignore-missing-imports
           name: Type Checking
       - run:
-          command: coverage run setup.py test
+          command: coverage run -m unittest
           name: Test
       - run:
           command: coverage report -m
