@@ -136,3 +136,13 @@ class TestExecuteShell(unittest.TestCase):
         self.assertEqual(result.stdout, b'')
         self.assertEqual(result.stderr, b'')
         self.assertTrue(self.mock_log.called)
+
+
+class TestLog(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
+    def test_log(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.req_update.log('asdf')
+            self.assertEqual(mock_out.getvalue(), 'asdf\n')
