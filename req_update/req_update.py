@@ -77,6 +77,11 @@ class ReqUpdate():
     def execute_shell(
         self, command: List[str]
     ) -> subprocess.CompletedProcess[bytes]:
+        if self.dry_run:
+            print(command)
+            return subprocess.CompletedProcess(
+                command, 0, stdout=b'', stderr=b''
+            )
         result = subprocess.run(
             command,
             capture_output=True,
