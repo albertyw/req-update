@@ -75,9 +75,12 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
 class TestCreateBranch(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_create_branch(self) -> None:
         self.req_update.create_branch()
+        self.assertTrue(self.mock_execute_shell.called)
 
 
 class TestUpdateDependencies(unittest.TestCase):
