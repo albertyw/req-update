@@ -78,7 +78,7 @@ class ReqUpdate():
         self, command: List[str]
     ) -> subprocess.CompletedProcess[bytes]:
         if self.dry_run:
-            print(command)
+            self.log(' '.join(command))
             return subprocess.CompletedProcess(
                 command, 0, stdout=b'', stderr=b''
             )
@@ -88,6 +88,9 @@ class ReqUpdate():
         )
         result.check_returncode()
         return result
+
+    def log(self, data: str) -> None:
+        print(data)
 
 
 if __name__ == "__main__":
