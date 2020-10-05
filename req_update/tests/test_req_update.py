@@ -3,23 +3,30 @@ import io
 import sys
 from typing import List
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 from req_update import req_update
 
 
 class TestMain(unittest.TestCase):
-    @patch('req_update.req_update.check_repository_cleanliness')
-    def test_main(self, mock_check: Mock) -> None:
-        req_update.main()
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
+    def test_main(self) -> None:
+        mock_check = MagicMock()
+        setattr(self.req_update, 'check_repository_cleanliness', mock_check)
+        self.req_update.main()
         self.assertTrue(mock_check.called)
 
 
 class TestGetArgs(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def get_args_with_argv(self, argv: List[str]) -> argparse.Namespace:
         argv = ['req_update.py'] + argv
         with patch.object(sys, 'argv', argv):
-            args = req_update.get_args()
+            args = self.req_update.get_args()
         return args
 
     def test_none(self) -> None:
@@ -46,48 +53,69 @@ class TestGetArgs(unittest.TestCase):
 
 
 class TestCheckRepositoryCleanliness(unittest.TestCase):
-    @patch('req_update.req_update.execute_shell')
-    def test_clean(self, mock_execute_shell: Mock) -> None:
-        mock_execute_shell.return_value = MagicMock(stdout='')
-        req_update.check_repository_cleanliness()
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
-    @patch('req_update.req_update.execute_shell')
-    def test_unclean(self, mock_execute_shell: Mock) -> None:
-        mock_execute_shell.return_value = MagicMock(
+    def test_clean(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(stdout='')
+        self.req_update.check_repository_cleanliness()
+
+    def test_unclean(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(
             stdout=' M req_update/req_update.py'
         )
         with self.assertRaises(RuntimeError):
-            req_update.check_repository_cleanliness()
+            self.req_update.check_repository_cleanliness()
 
 
 class TestCreateBranch(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def test_create_branch(self) -> None:
-        req_update.create_branch()
+        self.req_update.create_branch()
 
 
 class TestUpdateDependencies(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def test_update_dependencies(self) -> None:
-        req_update.update_dependencies()
+        self.req_update.update_dependencies()
 
 
 class TestGetPipOutdated(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def test_get_pip_outdated(self) -> None:
-        req_update.get_pip_outdated()
+        self.req_update.get_pip_outdated()
 
 
 class TestWriteDependencyUpdate(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def test_write_dependency_update(self) -> None:
-        req_update.write_dependency_update('varsnap', '1.2.3')
+        self.req_update.write_dependency_update('varsnap', '1.2.3')
 
 
 class TestCommitDependencyUpdate(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def test_commit_dependency_update(self) -> None:
-        req_update.commit_dependency_update('varsnap', '1.2.3')
+        self.req_update.commit_dependency_update('varsnap', '1.2.3')
 
 
 class TestExecuteShell(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
     def test_ls(self) -> None:
-        result = req_update.execute_shell(['ls'])
+        result = self.req_update.execute_shell(['ls'])
         self.assertTrue(len(result.stdout) > 0)
         files = result.stdout.decode('utf-8').split('\n')
         self.assertIn('requirements-test.txt', files)
