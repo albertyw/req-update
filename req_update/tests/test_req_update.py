@@ -34,10 +34,12 @@ class TestGetArgs(unittest.TestCase):
         self.assertFalse(args.verbose)
 
     def test_dryrun(self) -> None:
+        self.assertFalse(self.req_update.dry_run)
         args = self.get_args_with_argv(['--dryrun'])
         self.assertTrue(args.dryrun)
         args = self.get_args_with_argv(['-d'])
         self.assertTrue(args.dryrun)
+        self.assertTrue(self.req_update.dry_run)
 
     def test_verbose(self) -> None:
         args = self.get_args_with_argv(['--verbose'])
@@ -113,9 +115,34 @@ class TestCommitDependencyUpdate(unittest.TestCase):
 class TestExecuteShell(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_log = MagicMock()
+        setattr(self.req_update, 'log', self.mock_log)
 
     def test_ls(self) -> None:
         result = self.req_update.execute_shell(['ls'])
+        self.assertEqual(result.args, ['ls'])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stderr, b'')
         self.assertTrue(len(result.stdout) > 0)
         files = result.stdout.decode('utf-8').split('\n')
         self.assertIn('requirements-test.txt', files)
+        self.assertFalse(self.mock_log.called)
+
+    def test_execute_shell(self) -> None:
+        self.req_update.dry_run = True
+        result = self.req_update.execute_shell(['ls'])
+        self.assertEqual(result.args, ['ls'])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, b'')
+        self.assertEqual(result.stderr, b'')
+        self.assertTrue(self.mock_log.called)
+
+
+class TestLog(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+
+    def test_log(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.req_update.log('asdf')
+            self.assertEqual(mock_out.getvalue(), 'asdf\n')

@@ -44,6 +44,7 @@ class ReqUpdate():
             version=__version__,
         )
         args = parser.parse_args()
+        self.dry_run = args.dryrun
         return args
 
     def check_repository_cleanliness(self) -> None:
@@ -76,12 +77,20 @@ class ReqUpdate():
     def execute_shell(
         self, command: List[str]
     ) -> subprocess.CompletedProcess[bytes]:
+        if self.dry_run:
+            self.log(' '.join(command))
+            return subprocess.CompletedProcess(
+                command, 0, stdout=b'', stderr=b''
+            )
         result = subprocess.run(
             command,
             capture_output=True,
         )
         result.check_returncode()
         return result
+
+    def log(self, data: str) -> None:
+        print(data)
 
 
 if __name__ == "__main__":
