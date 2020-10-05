@@ -11,6 +11,7 @@ DESCRIPTION = (
     'Update python dependencies for your project with git integration\n'
     'https://github.com/albertyw/req-update'
 )
+BRANCH_NAME = 'dep-update'
 
 
 class ReqUpdate():
@@ -56,7 +57,8 @@ class ReqUpdate():
 
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
-        pass
+        command = ['git', 'checkout', '-b', BRANCH_NAME]
+        self.execute_shell(command)
 
     def update_dependencies(self) -> None:
         """ Update and commit a list of dependency updates """
