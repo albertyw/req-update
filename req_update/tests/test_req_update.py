@@ -115,6 +115,8 @@ class TestCommitDependencyUpdate(unittest.TestCase):
 class TestExecuteShell(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_log = MagicMock()
+        setattr(self.req_update, 'log', self.mock_log)
 
     def test_ls(self) -> None:
         result = self.req_update.execute_shell(['ls'])
@@ -124,6 +126,7 @@ class TestExecuteShell(unittest.TestCase):
         self.assertTrue(len(result.stdout) > 0)
         files = result.stdout.decode('utf-8').split('\n')
         self.assertIn('requirements-test.txt', files)
+        self.assertFalse(self.mock_log.called)
 
     def test_execute_shell(self) -> None:
         self.req_update.dry_run = True
@@ -132,3 +135,4 @@ class TestExecuteShell(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, b'')
         self.assertEqual(result.stderr, b'')
+        self.assertTrue(self.mock_log.called)
