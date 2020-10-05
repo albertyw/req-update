@@ -1,7 +1,8 @@
 from __future__ import annotations
 import argparse
+import json
 import subprocess
-from typing import List, Tuple
+from typing import Dict, List
 
 VERSION = (0, 0, 1)
 __version__ = '.'.join(map(str, VERSION))
@@ -11,6 +12,7 @@ DESCRIPTION = (
     'Update python dependencies for your project with git integration\n'
     'https://github.com/albertyw/req-update'
 )
+BRANCH_NAME = 'dep-update'
 
 
 class ReqUpdate():
@@ -56,15 +58,19 @@ class ReqUpdate():
 
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
-        pass
+        command = ['git', 'checkout', '-b', BRANCH_NAME]
+        self.execute_shell(command)
 
     def update_dependencies(self) -> None:
         """ Update and commit a list of dependency updates """
         pass
 
-    def get_pip_outdated(self) -> List[Tuple[str, str]]:
+    def get_pip_outdated(self) -> List[Dict[str, str]]:
         """ Get a list of outdated pip packages """
-        pass
+        command = ['pip', 'list', '--outdated', '--format', 'json']
+        result = self.execute_shell(command)
+        outdated: List[Dict[str, str]] = json.loads(result.stdout)
+        return outdated
 
     def write_dependency_update(self, dependency: str, version: str) -> None:
         """ Given a dependency, update it to a given version """
