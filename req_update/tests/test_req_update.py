@@ -1,5 +1,7 @@
 import argparse
 import io
+import json
+import subprocess
 import sys
 from typing import List
 import unittest
@@ -8,9 +10,16 @@ from unittest.mock import MagicMock, patch
 from req_update import req_update
 
 
+PIP_OUTDATED = [
+    {"name": "varsnap", "version": "1.0.0", "latest_version": "1.2.3"}
+]
+
+
 class TestMain(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_main(self) -> None:
         mock_check = MagicMock()
@@ -94,9 +103,15 @@ class TestUpdateDependencies(unittest.TestCase):
 class TestGetPipOutdated(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_get_pip_outdated(self) -> None:
-        self.req_update.get_pip_outdated()
+        self.mock_execute_shell.return_value = subprocess.CompletedProcess(
+            [], 0, stdout=json.dumps(PIP_OUTDATED).encode('utf-8'),
+        )
+        data = self.req_update.get_pip_outdated()
+        self.assertEqual(data, PIP_OUTDATED)
 
 
 class TestWriteDependencyUpdate(unittest.TestCase):
