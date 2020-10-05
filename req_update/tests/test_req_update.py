@@ -118,6 +118,17 @@ class TestExecuteShell(unittest.TestCase):
 
     def test_ls(self) -> None:
         result = self.req_update.execute_shell(['ls'])
+        self.assertEqual(result.args, ['ls'])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stderr, b'')
         self.assertTrue(len(result.stdout) > 0)
         files = result.stdout.decode('utf-8').split('\n')
         self.assertIn('requirements-test.txt', files)
+
+    def test_execute_shell(self) -> None:
+        self.req_update.dry_run = True
+        result = self.req_update.execute_shell(['ls'])
+        self.assertEqual(result.args, ['ls'])
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, b'')
+        self.assertEqual(result.stderr, b'')
