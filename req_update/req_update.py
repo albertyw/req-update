@@ -44,6 +44,7 @@ class ReqUpdate():
             version=__version__,
         )
         args = parser.parse_args()
+        self.dry_run = args.dryrun
         return args
 
     def check_repository_cleanliness(self) -> None:

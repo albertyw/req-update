@@ -34,10 +34,12 @@ class TestGetArgs(unittest.TestCase):
         self.assertFalse(args.verbose)
 
     def test_dryrun(self) -> None:
+        self.assertFalse(self.req_update.dry_run)
         args = self.get_args_with_argv(['--dryrun'])
         self.assertTrue(args.dryrun)
         args = self.get_args_with_argv(['-d'])
         self.assertTrue(args.dryrun)
+        self.assertTrue(self.req_update.dry_run)
 
     def test_verbose(self) -> None:
         args = self.get_args_with_argv(['--verbose'])
