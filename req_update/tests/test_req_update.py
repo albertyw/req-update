@@ -22,9 +22,12 @@ class TestMain(unittest.TestCase):
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_main(self) -> None:
+        mock_get_args = MagicMock()
+        setattr(self.req_update, 'get_args', mock_get_args)
         mock_check = MagicMock()
         setattr(self.req_update, 'check_repository_cleanliness', mock_check)
         self.req_update.main()
+        self.assertTrue(mock_get_args.called)
         self.assertTrue(mock_check.called)
 
 
