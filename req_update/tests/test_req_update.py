@@ -26,6 +26,8 @@ class TestMain(unittest.TestCase):
         setattr(self.req_update, 'get_args', mock_get_args)
         mock_check = MagicMock()
         setattr(self.req_update, 'check_repository_cleanliness', mock_check)
+        mock_update_dependencies = MagicMock()
+        setattr(self.req_update, 'update_dependencies', mock_update_dependencies)
         self.req_update.main()
         self.assertTrue(mock_get_args.called)
         self.assertTrue(mock_check.called)
@@ -100,8 +102,11 @@ class TestCreateBranch(unittest.TestCase):
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_update_dependencies(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(stdout='{}')
         self.req_update.update_dependencies()
 
 
