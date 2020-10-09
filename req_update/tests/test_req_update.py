@@ -162,10 +162,23 @@ class TestEditRequirements(unittest.TestCase):
 
 class TestWriteDependencyUpdate(unittest.TestCase):
     def setUp(self) -> None:
+        self.tempfile = tempfile.NamedTemporaryFile()
+        self.original_reqfiles = req_update.REQUIREMENTS_FILES
+        req_update.REQUIREMENTS_FILES = [self.tempfile.name]
         self.req_update = req_update.ReqUpdate()
 
+    def tearDown(self) -> None:
+        self.tempfile.close()
+        req_update.REQUIREMENTS_FILES = self.original_reqfiles
+
     def test_write_dependency_update(self) -> None:
+        with open(self.tempfile.name, 'w') as handle:
+            handle.write('abcd==0.0.1\nvarsnap==1.0.0 # qwer')
         self.req_update.write_dependency_update('varsnap', '1.2.3')
+        with open(self.tempfile.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
+            self.assertEqual(lines[1].strip(), 'varsnap==1.2.3 # qwer')
 
 
 class TestCommitDependencyUpdate(unittest.TestCase):
