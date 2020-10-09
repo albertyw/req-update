@@ -1,3 +1,4 @@
+from __future__ import annotations
 import argparse
 import io
 import json
@@ -26,8 +27,7 @@ class TestMain(unittest.TestCase):
         setattr(self.req_update, 'get_args', mock_get_args)
         mock_check = MagicMock()
         setattr(self.req_update, 'check_repository_cleanliness', mock_check)
-        mock_update_dependencies = MagicMock()
-        setattr(self.req_update, 'update_dependencies', mock_update_dependencies)
+        setattr(self.req_update, 'update_dependencies', MagicMock())
         self.req_update.main()
         self.assertTrue(mock_get_args.called)
         self.assertTrue(mock_check.called)
@@ -105,8 +105,18 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
+    def test_update_dependencies_clean(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(stdout='[]')
+        self.req_update.update_dependencies()
+
     def test_update_dependencies(self) -> None:
-        self.mock_execute_shell.return_value = MagicMock(stdout='{}')
+        def execute_shell_returns(
+            command: List[str]
+        ) -> subprocess.CompletedProcess[bytes]:
+            if '--outdated' in command:
+                return MagicMock(stdout=json.dumps(PIP_OUTDATED))
+            raise ValueError()  # pragma: no cover
+        self.mock_execute_shell.side_effect = execute_shell_returns
         self.req_update.update_dependencies()
 
 
