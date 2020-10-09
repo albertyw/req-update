@@ -1,8 +1,9 @@
 from __future__ import annotations
 import argparse
+from contextlib import contextmanager
 import json
 import subprocess
-from typing import Dict, List
+from typing import Dict, Iterator, List
 
 VERSION = (0, 0, 1)
 __version__ = '.'.join(map(str, VERSION))
@@ -77,6 +78,16 @@ class ReqUpdate():
         result = self.execute_shell(command)
         outdated: List[Dict[str, str]] = json.loads(result.stdout)
         return outdated
+
+    @staticmethod
+    @contextmanager
+    def edit_requirements(file_name: str) -> Iterator[List[str]]:
+        lines: List[str] = []
+        with open(file_name, 'r') as handle:
+            lines = handle.readlines()
+        yield lines
+        with open(file_name, 'w') as handle:
+            handle.write('\n'.join(lines))
 
     def write_dependency_update(self, dependency: str, version: str) -> bool:
         """ Given a dependency, update it to a given version """
