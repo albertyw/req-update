@@ -83,11 +83,14 @@ class ReqUpdate():
     @contextmanager
     def edit_requirements(file_name: str) -> Iterator[List[str]]:
         lines: List[str] = []
-        with open(file_name, 'r') as handle:
-            lines = handle.readlines()
+        try:
+            with open(file_name, 'r') as handle:
+                lines = handle.readlines()
+        except FileNotFoundError:
+            pass
         yield lines
         with open(file_name, 'w') as handle:
-            handle.write('\n'.join(lines))
+            handle.write(''.join(lines))
 
     def write_dependency_update(self, dependency: str, version: str) -> bool:
         """ Given a dependency, update it to a given version """

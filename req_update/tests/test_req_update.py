@@ -145,11 +145,11 @@ class TestEditRequirements(unittest.TestCase):
     def test_edit_requirements(self) -> None:
         filename = self.tempfile.name
         with req_update.ReqUpdate.edit_requirements(filename) as lines:
-            lines.append('asdf')
-            lines.append('qwer')
+            lines.append('asdf\n')
+            lines.append('qwer\n')
         with open(filename, 'r') as handle:
             data = handle.read()
-            self.assertEqual(data, 'asdf\nqwer')
+            self.assertEqual(data, 'asdf\nqwer\n')
 
 
 class TestWriteDependencyUpdate(unittest.TestCase):
