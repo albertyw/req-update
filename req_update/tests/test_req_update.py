@@ -46,7 +46,9 @@ class TestGetArgs(unittest.TestCase):
         self.assertFalse(args.verbose)
 
     def test_dryrun(self) -> None:
-        self.assertFalse(self.req_update.dry_run)
+        self.assertTrue(self.req_update.dry_run)
+        args = self.get_args_with_argv([])
+        self.assertFalse(args.dryrun)
         args = self.get_args_with_argv(['--dryrun'])
         self.assertTrue(args.dryrun)
         args = self.get_args_with_argv(['-d'])
@@ -136,6 +138,7 @@ class TestCommitDependencyUpdate(unittest.TestCase):
 class TestExecuteShell(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.req_update.dry_run = False
         self.mock_log = MagicMock()
         setattr(self.req_update, 'log', self.mock_log)
 

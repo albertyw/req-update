@@ -17,7 +17,7 @@ BRANCH_NAME = 'dep-update'
 
 class ReqUpdate():
     def __init__(self) -> None:
-        self.dry_run = False
+        self.dry_run = True
 
     def main(self) -> None:
         """ Update all dependencies """
