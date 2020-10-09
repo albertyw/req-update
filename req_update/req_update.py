@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 import json
+import re
 import subprocess
 from typing import Dict, Iterator, List
 
@@ -14,6 +15,18 @@ DESCRIPTION = (
     'https://github.com/albertyw/req-update'
 )
 BRANCH_NAME = 'dep-update'
+PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9_]+)'
+PYTHON_PACKAGE_OPERATOR_REGEX = r'([<=>]+)'
+PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+)'
+PYTHON_REQUIREMENTS_LINE_REGEX = r'%s%s%s' % (
+    PYTHON_PACKAGE_NAME_REGEX,
+    PYTHON_PACKAGE_OPERATOR_REGEX,
+    PYTHON_PACKAGE_VERSION_REGEX,
+)
+REQUIREMENTS_FILES = [
+    'requirements.txt',
+    'requirements-test.txt',
+]
 
 
 class ReqUpdate():
@@ -96,7 +109,21 @@ class ReqUpdate():
 
     def write_dependency_update(self, dependency: str, version: str) -> bool:
         """ Given a dependency, update it to a given version """
-        return True
+        for reqfile in REQUIREMENTS_FILES:
+            with ReqUpdate.edit_requirements(reqfile) as lines:
+                for i, line in enumerate(lines):
+                    match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
+                    if not match:
+                        continue
+                    if match.group(1) == dependency:
+                        line = re.sub(
+                            PYTHON_REQUIREMENTS_LINE_REGEX,
+                            r'\g<1>\g<2>%s' % version,
+                            line,
+                        )
+                        lines[i] = line
+                        return True
+        return False
 
     def commit_dependency_update(self, dependency: str, version: str) -> None:
         """ Create a commit with a dependency update """
