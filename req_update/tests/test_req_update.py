@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import random
 import subprocess
 import sys
 import tempfile
@@ -150,6 +151,13 @@ class TestEditRequirements(unittest.TestCase):
         with open(filename, 'r') as handle:
             data = handle.read()
             self.assertEqual(data, 'asdf\nqwer\n')
+
+    def test_edit_requirements_not_found(self) -> None:
+        filename = str(random.randint(10**10, 10**11))
+        with req_update.ReqUpdate.edit_requirements(filename):
+            pass
+        with self.assertRaises(FileNotFoundError):
+            open(filename, 'r')
 
 
 class TestWriteDependencyUpdate(unittest.TestCase):

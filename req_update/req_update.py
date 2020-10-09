@@ -89,6 +89,8 @@ class ReqUpdate():
         except FileNotFoundError:
             pass
         yield lines
+        if not lines:
+            return
         with open(file_name, 'w') as handle:
             handle.write(''.join(lines))
 
