@@ -4,6 +4,7 @@ import io
 import json
 import subprocess
 import sys
+import tempfile
 from typing import List
 import unittest
 from unittest.mock import MagicMock, patch
@@ -132,6 +133,23 @@ class TestGetPipOutdated(unittest.TestCase):
         )
         data = self.req_update.get_pip_outdated()
         self.assertEqual(data, PIP_OUTDATED)
+
+
+class TestEditRequirements(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tempfile = tempfile.NamedTemporaryFile()
+
+    def tearDown(self) -> None:
+        self.tempfile.close()
+
+    def test_edit_requirements(self) -> None:
+        filename = self.tempfile.name
+        with req_update.ReqUpdate.edit_requirements(filename) as lines:
+            lines.append('asdf')
+            lines.append('qwer')
+        with open(filename, 'r') as handle:
+            data = handle.read()
+            self.assertEqual(data, 'asdf\nqwer')
 
 
 class TestWriteDependencyUpdate(unittest.TestCase):
