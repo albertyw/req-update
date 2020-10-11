@@ -5,6 +5,8 @@ orbs:
 
 jobs:
   build-and-test:
+    environment:
+      CC_TEST_REPORTER_ID: 20588a9f3d871445aaee95c9e3f5799cb13812b98b321a34ecebf503578fa2c8
     resource_class: small
     executor: python/default
     steps:
@@ -13,14 +15,26 @@ jobs:
           pip-dependency-file: requirements-test.txt
           pkg-manager: pip
       - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            # download test reporter as a static binary
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
           command: flake8
           name: Lint
       - run:
           command: mypy . --strict --ignore-missing-imports
           name: Type Checking
       - run:
-          command: coverage run -m unittest
           name: Test
+          command: |
+            ./cc-test-reporter before-build
+            coverage run -m unittest
+            exitcode="$?"
+            coverage xml
+            ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code "$exitcode"
+            exit "$exitcode"
       - run:
           command: coverage report -m
           name: Test Coverage
