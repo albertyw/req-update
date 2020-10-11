@@ -19,6 +19,13 @@ PIP_OUTDATED = [
 
 
 class TestMain(unittest.TestCase):
+    def test_main(self) -> None:
+        with patch('req_update.req_update.ReqUpdate') as mock_req_update:
+            req_update.main()
+            self.assertTrue(mock_req_update().main.called)
+
+
+class TestReqUpdateMain(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
