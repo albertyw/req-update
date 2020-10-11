@@ -19,7 +19,7 @@ your current installed packages), and commit a series of single-package update
 commits.
 
 ```
-$ python req_update/req_update.py -h
+$ req_update
 usage: req_update.py [-h] [-d] [-v] [--version]
 
 Update python dependencies for your project with git integration https://github.com/albertyw/req-update
