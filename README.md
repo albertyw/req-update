@@ -11,6 +11,26 @@
 
 `req-update` is a CLI tool to automatically update dependencies listed in `requirements.txt`.
 
+## Usage
+
+`req-update` requires no command line arguments.  Running `req-update` will
+make it create a branch `dep-update`, check outdated packages (compared against
+your current installed packages), and commit a series of single-package update
+commits.
+
+```
+$ python req_update/req_update.py -h
+usage: req_update.py [-h] [-d] [-v] [--version]
+
+Update python dependencies for your project with git integration https://github.com/albertyw/req-update
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -d, --dryrun   Dry run
+  -v, --verbose  Verbose output
+  --version      show program's version number and exit
+```
+
 ## Features
 
  - Integrates with git, creating a branch with one commit per updated dependency
