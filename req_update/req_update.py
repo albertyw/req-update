@@ -66,10 +66,19 @@ class ReqUpdate():
 
     def check_repository_cleanliness(self) -> None:
         """ Check that the repository is ready for updating dependencies """
+        # Make sure there are no uncommitted files
         command = ['git', 'status', '--porcelain']
         result = self.execute_shell(command)
         if not len(result.stdout) == 0:
             raise RuntimeError('Repository not clean')
+
+        # Make sure branch does not already exist
+        command = ['git', 'branch']
+        result = self.execute_shell(command)
+        output = result.stdout
+        branches = [b.strip() for b in output.split('\n')]
+        if BRANCH_NAME in branches:
+            raise RuntimeError('Branch "%s" already exists' % BRANCH_NAME)
 
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
