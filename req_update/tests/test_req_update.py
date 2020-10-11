@@ -149,7 +149,7 @@ class TestGetPipOutdated(unittest.TestCase):
 
     def test_get_pip_outdated(self) -> None:
         self.mock_execute_shell.return_value = subprocess.CompletedProcess(
-            [], 0, stdout=json.dumps(PIP_OUTDATED).encode('utf-8'),
+            [], 0, stdout=json.dumps(PIP_OUTDATED),
         )
         data = self.req_update.get_pip_outdated()
         self.assertEqual(data, PIP_OUTDATED)
@@ -231,9 +231,9 @@ class TestExecuteShell(unittest.TestCase):
         result = self.req_update.execute_shell(['ls'])
         self.assertEqual(result.args, ['ls'])
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stderr, b'')
+        self.assertEqual(result.stderr, '')
         self.assertTrue(len(result.stdout) > 0)
-        files = result.stdout.decode('utf-8').split('\n')
+        files = result.stdout.split('\n')
         self.assertIn('requirements-test.txt', files)
         self.assertFalse(self.mock_log.called)
 
@@ -242,8 +242,8 @@ class TestExecuteShell(unittest.TestCase):
         result = self.req_update.execute_shell(['ls'])
         self.assertEqual(result.args, ['ls'])
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, b'')
-        self.assertEqual(result.stderr, b'')
+        self.assertEqual(result.stdout, '')
+        self.assertEqual(result.stderr, '')
         self.assertTrue(self.mock_log.called)
 
 

@@ -138,15 +138,16 @@ class ReqUpdate():
 
     def execute_shell(
         self, command: List[str]
-    ) -> subprocess.CompletedProcess[bytes]:
+    ) -> subprocess.CompletedProcess[str]:
         if self.dry_run:
             self.log(' '.join(command))
             return subprocess.CompletedProcess(
-                command, 0, stdout=b'', stderr=b''
+                command, 0, stdout='', stderr=''
             )
         result = subprocess.run(
             command,
             capture_output=True,
+            encoding='utf-8',
         )
         result.check_returncode()
         return result
