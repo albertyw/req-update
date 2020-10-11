@@ -5,6 +5,11 @@ orbs:
 
 jobs:
   build-and-test:
+    docker:
+      - image: circleci/python:3.9.0
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     environment:
       CC_TEST_REPORTER_ID: 20588a9f3d871445aaee95c9e3f5799cb13812b98b321a34ecebf503578fa2c8
     resource_class: small
@@ -42,4 +47,6 @@ jobs:
 workflows:
   main:
     jobs:
-      - build-and-test
+      - build-and-test:
+          context:
+            - dockerhub
