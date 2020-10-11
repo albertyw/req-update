@@ -203,9 +203,21 @@ class TestWriteDependencyUpdate(unittest.TestCase):
 class TestCommitDependencyUpdate(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
+        self.mock_log = MagicMock()
+        setattr(self.req_update, 'log', self.mock_log)
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_commit_dependency_update(self) -> None:
         self.req_update.commit_dependency_update('varsnap', '1.2.3')
+        self.assertTrue(self.mock_log.called)
+        log_value = self.mock_log.mock_calls[0][1]
+        self.assertIn('varsnap', log_value[0])
+        self.assertIn('1.2.3', log_value[0])
+        self.assertTrue(self.mock_execute_shell.called)
+        command = self.mock_execute_shell.mock_calls[0][1]
+        self.assertIn('varsnap', command[0][3])
+        self.assertIn('1.2.3', command[0][3])
 
 
 class TestExecuteShell(unittest.TestCase):
