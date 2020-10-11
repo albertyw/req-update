@@ -15,6 +15,7 @@ DESCRIPTION = (
     'https://github.com/albertyw/req-update'
 )
 BRANCH_NAME = 'dep-update'
+COMMIT_MESSAGE = 'Update {package} package to {version}'
 PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'([<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+)'
@@ -127,7 +128,13 @@ class ReqUpdate():
 
     def commit_dependency_update(self, dependency: str, version: str) -> None:
         """ Create a commit with a dependency update """
-        pass
+        commit_message = COMMIT_MESSAGE.format(
+            package=dependency,
+            version=version,
+        )
+        self.log(commit_message)
+        command = ['git', 'commit', '-am', commit_message]
+        self.execute_shell(command)
 
     def execute_shell(
         self, command: List[str]
