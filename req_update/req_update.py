@@ -30,6 +30,10 @@ REQUIREMENTS_FILES = [
 ]
 
 
+def main() -> None:
+    ReqUpdate().main()
+
+
 class ReqUpdate():
     def __init__(self) -> None:
         self.dry_run = True
@@ -166,4 +170,4 @@ class ReqUpdate():
 
 
 if __name__ == "__main__":
-    ReqUpdate().main()
+    main()
