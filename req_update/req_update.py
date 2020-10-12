@@ -104,6 +104,7 @@ class ReqUpdate():
         command = ['pip', 'list', '--outdated', '--format', 'json']
         result = self.execute_shell(command)
         outdated: List[Dict[str, str]] = json.loads(result.stdout)
+        outdated = sorted(outdated, key=lambda p: p['name'])
         return outdated
 
     @staticmethod

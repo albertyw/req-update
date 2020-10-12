@@ -1,5 +1,6 @@
 from __future__ import annotations
 import argparse
+import copy
 import io
 import json
 import random
@@ -172,6 +173,20 @@ class TestGetPipOutdated(unittest.TestCase):
         )
         data = self.req_update.get_pip_outdated()
         self.assertEqual(data, PIP_OUTDATED)
+
+    def test_sorts_packages(self) -> None:
+        outdated = [
+            copy.deepcopy(PIP_OUTDATED[0]),
+            copy.deepcopy(PIP_OUTDATED[0]),
+        ]
+        outdated[1]['name'] = 'abcd'
+        self.mock_execute_shell.return_value = subprocess.CompletedProcess(
+            [], 0, stdout=json.dumps(outdated),
+        )
+        data = self.req_update.get_pip_outdated()
+        self.assertEqual(data[0]['name'], 'abcd')
+        self.assertEqual(data[1]['name'], 'varsnap')
+        self.assertNotEqual(data, outdated)
 
 
 class TestEditRequirements(unittest.TestCase):
