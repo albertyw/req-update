@@ -38,6 +38,7 @@ def main() -> None:
 
 class ReqUpdate():
     def __init__(self) -> None:
+        self.verbose = False
         self.dry_run = True
 
     def main(self) -> None:
@@ -67,6 +68,7 @@ class ReqUpdate():
             version=__version__,
         )
         args = parser.parse_args()
+        self.verbose = args.verbose
         self.dry_run = args.dryrun
         return args
 
@@ -155,8 +157,9 @@ class ReqUpdate():
     def execute_shell(
         self, command: List[str], readonly: bool,
     ) -> subprocess.CompletedProcess[str]:
-        if self.dry_run and not readonly:
+        if self.verbose:
             self.log(' '.join(command))
+        if self.dry_run and not readonly:
             return subprocess.CompletedProcess(
                 command, 0, stdout='', stderr=''
             )
