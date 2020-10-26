@@ -74,13 +74,13 @@ class ReqUpdate():
         """ Check that the repository is ready for updating dependencies """
         # Make sure there are no uncommitted files
         command = ['git', 'status', '--porcelain']
-        result = self.execute_shell(command)
+        result = self.execute_shell(command, True)
         if not len(result.stdout) == 0:
             raise RuntimeError('Repository not clean')
 
         # Make sure branch does not already exist
         command = ['git', 'branch']
-        result = self.execute_shell(command)
+        result = self.execute_shell(command, True)
         output = result.stdout
         branches = [b.strip() for b in output.split('\n')]
         if BRANCH_NAME in branches:
@@ -89,7 +89,7 @@ class ReqUpdate():
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
         command = ['git', 'checkout', '-b', BRANCH_NAME]
-        self.execute_shell(command)
+        self.execute_shell(command, False)
 
     def update_dependencies(self) -> None:
         """ Update and commit a list of dependency updates """
@@ -104,7 +104,7 @@ class ReqUpdate():
     def get_pip_outdated(self) -> List[Dict[str, str]]:
         """ Get a list of outdated pip packages """
         command = ['pip', 'list', '--outdated', '--format', 'json']
-        result = self.execute_shell(command)
+        result = self.execute_shell(command, True)
         outdated: List[Dict[str, str]] = json.loads(result.stdout)
         outdated = sorted(outdated, key=lambda p: p['name'])
         return outdated
@@ -150,12 +150,12 @@ class ReqUpdate():
         )
         self.log(commit_message)
         command = ['git', 'commit', '-am', commit_message]
-        self.execute_shell(command)
+        self.execute_shell(command, False)
 
     def execute_shell(
-        self, command: List[str]
+        self, command: List[str], readonly: bool,
     ) -> subprocess.CompletedProcess[str]:
-        if self.dry_run:
+        if self.dry_run and not readonly:
             self.log(' '.join(command))
             return subprocess.CompletedProcess(
                 command, 0, stdout='', stderr=''

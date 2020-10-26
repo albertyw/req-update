@@ -99,7 +99,8 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
 
     def test_branch_exists(self) -> None:
         def execute_shell_returns(
-            command: List[str]
+            command: List[str],
+            readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if 'status' in command:
                 return MagicMock(stdout='')
@@ -133,7 +134,8 @@ class TestUpdateDependencies(unittest.TestCase):
 
     def test_update_dependencies(self) -> None:
         def execute_shell_returns(
-            command: List[str]
+            command: List[str],
+            readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if '--outdated' in command:
                 return MagicMock(stdout=json.dumps(PIP_OUTDATED))
@@ -146,7 +148,8 @@ class TestUpdateDependencies(unittest.TestCase):
 
     def test_update_dependencies_commit(self) -> None:
         def execute_shell_returns(
-            command: List[str]
+            command: List[str],
+            readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if '--outdated' in command:
                 return MagicMock(stdout=json.dumps(PIP_OUTDATED))
@@ -262,7 +265,7 @@ class TestExecuteShell(unittest.TestCase):
         setattr(self.req_update, 'log', self.mock_log)
 
     def test_ls(self) -> None:
-        result = self.req_update.execute_shell(['ls'])
+        result = self.req_update.execute_shell(['ls'], True)
         self.assertEqual(result.args, ['ls'])
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stderr, '')
@@ -271,14 +274,19 @@ class TestExecuteShell(unittest.TestCase):
         self.assertIn('requirements-test.txt', files)
         self.assertFalse(self.mock_log.called)
 
-    def test_execute_shell(self) -> None:
+    def test_dry_run(self) -> None:
         self.req_update.dry_run = True
-        result = self.req_update.execute_shell(['ls'])
+        result = self.req_update.execute_shell(['ls'], False)
         self.assertEqual(result.args, ['ls'])
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, '')
         self.assertEqual(result.stderr, '')
         self.assertTrue(self.mock_log.called)
+
+    def test_dry_run_read_only(self) -> None:
+        self.req_update.dry_run = True
+        result = self.req_update.execute_shell(['ls'], True)
+        self.assertTrue(len(result.stdout) > 0)
 
 
 class TestLog(unittest.TestCase):
