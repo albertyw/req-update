@@ -281,7 +281,7 @@ class TestExecuteShell(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, '')
         self.assertEqual(result.stderr, '')
-        self.assertTrue(self.mock_log.called)
+        self.assertFalse(self.mock_log.called)
 
     def test_dry_run_read_only(self) -> None:
         self.req_update.dry_run = True
