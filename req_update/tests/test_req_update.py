@@ -288,6 +288,11 @@ class TestExecuteShell(unittest.TestCase):
         result = self.req_update.execute_shell(['ls'], True)
         self.assertTrue(len(result.stdout) > 0)
 
+    def test_verbose(self) -> None:
+        self.req_update.verbose = True
+        result = self.req_update.execute_shell(['ls'], True)
+        self.assertTrue(self.mock_log.called)
+
 
 class TestLog(unittest.TestCase):
     def setUp(self) -> None:
