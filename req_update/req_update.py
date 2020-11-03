@@ -88,6 +88,18 @@ class ReqUpdate():
         if BRANCH_NAME in branches:
             raise RuntimeError('Branch "%s" already exists' % BRANCH_NAME)
 
+        # Make sure pip is recent enough
+        command = ['pip', '--version']
+        result = self.execute_shell(command, True)
+        pip_version = result.stdout.split(' ')
+        if len(pip_version) < 2 or len(pip_version[1].split('.')) < 1:
+            raise RuntimeError('Pip version is not parseable')
+        pip_major_version = pip_version[1].split('.')[0]
+        if not pip_major_version.isnumeric():
+            raise RuntimeError('Pip version is not parseable')
+        if int(pip_major_version) < 9:
+            raise RuntimeError('Pip version must be at least v9')
+
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
         command = ['git', 'checkout', '-b', BRANCH_NAME]
