@@ -87,7 +87,14 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_clean(self) -> None:
-        self.mock_execute_shell.return_value = MagicMock(stdout='')
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='pip 20.2.4')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
         self.req_update.check_repository_cleanliness()
 
     def test_unclean(self) -> None:
