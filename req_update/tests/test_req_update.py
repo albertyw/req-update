@@ -87,7 +87,14 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_clean(self) -> None:
-        self.mock_execute_shell.return_value = MagicMock(stdout='')
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='pip 20.2.4')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
         self.req_update.check_repository_cleanliness()
 
     def test_unclean(self) -> None:
@@ -106,6 +113,30 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
                 return MagicMock(stdout='')
             branches = '  %s' % req_update.BRANCH_NAME
             return MagicMock(stdout=branches)
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        with self.assertRaises(RuntimeError):
+            self.req_update.check_repository_cleanliness()
+
+    def test_pip_version_parse(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        with self.assertRaises(RuntimeError):
+            self.req_update.check_repository_cleanliness()
+
+    def test_pip_version(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='pip 7.0.0')
+            return MagicMock(stdout='')
         self.mock_execute_shell.side_effect = execute_shell_returns
         with self.assertRaises(RuntimeError):
             self.req_update.check_repository_cleanliness()
