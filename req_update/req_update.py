@@ -91,11 +91,10 @@ class ReqUpdate():
         # Make sure pip is recent enough
         command = ['pip', '--version']
         result = self.execute_shell(command, True)
-        pip_version = result.stdout.split(' ')
-        if len(pip_version) < 2 or len(pip_version[1].split('.')) < 1:
-            raise RuntimeError('Pip version is not parseable')
-        pip_major_version = pip_version[1].split('.')[0]
-        if not pip_major_version.isnumeric():
+        try:
+            pip_version = result.stdout.split(' ')
+            pip_major_version = int(pip_version[1].split('.')[0])
+        except (ValueError, IndexError):
             raise RuntimeError('Pip version is not parseable')
         if int(pip_major_version) < 9:
             raise RuntimeError('Pip version must be at least v9')

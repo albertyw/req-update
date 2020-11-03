@@ -117,6 +117,30 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.req_update.check_repository_cleanliness()
 
+    def test_pip_version_parse(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        with self.assertRaises(RuntimeError):
+            self.req_update.check_repository_cleanliness()
+
+    def test_pip_version(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='pip 7.0.0')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        with self.assertRaises(RuntimeError):
+            self.req_update.check_repository_cleanliness()
+
 
 class TestCreateBranch(unittest.TestCase):
     def setUp(self) -> None:
