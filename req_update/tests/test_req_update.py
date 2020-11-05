@@ -104,19 +104,6 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.req_update.check_repository_cleanliness()
 
-    def test_branch_exists(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'status' in command:
-                return MagicMock(stdout='')
-            branches = '  %s' % req_update.BRANCH_NAME
-            return MagicMock(stdout=branches)
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        with self.assertRaises(RuntimeError):
-            self.req_update.check_repository_cleanliness()
-
     def test_pip_version_parse(self) -> None:
         def execute_shell_returns(
             command: List[str],
@@ -149,8 +136,35 @@ class TestCreateBranch(unittest.TestCase):
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
     def test_create_branch(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
         self.req_update.create_branch()
-        self.assertTrue(self.mock_execute_shell.called)
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+        branch_call = self.mock_execute_shell.mock_calls[0]
+        print(self.mock_execute_shell.mock_calls[0][1][0])
+        self.assertEqual(branch_call[1][0][1], 'branch')
+        create_call = self.mock_execute_shell.mock_calls[1]
+        self.assertIn('-b', create_call[1][0])
+
+    def test_create_branch_exists(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'branch' in command:
+                return MagicMock(stdout='dep-update')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        self.req_update.create_branch()
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+        branch_call = self.mock_execute_shell.mock_calls[0]
+        self.assertEqual(branch_call[1][0][1], 'branch')
+        create_call = self.mock_execute_shell.mock_calls[1]
+        self.assertNotIn('-b', create_call[1][0])
 
 
 class TestUpdateDependencies(unittest.TestCase):
