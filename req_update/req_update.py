@@ -80,14 +80,6 @@ class ReqUpdate():
         if not len(result.stdout) == 0:
             raise RuntimeError('Repository not clean')
 
-        # Make sure branch does not already exist
-        command = ['git', 'branch']
-        result = self.execute_shell(command, True)
-        output = result.stdout
-        branches = [b.strip() for b in output.split('\n')]
-        if BRANCH_NAME in branches:
-            raise RuntimeError('Branch "%s" already exists' % BRANCH_NAME)
-
         # Make sure pip is recent enough
         command = ['pip', '--version']
         result = self.execute_shell(command, True)
