@@ -104,19 +104,6 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.req_update.check_repository_cleanliness()
 
-    def test_branch_exists(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'status' in command:
-                return MagicMock(stdout='')
-            branches = '  %s' % req_update.BRANCH_NAME
-            return MagicMock(stdout=branches)
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        with self.assertRaises(RuntimeError):
-            self.req_update.check_repository_cleanliness()
-
     def test_pip_version_parse(self) -> None:
         def execute_shell_returns(
             command: List[str],
