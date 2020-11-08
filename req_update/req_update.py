@@ -145,7 +145,10 @@ class ReqUpdate():
                     match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
                     if not match:
                         continue
+                    old_version = match.group(3)
                     if match.group(1) == dependency:
+                        if old_version[-1] == ' ':
+                            version = version + ' ' * (len(old_version) - len(version))
                         line = re.sub(
                             PYTHON_REQUIREMENTS_LINE_REGEX,
                             r'\g<1>\g<2>%s' % version,
