@@ -20,7 +20,7 @@ BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {package} package to {version}'
 PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'([<=>]+)'
-PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+)'
+PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+[ ]+)'
 PYTHON_REQUIREMENTS_LINE_REGEX = r'^%s%s%s' % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
@@ -145,7 +145,11 @@ class ReqUpdate():
                     match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
                     if not match:
                         continue
+                    old_version = match.group(3)
                     if match.group(1) == dependency:
+                        if old_version[-1] == ' ':
+                            spacing = len(old_version) - len(version)
+                            version = version + ' ' * spacing
                         line = re.sub(
                             PYTHON_REQUIREMENTS_LINE_REGEX,
                             r'\g<1>\g<2>%s' % version,
