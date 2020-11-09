@@ -102,7 +102,14 @@ class ReqUpdate():
             command = ['git', 'checkout', BRANCH_NAME]
         else:
             command = ['git', 'checkout', '-b', BRANCH_NAME]
-        result = self.execute_shell(command, False)
+        self.execute_shell(command, False)
+
+    def rollback_branch(self) -> None:
+        """ Delete the dependency update branch """
+        command = ['git', 'checkout', '-']
+        self.execute_shell(command, False)
+        command = ['git', 'branch', '-d', BRANCH_NAME]
+        self.execute_shell(command, False)
 
     def update_dependencies(self) -> None:
         """ Update and commit a list of dependency updates """

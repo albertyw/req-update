@@ -166,6 +166,21 @@ class TestCreateBranch(unittest.TestCase):
         self.assertNotIn('-b', create_call[1][0])
 
 
+class TestRollbackBranch(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+
+    def test_rollback(self) -> None:
+        self.req_update.rollback_branch()
+        checkout = self.mock_execute_shell.mock_calls[0]
+        self.assertIn('checkout', checkout[1][0])
+        delete = self.mock_execute_shell.mock_calls[1]
+        self.assertIn('branch', delete[1][0])
+        self.assertIn('-d', delete[1][0])
+
+
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
