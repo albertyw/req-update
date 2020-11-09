@@ -145,7 +145,6 @@ class TestCreateBranch(unittest.TestCase):
         self.req_update.create_branch()
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
         branch_call = self.mock_execute_shell.mock_calls[0]
-        print(self.mock_execute_shell.mock_calls[0][1][0])
         self.assertEqual(branch_call[1][0][1], 'branch')
         create_call = self.mock_execute_shell.mock_calls[1]
         self.assertIn('-b', create_call[1][0])
