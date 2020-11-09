@@ -73,7 +73,10 @@ class ReqUpdate():
         return args
 
     def check_repository_cleanliness(self) -> None:
-        """ Check that the repository is ready for updating dependencies """
+        """
+        Check that the repository is ready for updating dependencies.
+        Non-clean repositories will raise a RuntimeError
+        """
         # Make sure there are no uncommitted files
         command = ['git', 'status', '--porcelain']
         result = self.execute_shell(command, True)
@@ -132,6 +135,10 @@ class ReqUpdate():
     @staticmethod
     @contextmanager
     def edit_requirements(file_name: str) -> Iterator[List[str]]:
+        """
+        This yields lines from a file, which will be written back into
+        the file after yielding
+        """
         lines: List[str] = []
         try:
             with open(file_name, 'r') as handle:
@@ -192,6 +199,7 @@ class ReqUpdate():
     def execute_shell(
         self, command: List[str], readonly: bool,
     ) -> subprocess.CompletedProcess[str]:
+        """ Helper method to execute commands in a shell and return output """
         if self.verbose:
             self.log(' '.join(command))
         if self.dry_run and not readonly:
@@ -207,6 +215,7 @@ class ReqUpdate():
         return result
 
     def log(self, data: str) -> None:
+        """ Helper method for taking care of logging statements """
         print(data)
 
 
