@@ -139,24 +139,37 @@ class ReqUpdate():
 
     def write_dependency_update(self, dependency: str, version: str) -> bool:
         """ Given a dependency, update it to a given version """
+        updated = False
         for reqfile in REQUIREMENTS_FILES:
             with ReqUpdate.edit_requirements(reqfile) as lines:
-                for i, line in enumerate(lines):
-                    match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
-                    if not match:
-                        continue
-                    old_version = match.group(3)
-                    if match.group(1) == dependency:
-                        if old_version[-1] == ' ':
-                            spacing = len(old_version) - len(version)
-                            version = version + ' ' * spacing
-                        line = re.sub(
-                            PYTHON_REQUIREMENTS_LINE_REGEX,
-                            r'\g<1>\g<2>%s' % version,
-                            line,
-                        )
-                        lines[i] = line
-                        return True
+                updated = updated or self.write_dependency_update_lines(
+                    dependency, version, lines
+                )
+        return updated
+
+    def write_dependency_update_lines(
+        self, dependency: str, version: str, lines: List[str]
+    ) -> bool:
+        """
+        Given a dependency and some lines, update the lines.  Return a
+        boolean for whether the lines have been updated
+        """
+        for i, line in enumerate(lines):
+            match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
+            if not match:
+                continue
+            old_version = match.group(3)
+            if match.group(1) == dependency:
+                if old_version[-1] == ' ':
+                    spacing = len(old_version) - len(version)
+                    version = version + ' ' * spacing
+                line = re.sub(
+                    PYTHON_REQUIREMENTS_LINE_REGEX,
+                    r'\g<1>\g<2>%s' % version,
+                    line,
+                )
+                lines[i] = line
+                return True
         return False
 
     def commit_dependency_update(self, dependency: str, version: str) -> None:
