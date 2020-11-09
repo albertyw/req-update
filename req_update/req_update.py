@@ -114,8 +114,11 @@ class ReqUpdate():
         command = ['git', 'branch', '-d', BRANCH_NAME]
         self.execute_shell(command, False)
 
-    def update_dependencies(self) -> None:
-        """ Update and commit a list of dependency updates """
+    def update_dependencies(self) -> bool:
+        """
+        Update and commit a list of dependency updates.
+        Return if updates were made.
+        """
         outdated_list = self.get_pip_outdated()
         clean = True
         for outdated in outdated_list:
@@ -128,6 +131,7 @@ class ReqUpdate():
         if clean:
             self.log('No updates.  Rolling back')
             self.rollback_branch()
+        return not clean
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:
         """ Get a list of outdated pip packages """
