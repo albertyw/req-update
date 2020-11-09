@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+1.3.0 (2020-11-08)
+------------------
+
+ - Align comments on dependency lines when updating
+ - Rollback dep-update branch if no dependencies were updated
+ - Require that dependencies in requirements.txt files start at beginning of line
+ - Cleanup
+
+
 1.2.0 (2020-11-04)
 ------------------
 
