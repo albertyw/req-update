@@ -102,7 +102,7 @@ class ReqUpdate():
             command = ['git', 'checkout', BRANCH_NAME]
         else:
             command = ['git', 'checkout', '-b', BRANCH_NAME]
-        result = self.execute_shell(command, True)
+        result = self.execute_shell(command, False)
 
     def update_dependencies(self) -> None:
         """ Update and commit a list of dependency updates """
