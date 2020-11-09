@@ -188,10 +188,14 @@ class TestUpdateDependencies(unittest.TestCase):
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
         self.mock_rollback_branch = MagicMock()
         setattr(self.req_update, 'rollback_branch', self.mock_rollback_branch)
+        self.mock_log = MagicMock()
+        setattr(self.req_update, 'log', self.mock_log)
 
     def test_update_dependencies_clean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='[]')
-        self.req_update.update_dependencies()
+        updated = self.req_update.update_dependencies()
+        self.assertTrue(self.mock_log.called)
+        self.assertFalse(updated)
 
     def test_update_dependencies(self) -> None:
         def execute_shell_returns(
@@ -204,9 +208,11 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_execute_shell.side_effect = execute_shell_returns
         mock_commit = MagicMock()
         setattr(self.req_update, 'commit_dependency_update', mock_commit)
-        self.req_update.update_dependencies()
+        updated = self.req_update.update_dependencies()
         self.assertFalse(mock_commit.called)
+        self.assertTrue(self.mock_log.called)
         self.assertTrue(self.mock_rollback_branch.called)
+        self.assertFalse(updated)
 
     def test_update_dependencies_commit(self) -> None:
         def execute_shell_returns(
@@ -221,10 +227,11 @@ class TestUpdateDependencies(unittest.TestCase):
         setattr(self.req_update, 'write_dependency_update', mock_write)
         mock_commit = MagicMock()
         setattr(self.req_update, 'commit_dependency_update', mock_commit)
-        self.req_update.update_dependencies()
+        updated = self.req_update.update_dependencies()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
         self.assertFalse(self.mock_rollback_branch.called)
+        self.assertTrue(updated)
 
 
 class TestGetPipOutdated(unittest.TestCase):
