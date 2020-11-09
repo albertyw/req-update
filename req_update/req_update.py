@@ -106,6 +106,8 @@ class ReqUpdate():
 
     def rollback_branch(self) -> None:
         """ Delete the dependency update branch """
+        command = ['git', 'checkout', '-']
+        self.execute_shell(command, False)
         command = ['git', 'branch', '-d', BRANCH_NAME]
         self.execute_shell(command, False)
 
