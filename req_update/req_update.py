@@ -129,7 +129,7 @@ class ReqUpdate():
                 self.commit_dependency_update(dependency, version)
                 clean = False
         if clean:
-            self.log('No updates.  Rolling back')
+            self.log('No updates')
             self.rollback_branch()
         return not clean
 
