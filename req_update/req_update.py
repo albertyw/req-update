@@ -117,12 +117,17 @@ class ReqUpdate():
     def update_dependencies(self) -> None:
         """ Update and commit a list of dependency updates """
         outdated_list = self.get_pip_outdated()
+        clean = True
         for outdated in outdated_list:
             dependency = outdated['name']
             version = outdated['latest_version']
             written = self.write_dependency_update(dependency, version)
             if written:
                 self.commit_dependency_update(dependency, version)
+                clean = False
+        if clean:
+            self.log('No updates.  Rolling back')
+            self.rollback_branch()
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:
         """ Get a list of outdated pip packages """
