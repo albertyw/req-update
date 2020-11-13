@@ -97,11 +97,10 @@ class ReqUpdate():
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
         # Make sure branch does not already exist
-        command = ['git', 'branch']
+        command = ['git', 'branch', '--list', BRANCH_NAME]
         result = self.execute_shell(command, True)
         output = result.stdout
-        branches = [b.strip() for b in output.split('\n')]
-        if BRANCH_NAME in branches:
+        if output.strip() != '':
             command = ['git', 'checkout', BRANCH_NAME]
         else:
             command = ['git', 'checkout', '-b', BRANCH_NAME]
