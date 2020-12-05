@@ -122,6 +122,7 @@ class ReqUpdate():
         clean = True
         for outdated in outdated_list:
             dependency = outdated['name']
+            self.log('Checking dependency: %s' % dependency)
             version = outdated['latest_version']
             written = self.write_dependency_update(dependency, version)
             if written:
