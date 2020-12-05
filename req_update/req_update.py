@@ -187,12 +187,14 @@ class ReqUpdate():
                 if old_version[-1] == ' ':
                     spacing = len(old_version) - len(version)
                     version = version + ' ' * spacing
-                line = re.sub(
+                new_line = re.sub(
                     PYTHON_REQUIREMENTS_LINE_REGEX,
                     r'\g<1>\g<2>%s' % version,
                     line,
                 )
-                lines[i] = line
+                if line == new_line:
+                    continue
+                lines[i] = new_line
                 return True
         return False
 
