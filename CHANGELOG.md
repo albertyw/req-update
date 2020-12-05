@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.3.2 (2020-12-05)
+------------------
+
+ - Correctly with with packages with dashes and/or underscores in name
+ - Fix bug with no-op version updates
+
+
 1.3.1 (2020-11-12)
 ------------------
 
