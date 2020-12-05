@@ -177,12 +177,13 @@ class ReqUpdate():
         Given a dependency and some lines, update the lines.  Return a
         boolean for whether the lines have been updated
         """
+        dependency = dependency.replace('_', '-')
         for i, line in enumerate(lines):
             match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
             if not match:
                 continue
             old_version = match.group(3)
-            if match.group(1) == dependency:
+            if match.group(1).replace('_', '-') == dependency:
                 if old_version[-1] == ' ':
                     spacing = len(old_version) - len(version)
                     version = version + ' ' * spacing
