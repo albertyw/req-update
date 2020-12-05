@@ -18,7 +18,7 @@ DESCRIPTION = (
 )
 BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {package} package to {version}'
-PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9_]+)'
+PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'([<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+[ ]+)'
 PYTHON_REQUIREMENTS_LINE_REGEX = r'^%s%s%s' % (
