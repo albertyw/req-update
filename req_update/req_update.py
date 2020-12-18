@@ -80,7 +80,10 @@ class ReqUpdate():
         # Make sure there are no uncommitted files
         command = ['git', 'status', '--porcelain']
         result = self.execute_shell(command, True)
-        if not len(result.stdout) == 0:
+        lines = result.stdout.split("\n")
+        # Do not count untracked files when checking for repository cleanliness
+        lines = [line for line in lines if line and line[:2] != '??']
+        if lines:
             raise RuntimeError('Repository not clean')
 
         # Make sure pip is recent enough
