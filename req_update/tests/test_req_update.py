@@ -297,6 +297,16 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         self.tempfile.close()
         req_update.REQUIREMENTS_FILES = self.original_reqfiles
 
+    def test_write_dependency_update_no_comment(self) -> None:
+        with open(self.tempfile.name, 'w') as handle:
+            handle.write('abcd==0.0.1\nvarsnap==1.0.0')
+        updated = self.req_update.write_dependency_update('varsnap', '1.2.3')
+        self.assertTrue(updated)
+        with open(self.tempfile.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
+            self.assertEqual(lines[1].strip(), 'varsnap==1.2.3')
+
     def test_write_dependency_update(self) -> None:
         with open(self.tempfile.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0.0    # qwer')
