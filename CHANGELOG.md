@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.3.3 (2020-12-25)
+------------------
+
+ - Ignore untracked files when checking repository cleanliness
+
+
 1.3.2 (2020-12-05)
 ------------------
 
