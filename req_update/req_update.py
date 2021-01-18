@@ -20,11 +20,13 @@ BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {package} package to {version}'
 PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'([<=>]+)'
-PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+[ ]+)'
-PYTHON_REQUIREMENTS_LINE_REGEX = r'^%s%s%s' % (
+PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+)'
+PYTHON_PACKAGE_SPACER_REGEX = r'([ ]*)'
+PYTHON_REQUIREMENTS_LINE_REGEX = r'^%s%s%s%s' % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
     PYTHON_PACKAGE_VERSION_REGEX,
+    PYTHON_PACKAGE_SPACER_REGEX,
 )
 REQUIREMENTS_FILES = [
     'requirements.txt',
@@ -188,12 +190,15 @@ class ReqUpdate():
             if match.group(1).replace('_', '-') != dependency:
                 continue
             old_version = match.group(3)
-            if old_version[-1] == ' ':
-                spacing = len(old_version) - len(version)
-                version = version + ' ' * spacing
+            old_spacer = match.group(4)
+            if old_spacer:
+                spacing = len(old_version) + len(old_spacer) - len(version)
+                spacer = ' ' * spacing
+            else:
+                spacer = ''
             new_line = re.sub(
                 PYTHON_REQUIREMENTS_LINE_REGEX,
-                r'\g<1>\g<2>%s' % version,
+                r'\g<1>\g<2>%s%s' % (version, spacer),
                 line,
             )
             if line == new_line:
