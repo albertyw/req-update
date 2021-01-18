@@ -185,20 +185,21 @@ class ReqUpdate():
             match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
             if not match:
                 continue
+            if match.group(1).replace('_', '-') != dependency:
+                continue
             old_version = match.group(3)
-            if match.group(1).replace('_', '-') == dependency:
-                if old_version[-1] == ' ':
-                    spacing = len(old_version) - len(version)
-                    version = version + ' ' * spacing
-                new_line = re.sub(
-                    PYTHON_REQUIREMENTS_LINE_REGEX,
-                    r'\g<1>\g<2>%s' % version,
-                    line,
-                )
-                if line == new_line:
-                    continue
-                lines[i] = new_line
-                return True
+            if old_version[-1] == ' ':
+                spacing = len(old_version) - len(version)
+                version = version + ' ' * spacing
+            new_line = re.sub(
+                PYTHON_REQUIREMENTS_LINE_REGEX,
+                r'\g<1>\g<2>%s' % version,
+                line,
+            )
+            if line == new_line:
+                continue
+            lines[i] = new_line
+            return True
         return False
 
     def commit_dependency_update(self, dependency: str, version: str) -> None:
