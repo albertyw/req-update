@@ -57,6 +57,16 @@ class TestGetArgs(unittest.TestCase):
         args = self.get_args_with_argv([])
         self.assertFalse(args.verbose)
 
+    def test_push(self) -> None:
+        self.assertFalse(self.req_update.push)
+        args = self.get_args_with_argv([])
+        self.assertFalse(args.push)
+        args = self.get_args_with_argv(['--push'])
+        self.assertTrue(args.push)
+        args = self.get_args_with_argv(['-p'])
+        self.assertTrue(args.push)
+        self.assertTrue(self.req_update.push)
+
     def test_dryrun(self) -> None:
         self.assertTrue(self.req_update.dry_run)
         args = self.get_args_with_argv([])
@@ -230,6 +240,29 @@ class TestUpdateDependencies(unittest.TestCase):
         updated = self.req_update.update_dependencies()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
+        self.assertFalse(self.mock_rollback_branch.called)
+        self.assertTrue(updated)
+
+    def test_update_dependencies_push(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if '--outdated' in command:
+                return MagicMock(stdout=json.dumps(PIP_OUTDATED))
+            raise ValueError()  # pragma: no cover
+        self.req_update.push = True
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_write = MagicMock(return_value=True)
+        setattr(self.req_update, 'write_dependency_update', mock_write)
+        mock_commit = MagicMock()
+        setattr(self.req_update, 'commit_dependency_update', mock_commit)
+        mock_push = MagicMock()
+        setattr(self.req_update, 'push_dependency_update', mock_push)
+        updated = self.req_update.update_dependencies()
+        self.assertTrue(mock_write.called)
+        self.assertTrue(mock_commit.called)
+        self.assertTrue(mock_push.called)
         self.assertFalse(self.mock_rollback_branch.called)
         self.assertTrue(updated)
 
@@ -415,6 +448,24 @@ class TestCommitDependencyUpdate(unittest.TestCase):
         command = self.mock_execute_shell.mock_calls[0][1]
         self.assertIn('varsnap', command[0][3])
         self.assertIn('1.2.3', command[0][3])
+
+
+class TestPushDependencyUpdate(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+        self.mock_log = MagicMock()
+        setattr(self.req_update, 'log', self.mock_log)
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+
+    def test_push_dependency_update(self) -> None:
+        self.req_update.push_dependency_update()
+        self.assertTrue(self.mock_log.called)
+        log_value = self.mock_log.mock_calls[0][1]
+        self.assertIn('Push', log_value[0])
+        self.assertTrue(self.mock_execute_shell.called)
+        command = self.mock_execute_shell.mock_calls[0][1]
+        self.assertIn('push', command[0])
 
 
 class TestExecuteShell(unittest.TestCase):

@@ -40,6 +40,7 @@ def main() -> None:
 
 class ReqUpdate():
     def __init__(self) -> None:
+        self.push = False
         self.verbose = False
         self.dry_run = True
 
@@ -52,6 +53,12 @@ class ReqUpdate():
 
     def get_args(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description=DESCRIPTION)
+        parser.add_argument(
+            '-p',
+            '--push',
+            action='store_true',
+            help='Push commits individually to remote origin',
+        )
         parser.add_argument(
             '-d',
             '--dryrun',
@@ -70,6 +77,7 @@ class ReqUpdate():
             version=__version__,
         )
         args = parser.parse_args()
+        self.push = args.push
         self.verbose = args.verbose
         self.dry_run = args.dryrun
         return args
@@ -132,6 +140,8 @@ class ReqUpdate():
             written = self.write_dependency_update(dependency, version)
             if written:
                 self.commit_dependency_update(dependency, version)
+                if self.push:
+                    self.push_dependency_update()
                 clean = False
         if clean:
             self.log('No updates')
@@ -245,6 +255,12 @@ class ReqUpdate():
         )
         self.log(commit_message)
         command = ['git', 'commit', '-am', commit_message]
+        self.execute_shell(command, False)
+
+    def push_dependency_update(self) -> None:
+        """ Git push any commits to remote """
+        self.log("Pushing commit to git remote")
+        command = ['git', 'push', '-u', 'origin']
         self.execute_shell(command, False)
 
     def execute_shell(
