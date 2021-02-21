@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.4.0 (2021-02-21)
+------------------
+
+ - Add a new `--push` option to git push each commit to the default remote
+ - Switch CI platform from CirlcCI to Drone
+ - Update dependencies
+
+
 1.3.4 (2021-01-18)
 ------------------
 
