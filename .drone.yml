@@ -18,3 +18,16 @@ steps:
       - cc-test-reporter after-build --exit-code "$exitcode"
     environment:
       CC_TEST_REPORTER_ID: 20588a9f3d871445aaee95c9e3f5799cb13812b98b321a34ecebf503578fa2c8
+
+  - name: Upload Python
+    image: python:3.9
+    commands:
+      - pip install twine
+      - python setup.py sdist bdist_wheel
+      - twine upload dist/*
+    volumes:
+      - name: pypirc
+        path: /root/.pypirc
+    when:
+      event:
+        - tag
