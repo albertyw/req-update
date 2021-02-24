@@ -273,12 +273,17 @@ class ReqUpdate():
             return subprocess.CompletedProcess(
                 command, 0, stdout='', stderr=''
             )
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            encoding='utf-8',
-        )
-        result.check_returncode()
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                check=True,
+                encoding='utf-8',
+            )
+        except subprocess.CalledProcessError as error:
+            self.log(error.stdout)
+            self.log(error.stderr)
+            raise
         return result
 
     def log(self, data: str) -> None:

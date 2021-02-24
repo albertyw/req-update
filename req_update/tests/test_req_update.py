@@ -504,6 +504,12 @@ class TestExecuteShell(unittest.TestCase):
         self.req_update.execute_shell(['ls'], True)
         self.assertTrue(self.mock_log.called)
 
+    def test_error(self) -> None:
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.req_update.execute_shell(['ls', 'asdf'], True)
+        self.assertTrue(self.mock_log.called)
+        self.assertIn('cannot access', self.mock_log.call_args[0][0])
+
 
 class TestLog(unittest.TestCase):
     def setUp(self) -> None:
