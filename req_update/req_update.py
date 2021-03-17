@@ -8,7 +8,7 @@ import re
 import subprocess
 from typing import Dict, Iterator, List, Optional
 
-VERSION = (1, 4, 0)
+VERSION = (1, 4, 1)
 __version__ = '.'.join(map(str, VERSION))
 
 

@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.4.1 (2021-03-16)
+------------------
+
+ - Clean up error messages
+ - Update dependencies
+ - Build optimizations
+
+
 1.4.0 (2021-02-21)
 ------------------
 
