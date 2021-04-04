@@ -67,6 +67,16 @@ class TestGetArgs(unittest.TestCase):
         self.assertTrue(args.push)
         self.assertTrue(self.req_update.push)
 
+    def test_install(self) -> None:
+        self.assertFalse(self.req_update.install)
+        args = self.get_args_with_argv([])
+        self.assertFalse(args.install)
+        args = self.get_args_with_argv(['--install'])
+        self.assertTrue(args.install)
+        args = self.get_args_with_argv(['-i'])
+        self.assertTrue(args.install)
+        self.assertTrue(self.req_update.install)
+
     def test_dryrun(self) -> None:
         self.assertTrue(self.req_update.dry_run)
         args = self.get_args_with_argv([])
@@ -339,6 +349,7 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             lines = handle.readlines()
             self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip(), 'varsnap==1.2.3')
+        self.assertIn(self.tempfile.name, self.req_update.updated_files)
 
     def test_write_dependency_update(self) -> None:
         with open(self.tempfile.name, 'w') as handle:
@@ -349,6 +360,7 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             lines = handle.readlines()
             self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip(), 'varsnap==1.2.3    # qwer')
+        self.assertIn(self.tempfile.name, self.req_update.updated_files)
 
     def test_write_dependency_update_aligned(self) -> None:
         with open(self.tempfile.name, 'w') as handle:
@@ -359,6 +371,7 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             lines = handle.readlines()
             self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip(), 'varsnap==1.2.3  # qwer')
+        self.assertIn(self.tempfile.name, self.req_update.updated_files)
 
     def test_write_dependency_update_no_op(self) -> None:
         with open(self.tempfile.name, 'w') as handle:
@@ -369,6 +382,7 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             lines = handle.readlines()
             self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip(), 'varsnap==1.0.0    # qwer')
+        self.assertNotIn(self.tempfile.name, self.req_update.updated_files)
 
 
 class TestCheckMajorVersionUpdate(unittest.TestCase):
@@ -466,6 +480,40 @@ class TestPushDependencyUpdate(unittest.TestCase):
         self.assertTrue(self.mock_execute_shell.called)
         command = self.mock_execute_shell.mock_calls[0][1]
         self.assertIn('push', command[0])
+
+
+class TestInstallUpdates(unittest.TestCase):
+    def setUp(self) -> None:
+        self.req_update = req_update.ReqUpdate()
+        self.mock_log = MagicMock()
+        setattr(self.req_update, 'log', self.mock_log)
+        self.mock_execute_shell = MagicMock()
+        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+
+    def test_install_updates_noop(self) -> None:
+        self.req_update.updated_files.add('requirements.txt')
+        self.req_update.install_updates()
+        self.assertEqual(len(self.mock_log.mock_calls), 0)
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 0)
+
+    def test_install_updates(self) -> None:
+        self.req_update.install = True
+        self.req_update.updated_files.add('requirements.txt')
+        self.req_update.install_updates()
+        self.assertEqual(len(self.mock_log.mock_calls), 1)
+        log_value = self.mock_log.mock_calls[0][1]
+        self.assertIn('requirements.txt', log_value[0])
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 1)
+        command = self.mock_execute_shell.mock_calls[0][1]
+        self.assertEqual('requirements.txt', command[0][3])
+
+    def test_install_multiple_updates(self) -> None:
+        self.req_update.install = True
+        self.req_update.updated_files.add('requirements-test.txt')
+        self.req_update.updated_files.add('requirements.txt')
+        self.req_update.install_updates()
+        self.assertEqual(len(self.mock_log.mock_calls), 2)
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
 
 
 class TestExecuteShell(unittest.TestCase):

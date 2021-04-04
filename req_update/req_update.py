@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import json
 import re
 import subprocess
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Set
 
 VERSION = (1, 4, 1)
 __version__ = '.'.join(map(str, VERSION))
@@ -41,8 +41,10 @@ def main() -> None:
 class ReqUpdate():
     def __init__(self) -> None:
         self.push = False
+        self.install = False
         self.verbose = False
         self.dry_run = True
+        self.updated_files: Set[str] = set([])
 
     def main(self) -> None:
         """ Update all dependencies """
@@ -50,6 +52,7 @@ class ReqUpdate():
         self.check_repository_cleanliness()
         self.create_branch()
         self.update_dependencies()
+        self.install_updates()
 
     def get_args(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -58,6 +61,12 @@ class ReqUpdate():
             '--push',
             action='store_true',
             help='Push commits individually to remote origin',
+        )
+        parser.add_argument(
+            '-i',
+            '--install',
+            action='store_true',
+            help='Install updates',
         )
         parser.add_argument(
             '-d',
@@ -78,6 +87,7 @@ class ReqUpdate():
         )
         args = parser.parse_args()
         self.push = args.push
+        self.install = args.install
         self.verbose = args.verbose
         self.dry_run = args.dryrun
         return args
@@ -180,9 +190,12 @@ class ReqUpdate():
         updated = False
         for reqfile in REQUIREMENTS_FILES:
             with ReqUpdate.edit_requirements(reqfile) as lines:
-                updated = updated or self.write_dependency_update_lines(
+                updated_file = self.write_dependency_update_lines(
                     dependency, version, lines
                 )
+                if updated_file:
+                    self.updated_files.add(reqfile)
+                    updated = True
         return updated
 
     def write_dependency_update_lines(
@@ -262,6 +275,15 @@ class ReqUpdate():
         self.log("Pushing commit to git remote")
         command = ['git', 'push', '-u', 'origin']
         self.execute_shell(command, False)
+
+    def install_updates(self) -> None:
+        """ Install requirements updates """
+        if not self.install:
+            return
+        for updated_file in self.updated_files:
+            command = ['pip', 'install', '-r', updated_file]
+            self.execute_shell(command, False)
+            self.log('Installing updated packages in %s' % updated_file)
 
     def execute_shell(
         self, command: List[str], readonly: bool,
