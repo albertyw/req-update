@@ -67,6 +67,16 @@ class TestGetArgs(unittest.TestCase):
         self.assertTrue(args.push)
         self.assertTrue(self.req_update.push)
 
+    def test_install(self) -> None:
+        self.assertFalse(self.req_update.install)
+        args = self.get_args_with_argv([])
+        self.assertFalse(args.install)
+        args = self.get_args_with_argv(['--install'])
+        self.assertTrue(args.install)
+        args = self.get_args_with_argv(['-i'])
+        self.assertTrue(args.install)
+        self.assertTrue(self.req_update.install)
+
     def test_dryrun(self) -> None:
         self.assertTrue(self.req_update.dry_run)
         args = self.get_args_with_argv([])
