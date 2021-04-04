@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import json
 import re
 import subprocess
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Set
 
 VERSION = (1, 4, 1)
 __version__ = '.'.join(map(str, VERSION))
@@ -44,6 +44,7 @@ class ReqUpdate():
         self.install = False
         self.verbose = False
         self.dry_run = True
+        self.updated_files: Set[str] = set([])
 
     def main(self) -> None:
         """ Update all dependencies """
@@ -188,9 +189,12 @@ class ReqUpdate():
         updated = False
         for reqfile in REQUIREMENTS_FILES:
             with ReqUpdate.edit_requirements(reqfile) as lines:
-                updated = updated or self.write_dependency_update_lines(
+                updated_file = self.write_dependency_update_lines(
                     dependency, version, lines
                 )
+                if updated_file:
+                    self.updated_files.add(reqfile)
+                    updated = True
         return updated
 
     def write_dependency_update_lines(
