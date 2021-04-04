@@ -41,6 +41,7 @@ def main() -> None:
 class ReqUpdate():
     def __init__(self) -> None:
         self.push = False
+        self.install = False
         self.verbose = False
         self.dry_run = True
 
@@ -58,6 +59,12 @@ class ReqUpdate():
             '--push',
             action='store_true',
             help='Push commits individually to remote origin',
+        )
+        parser.add_argument(
+            '-i',
+            '--install',
+            action='store_true',
+            help='Install updates',
         )
         parser.add_argument(
             '-d',
@@ -78,6 +85,7 @@ class ReqUpdate():
         )
         args = parser.parse_args()
         self.push = args.push
+        self.install = args.install
         self.verbose = args.verbose
         self.dry_run = args.dryrun
         return args
