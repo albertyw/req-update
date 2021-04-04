@@ -52,6 +52,7 @@ class ReqUpdate():
         self.check_repository_cleanliness()
         self.create_branch()
         self.update_dependencies()
+        self.install_updates()
 
     def get_args(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -274,6 +275,15 @@ class ReqUpdate():
         self.log("Pushing commit to git remote")
         command = ['git', 'push', '-u', 'origin']
         self.execute_shell(command, False)
+
+    def install_updates(self) -> None:
+        """ Install requirements updates """
+        if not self.install:
+            return
+        for updated_file in self.updated_files:
+            command = ['pip', 'install', '-r', updated_file]
+            self.execute_shell(command, False)
+            self.log('Installing updated packages in %s' % updated_file)
 
     def execute_shell(
         self, command: List[str], readonly: bool,
