@@ -45,6 +45,7 @@ class ReqUpdate():
         self.verbose = False
         self.dry_run = True
         self.updated_files: Set[str] = set([])
+        self.branch_exists = False
 
     def main(self) -> None:
         """ Update all dependencies """
@@ -125,12 +126,15 @@ class ReqUpdate():
         output = result.stdout
         if output.strip() != '':
             command = ['git', 'checkout', BRANCH_NAME]
+            self.branch_exists = True
         else:
             command = ['git', 'checkout', '-b', BRANCH_NAME]
         self.execute_shell(command, False)
 
     def rollback_branch(self) -> None:
         """ Delete the dependency update branch """
+        if self.branch_exists:
+            return
         command = ['git', 'checkout', '-']
         self.execute_shell(command, False)
         command = ['git', 'branch', '-d', BRANCH_NAME]
