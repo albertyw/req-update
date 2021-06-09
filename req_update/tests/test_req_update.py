@@ -168,6 +168,7 @@ class TestCreateBranch(unittest.TestCase):
         self.assertEqual(branch_call[1][0][1], 'branch')
         create_call = self.mock_execute_shell.mock_calls[1]
         self.assertIn('-b', create_call[1][0])
+        self.assertFalse(self.req_update.branch_exists)
 
     def test_create_branch_exists(self) -> None:
         def execute_shell_returns(
@@ -184,6 +185,7 @@ class TestCreateBranch(unittest.TestCase):
         self.assertEqual(branch_call[1][0][1], 'branch')
         create_call = self.mock_execute_shell.mock_calls[1]
         self.assertNotIn('-b', create_call[1][0])
+        self.assertTrue(self.req_update.branch_exists)
 
 
 class TestRollbackBranch(unittest.TestCase):
