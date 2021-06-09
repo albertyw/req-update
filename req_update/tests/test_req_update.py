@@ -200,6 +200,11 @@ class TestRollbackBranch(unittest.TestCase):
         self.assertIn('branch', delete[1][0])
         self.assertIn('-d', delete[1][0])
 
+    def test_does_not_rollback_already_exists(self) -> None:
+        self.req_update.branch_exists = True
+        self.req_update.rollback_branch()
+        self.assertFalse(self.mock_execute_shell.called)
+
 
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
