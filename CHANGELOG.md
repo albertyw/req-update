@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.5.1 (2021-06-09)
+------------------
+
+ - Work correctly with already existing dep-update branches
+ - Update dependencies
+
+
 1.5.0 (2021-04-04)
 ------------------
 
