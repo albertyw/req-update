@@ -9,7 +9,7 @@ volumes:
 
 steps:
   - name: Test Python
-    image: python:3.9
+    image: python:3.10
     commands:
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > "${HOME}/bin/cc-test-reporter"
       - chmod +x "${HOME}/bin/cc-test-reporter"
@@ -26,7 +26,7 @@ steps:
       CC_TEST_REPORTER_ID: 20588a9f3d871445aaee95c9e3f5799cb13812b98b321a34ecebf503578fa2c8
 
   - name: Upload Python
-    image: python:3.9
+    image: python:3.10
     commands:
       - pip install twine
       - python setup.py sdist bdist_wheel
