@@ -18,10 +18,10 @@ DESCRIPTION = (
 )
 BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {package} package to {version}'
-PYTHON_PACKAGE_NAME_REGEX = r'([a-zA-Z0-9\-_]+)'
-PYTHON_PACKAGE_OPERATOR_REGEX = r'([<=>]+)'
-PYTHON_PACKAGE_VERSION_REGEX = r'([0-9\.]+)'
-PYTHON_PACKAGE_SPACER_REGEX = r'([ ]*)'
+PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
+PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
+PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
+PYTHON_PACKAGE_SPACER_REGEX = r'(?P<spacer>[ ]*)'
 PYTHON_REQUIREMENTS_LINE_REGEX = r'^%s%s%s%s' % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
@@ -214,10 +214,10 @@ class ReqUpdate():
             match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
             if not match:
                 continue
-            if match.group(1).replace('_', '-') != dependency:
+            if match.group('name').replace('_', '-') != dependency:
                 continue
-            old_version = match.group(3)
-            old_spacer = match.group(4)
+            old_version = match.group('version')
+            old_spacer = match.group('spacer')
             if old_spacer:
                 spacing = len(old_version) + len(old_spacer) - len(version)
                 spacer = ' ' * spacing
