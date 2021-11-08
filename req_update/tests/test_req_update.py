@@ -391,6 +391,17 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             self.assertEqual(lines[1].strip(), 'varsnap==1.0.0    # qwer')
         self.assertNotIn(self.tempfile.name, self.req_update.updated_files)
 
+    def test_write_dependency_update_post(self) -> None:
+        with open(self.tempfile.name, 'w') as handle:
+            handle.write('abcd==0.0.1\nvarsnap==1.0.0post0    # qwer')
+        updated = self.req_update.write_dependency_update('varsnap', '1.2.3')
+        self.assertTrue(updated)
+        with open(self.tempfile.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip(), 'abcd==0.0.1')
+            self.assertEqual(lines[1].strip(), 'varsnap==1.2.3         # qwer')
+        self.assertIn(self.tempfile.name, self.req_update.updated_files)
+
 
 class TestCheckMajorVersionUpdate(unittest.TestCase):
     def setUp(self) -> None:
