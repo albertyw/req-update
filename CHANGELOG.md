@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.5.2 (2021-11-07)
+------------------
+
+ - Fix support for special python package version names
+ - Support python 3.10
+ - Update dependencies
+
+
 1.5.1 (2021-06-09)
 ------------------
 
