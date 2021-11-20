@@ -158,8 +158,7 @@ class ReqUpdate():
             written = self.write_dependency_update(dependency, version)
             if written:
                 self.commit_dependency_update(dependency, version)
-                if self.push:
-                    self.push_dependency_update()
+                self.push_dependency_update()
                 clean = False
         if clean:
             self.log('No updates')
@@ -280,6 +279,8 @@ class ReqUpdate():
 
     def push_dependency_update(self) -> None:
         """ Git push any commits to remote """
+        if not self.push:
+            return
         self.log("Pushing commit to git remote")
         command = ['git', 'push', '-u', 'origin']
         self.execute_shell(command, False)

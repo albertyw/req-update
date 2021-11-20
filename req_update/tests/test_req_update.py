@@ -490,7 +490,13 @@ class TestPushDependencyUpdate(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
 
+    def test_push_dependency_update_false(self) -> None:
+        self.req_update.push_dependency_update()
+        self.assertFalse(self.mock_log.called)
+        self.assertFalse(self.mock_execute_shell.called)
+
     def test_push_dependency_update(self) -> None:
+        self.req_update.push = True
         self.req_update.push_dependency_update()
         self.assertTrue(self.mock_log.called)
         log_value = self.mock_log.mock_calls[0][1]
