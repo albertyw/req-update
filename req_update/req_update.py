@@ -52,6 +52,10 @@ class ReqUpdate():
         self.get_args()
         self.check_repository_cleanliness()
         self.create_branch()
+        self.update_install_dependencies()
+
+    def update_install_dependencies(self) -> None:
+        """ Update dependencies and install updates """
         self.update_dependencies()
         self.install_updates()
 
