@@ -30,7 +30,7 @@ class TestReqUpdateMain(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
 
     def test_main(self) -> None:
         mock_get_args = MagicMock()
@@ -58,14 +58,14 @@ class TestGetArgs(unittest.TestCase):
         self.assertFalse(args.verbose)
 
     def test_push(self) -> None:
-        self.assertFalse(self.req_update.push)
+        self.assertFalse(self.req_update.util.push)
         args = self.get_args_with_argv([])
         self.assertFalse(args.push)
         args = self.get_args_with_argv(['--push'])
         self.assertTrue(args.push)
         args = self.get_args_with_argv(['-p'])
         self.assertTrue(args.push)
-        self.assertTrue(self.req_update.push)
+        self.assertTrue(self.req_update.util.push)
 
     def test_install(self) -> None:
         self.assertFalse(self.req_update.install)
@@ -78,14 +78,14 @@ class TestGetArgs(unittest.TestCase):
         self.assertTrue(self.req_update.install)
 
     def test_dryrun(self) -> None:
-        self.assertTrue(self.req_update.dry_run)
+        self.assertTrue(self.req_update.util.dry_run)
         args = self.get_args_with_argv([])
         self.assertFalse(args.dryrun)
         args = self.get_args_with_argv(['--dryrun'])
         self.assertTrue(args.dryrun)
         args = self.get_args_with_argv(['-d'])
         self.assertTrue(args.dryrun)
-        self.assertTrue(self.req_update.dry_run)
+        self.assertTrue(self.req_update.util.dry_run)
 
     def test_verbose(self) -> None:
         args = self.get_args_with_argv(['--verbose'])
@@ -104,7 +104,7 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
 
     def test_clean(self) -> None:
         def execute_shell_returns(
@@ -153,7 +153,7 @@ class TestCreateBranch(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
 
     def test_create_branch(self) -> None:
         def execute_shell_returns(
@@ -192,7 +192,7 @@ class TestRollbackBranch(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
 
     def test_rollback(self) -> None:
         self.req_update.rollback_branch()
@@ -212,11 +212,11 @@ class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
         self.mock_rollback_branch = MagicMock()
         setattr(self.req_update, 'rollback_branch', self.mock_rollback_branch)
         self.mock_log = MagicMock()
-        setattr(self.req_update, 'log', self.mock_log)
+        setattr(self.req_update.util, 'log', self.mock_log)
 
     def test_update_dependencies_clean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='[]')
@@ -234,7 +234,7 @@ class TestUpdateDependencies(unittest.TestCase):
             raise ValueError()  # pragma: no cover
         self.mock_execute_shell.side_effect = execute_shell_returns
         mock_commit = MagicMock()
-        setattr(self.req_update, 'commit_dependency_update', mock_commit)
+        setattr(self.req_update.util, 'commit_dependency_update', mock_commit)
         updated = self.req_update.update_dependencies()
         self.assertFalse(mock_commit.called)
         self.assertTrue(self.mock_log.called)
@@ -253,7 +253,7 @@ class TestUpdateDependencies(unittest.TestCase):
         mock_write = MagicMock(return_value=True)
         setattr(self.req_update, 'write_dependency_update', mock_write)
         mock_commit = MagicMock()
-        setattr(self.req_update, 'commit_dependency_update', mock_commit)
+        setattr(self.req_update.util, 'commit_dependency_update', mock_commit)
         updated = self.req_update.update_dependencies()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
@@ -268,14 +268,13 @@ class TestUpdateDependencies(unittest.TestCase):
             if '--outdated' in command:
                 return MagicMock(stdout=json.dumps(PIP_OUTDATED))
             raise ValueError()  # pragma: no cover
-        self.req_update.push = True
         self.mock_execute_shell.side_effect = execute_shell_returns
         mock_write = MagicMock(return_value=True)
         setattr(self.req_update, 'write_dependency_update', mock_write)
         mock_commit = MagicMock()
-        setattr(self.req_update, 'commit_dependency_update', mock_commit)
+        setattr(self.req_update.util, 'commit_dependency_update', mock_commit)
         mock_push = MagicMock()
-        setattr(self.req_update, 'push_dependency_update', mock_push)
+        setattr(self.req_update.util, 'push_dependency_update', mock_push)
         updated = self.req_update.update_dependencies()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
@@ -288,7 +287,7 @@ class TestGetPipOutdated(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
 
     def test_get_pip_outdated(self) -> None:
         self.mock_execute_shell.return_value = subprocess.CompletedProcess(
@@ -407,7 +406,7 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_log = MagicMock()
-        setattr(self.req_update, 'log', self.mock_log)
+        setattr(self.req_update.util, 'log', self.mock_log)
 
     def test_check_non_major_update(self) -> None:
         result = self.req_update.check_major_version_update(
@@ -462,57 +461,13 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
         self.assertFalse(self.mock_log.called)
 
 
-class TestCommitDependencyUpdate(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.mock_log = MagicMock()
-        setattr(self.req_update, 'log', self.mock_log)
-        self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
-
-    def test_commit_dependency_update(self) -> None:
-        self.req_update.commit_dependency_update('varsnap', '1.2.3')
-        self.assertTrue(self.mock_log.called)
-        log_value = self.mock_log.mock_calls[0][1]
-        self.assertIn('varsnap', log_value[0])
-        self.assertIn('1.2.3', log_value[0])
-        self.assertTrue(self.mock_execute_shell.called)
-        command = self.mock_execute_shell.mock_calls[0][1]
-        self.assertIn('varsnap', command[0][3])
-        self.assertIn('1.2.3', command[0][3])
-
-
-class TestPushDependencyUpdate(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.mock_log = MagicMock()
-        setattr(self.req_update, 'log', self.mock_log)
-        self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
-
-    def test_push_dependency_update_false(self) -> None:
-        self.req_update.push_dependency_update()
-        self.assertFalse(self.mock_log.called)
-        self.assertFalse(self.mock_execute_shell.called)
-
-    def test_push_dependency_update(self) -> None:
-        self.req_update.push = True
-        self.req_update.push_dependency_update()
-        self.assertTrue(self.mock_log.called)
-        log_value = self.mock_log.mock_calls[0][1]
-        self.assertIn('Push', log_value[0])
-        self.assertTrue(self.mock_execute_shell.called)
-        command = self.mock_execute_shell.mock_calls[0][1]
-        self.assertIn('push', command[0])
-
-
 class TestInstallUpdates(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_log = MagicMock()
-        setattr(self.req_update, 'log', self.mock_log)
+        setattr(self.req_update.util, 'log', self.mock_log)
         self.mock_execute_shell = MagicMock()
-        setattr(self.req_update, 'execute_shell', self.mock_execute_shell)
+        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
 
     def test_install_updates_noop(self) -> None:
         self.req_update.updated_files.add('requirements.txt')
@@ -538,56 +493,3 @@ class TestInstallUpdates(unittest.TestCase):
         self.req_update.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 2)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
-
-
-class TestExecuteShell(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.req_update.dry_run = False
-        self.mock_log = MagicMock()
-        setattr(self.req_update, 'log', self.mock_log)
-
-    def test_ls(self) -> None:
-        result = self.req_update.execute_shell(['ls'], True)
-        self.assertEqual(result.args, ['ls'])
-        self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stderr, '')
-        self.assertTrue(len(result.stdout) > 0)
-        files = result.stdout.split('\n')
-        self.assertIn('requirements-test.txt', files)
-        self.assertFalse(self.mock_log.called)
-
-    def test_dry_run(self) -> None:
-        self.req_update.dry_run = True
-        result = self.req_update.execute_shell(['ls'], False)
-        self.assertEqual(result.args, ['ls'])
-        self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, '')
-        self.assertEqual(result.stderr, '')
-        self.assertFalse(self.mock_log.called)
-
-    def test_dry_run_read_only(self) -> None:
-        self.req_update.dry_run = True
-        result = self.req_update.execute_shell(['ls'], True)
-        self.assertTrue(len(result.stdout) > 0)
-
-    def test_verbose(self) -> None:
-        self.req_update.verbose = True
-        self.req_update.execute_shell(['ls'], True)
-        self.assertTrue(self.mock_log.called)
-
-    def test_error(self) -> None:
-        with self.assertRaises(subprocess.CalledProcessError):
-            self.req_update.execute_shell(['ls', 'asdf'], True)
-        self.assertTrue(self.mock_log.called)
-        self.assertIn('cannot access', self.mock_log.call_args[0][0])
-
-
-class TestLog(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-
-    def test_log(self) -> None:
-        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
-            self.req_update.log('asdf')
-            self.assertEqual(mock_out.getvalue(), 'asdf\n')

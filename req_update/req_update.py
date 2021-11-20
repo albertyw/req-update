@@ -8,6 +8,9 @@ import re
 import subprocess
 from typing import Dict, Iterator, List, Optional, Set
 
+from . import util
+
+
 VERSION = (1, 5, 2)
 __version__ = '.'.join(map(str, VERSION))
 
@@ -17,7 +20,6 @@ DESCRIPTION = (
     'https://github.com/albertyw/req-update'
 )
 BRANCH_NAME = 'dep-update'
-COMMIT_MESSAGE = 'Update {package} package to {version}'
 PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
@@ -40,12 +42,10 @@ def main() -> None:
 
 class ReqUpdate():
     def __init__(self) -> None:
-        self.push = False
         self.install = False
-        self.verbose = False
-        self.dry_run = True
         self.updated_files: Set[str] = set([])
         self.branch_exists = False
+        self.util = util.Util()
 
     def main(self) -> None:
         """ Update all dependencies """
@@ -91,10 +91,10 @@ class ReqUpdate():
             version=__version__,
         )
         args = parser.parse_args()
-        self.push = args.push
         self.install = args.install
-        self.verbose = args.verbose
-        self.dry_run = args.dryrun
+        self.util.push = args.push
+        self.util.verbose = args.verbose
+        self.util.dry_run = args.dryrun
         return args
 
     def check_repository_cleanliness(self) -> None:
@@ -104,7 +104,7 @@ class ReqUpdate():
         """
         # Make sure there are no uncommitted files
         command = ['git', 'status', '--porcelain']
-        result = self.execute_shell(command, True)
+        result = self.util.execute_shell(command, True)
         lines = result.stdout.split("\n")
         # Do not count untracked files when checking for repository cleanliness
         lines = [line for line in lines if line and line[:2] != '??']
@@ -113,7 +113,7 @@ class ReqUpdate():
 
         # Make sure pip is recent enough
         command = ['pip', '--version']
-        result = self.execute_shell(command, True)
+        result = self.util.execute_shell(command, True)
         try:
             pip_version = result.stdout.split(' ')
             pip_major_version = int(pip_version[1].split('.')[0])
@@ -126,23 +126,23 @@ class ReqUpdate():
         """ Create a new branch for committing dependency updates """
         # Make sure branch does not already exist
         command = ['git', 'branch', '--list', BRANCH_NAME]
-        result = self.execute_shell(command, True)
+        result = self.util.execute_shell(command, True)
         output = result.stdout
         if output.strip() != '':
             command = ['git', 'checkout', BRANCH_NAME]
             self.branch_exists = True
         else:
             command = ['git', 'checkout', '-b', BRANCH_NAME]
-        self.execute_shell(command, False)
+        self.util.execute_shell(command, False)
 
     def rollback_branch(self) -> None:
         """ Delete the dependency update branch """
         if self.branch_exists:
             return
         command = ['git', 'checkout', '-']
-        self.execute_shell(command, False)
+        self.util.execute_shell(command, False)
         command = ['git', 'branch', '-d', BRANCH_NAME]
-        self.execute_shell(command, False)
+        self.util.execute_shell(command, False)
 
     def update_dependencies(self) -> bool:
         """
@@ -153,22 +153,22 @@ class ReqUpdate():
         clean = True
         for outdated in outdated_list:
             dependency = outdated['name']
-            self.log('Checking dependency: %s' % dependency)
+            self.util.log('Checking dependency: %s' % dependency)
             version = outdated['latest_version']
             written = self.write_dependency_update(dependency, version)
             if written:
-                self.commit_dependency_update(dependency, version)
-                self.push_dependency_update()
+                self.util.commit_dependency_update(dependency, version)
+                self.util.push_dependency_update()
                 clean = False
         if clean:
-            self.log('No updates')
+            self.util.log('No updates')
             self.rollback_branch()
         return not clean
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:
         """ Get a list of outdated pip packages """
         command = ['pip', 'list', '--outdated', '--format', 'json']
-        result = self.execute_shell(command, True)
+        result = self.util.execute_shell(command, True)
         outdated: List[Dict[str, str]] = json.loads(result.stdout)
         outdated = sorted(outdated, key=lambda p: p['name'])
         return outdated
@@ -262,28 +262,11 @@ class ReqUpdate():
             return None
         if old_version_major == new_version_major:
             return False
-        self.log('Warning: Major version change on %s: %s updated to %s' % (
-            dependency, old_version, new_version
-        ))
-        return True
-
-    def commit_dependency_update(self, dependency: str, version: str) -> None:
-        """ Create a commit with a dependency update """
-        commit_message = COMMIT_MESSAGE.format(
-            package=dependency,
-            version=version,
+        self.util.log(
+            'Warning: Major version change on %s: %s updated to %s'
+            % (dependency, old_version, new_version)
         )
-        self.log(commit_message)
-        command = ['git', 'commit', '-am', commit_message]
-        self.execute_shell(command, False)
-
-    def push_dependency_update(self) -> None:
-        """ Git push any commits to remote """
-        if not self.push:
-            return
-        self.log("Pushing commit to git remote")
-        command = ['git', 'push', '-u', 'origin']
-        self.execute_shell(command, False)
+        return True
 
     def install_updates(self) -> None:
         """ Install requirements updates """
@@ -291,35 +274,8 @@ class ReqUpdate():
             return
         for updated_file in self.updated_files:
             command = ['pip', 'install', '-r', updated_file]
-            self.execute_shell(command, False)
-            self.log('Installing updated packages in %s' % updated_file)
-
-    def execute_shell(
-        self, command: List[str], readonly: bool,
-    ) -> subprocess.CompletedProcess[str]:
-        """ Helper method to execute commands in a shell and return output """
-        if self.verbose:
-            self.log(' '.join(command))
-        if self.dry_run and not readonly:
-            return subprocess.CompletedProcess(
-                command, 0, stdout='', stderr=''
-            )
-        try:
-            result = subprocess.run(
-                command,
-                capture_output=True,
-                check=True,
-                encoding='utf-8',
-            )
-        except subprocess.CalledProcessError as error:
-            self.log(error.stdout)
-            self.log(error.stderr)
-            raise
-        return result
-
-    def log(self, data: str) -> None:
-        """ Helper method for taking care of logging statements """
-        print(data)
+            self.util.execute_shell(command, False)
+            self.util.log('Installing updated packages in %s' % updated_file)
 
 
 if __name__ == "__main__":
