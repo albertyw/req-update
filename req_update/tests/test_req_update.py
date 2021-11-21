@@ -402,65 +402,6 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         self.assertIn(self.tempfile.name, self.req_update.updated_files)
 
 
-class TestCheckMajorVersionUpdate(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.mock_log = MagicMock()
-        setattr(self.req_update.util, 'log', self.mock_log)
-
-    def test_check_non_major_update(self) -> None:
-        result = self.req_update.check_major_version_update(
-            'varsnap', '1.0.0', '1.2.3'
-        )
-        self.assertFalse(result)
-        self.assertFalse(self.mock_log.called)
-        result = self.req_update.check_major_version_update(
-            'varsnap', '1.0.0', '1.0.3'
-        )
-        self.assertFalse(result)
-        self.assertFalse(self.mock_log.called)
-
-    def test_check_major_update(self) -> None:
-        result = self.req_update.check_major_version_update(
-            'varsnap', '1.0.0', '2.0.0'
-        )
-        self.assertTrue(result)
-        self.assertTrue(self.mock_log.called)
-        log_value = self.mock_log.call_args[0][0]
-        self.assertIn('varsnap', log_value)
-        self.assertIn('1.0.0', log_value)
-        self.assertIn('2.0.0', log_value)
-
-    def test_semver_not_three_part(self) -> None:
-        result = self.req_update.check_major_version_update(
-            'varsnap', 'asdf', '2.0.0'
-        )
-        self.assertEqual(result, None)
-        self.assertFalse(self.mock_log.called)
-        result = self.req_update.check_major_version_update(
-            'varsnap', '1.0', '2.0.0'
-        )
-        self.assertEqual(result, None)
-        self.assertFalse(self.mock_log.called)
-        result = self.req_update.check_major_version_update(
-            'varsnap', '1.0.0', '2.0'
-        )
-        self.assertEqual(result, None)
-        self.assertFalse(self.mock_log.called)
-
-    def test_semver_not_integer(self) -> None:
-        result = self.req_update.check_major_version_update(
-            'varsnap', 'a.0.0', '2.0.0'
-        )
-        self.assertEqual(result, None)
-        self.assertFalse(self.mock_log.called)
-        result = self.req_update.check_major_version_update(
-            'varsnap', '1.0.0', 'a.0.0'
-        )
-        self.assertEqual(result, None)
-        self.assertFalse(self.mock_log.called)
-
-
 class TestInstallUpdates(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()

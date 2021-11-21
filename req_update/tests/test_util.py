@@ -51,6 +51,65 @@ class TestPushDependencyUpdate(unittest.TestCase):
         self.assertIn('push', command[0])
 
 
+class TestCheckMajorVersionUpdate(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_log = MagicMock()
+        setattr(self.util, 'log', self.mock_log)
+
+    def test_check_non_major_update(self) -> None:
+        result = self.util.check_major_version_update(
+            'varsnap', '1.0.0', '1.2.3'
+        )
+        self.assertFalse(result)
+        self.assertFalse(self.mock_log.called)
+        result = self.util.check_major_version_update(
+            'varsnap', '1.0.0', '1.0.3'
+        )
+        self.assertFalse(result)
+        self.assertFalse(self.mock_log.called)
+
+    def test_check_major_update(self) -> None:
+        result = self.util.check_major_version_update(
+            'varsnap', '1.0.0', '2.0.0'
+        )
+        self.assertTrue(result)
+        self.assertTrue(self.mock_log.called)
+        log_value = self.mock_log.call_args[0][0]
+        self.assertIn('varsnap', log_value)
+        self.assertIn('1.0.0', log_value)
+        self.assertIn('2.0.0', log_value)
+
+    def test_semver_not_three_part(self) -> None:
+        result = self.util.check_major_version_update(
+            'varsnap', 'asdf', '2.0.0'
+        )
+        self.assertEqual(result, None)
+        self.assertFalse(self.mock_log.called)
+        result = self.util.check_major_version_update(
+            'varsnap', '1.0', '2.0.0'
+        )
+        self.assertEqual(result, None)
+        self.assertFalse(self.mock_log.called)
+        result = self.util.check_major_version_update(
+            'varsnap', '1.0.0', '2.0'
+        )
+        self.assertEqual(result, None)
+        self.assertFalse(self.mock_log.called)
+
+    def test_semver_not_integer(self) -> None:
+        result = self.util.check_major_version_update(
+            'varsnap', 'a.0.0', '2.0.0'
+        )
+        self.assertEqual(result, None)
+        self.assertFalse(self.mock_log.called)
+        result = self.util.check_major_version_update(
+            'varsnap', '1.0.0', 'a.0.0'
+        )
+        self.assertEqual(result, None)
+        self.assertFalse(self.mock_log.called)
+
+
 class TestExecuteShell(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()

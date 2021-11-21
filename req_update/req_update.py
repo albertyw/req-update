@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import json
 import re
 import subprocess
-from typing import Dict, Iterator, List, Optional, Set
+from typing import Dict, Iterator, List, Set
 
 from . import util
 
@@ -233,40 +233,12 @@ class ReqUpdate():
             )
             if line == new_line:
                 continue
-            self.check_major_version_update(dependency, old_version, version)
+            self.util.check_major_version_update(
+                dependency, old_version, version
+            )
             lines[i] = new_line
             return True
         return False
-
-    def check_major_version_update(
-        self, dependency: str, old_version: str, new_version: str
-    ) -> Optional[bool]:
-        """
-        Try to parse versions as semver and compare major version numbers.
-        Log a warning if the major version numbers are different.
-        Returns True if there is a major version bump
-        Returns False if there is not a major version bump
-        Returns None if versions are not semver
-        """
-        old_version_parsed = old_version.split('.')
-        new_version_parsed = new_version.split('.')
-        if len(old_version_parsed) != 3 or len(new_version_parsed) != 3:
-            return None
-        try:
-            old_version_major = int(old_version_parsed[0])
-        except ValueError:
-            return None
-        try:
-            new_version_major = int(new_version_parsed[0])
-        except ValueError:
-            return None
-        if old_version_major == new_version_major:
-            return False
-        self.util.log(
-            'Warning: Major version change on %s: %s updated to %s'
-            % (dependency, old_version, new_version)
-        )
-        return True
 
     def install_updates(self) -> None:
         """ Install requirements updates """
