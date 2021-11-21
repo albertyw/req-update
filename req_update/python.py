@@ -4,7 +4,7 @@ import json
 import re
 from typing import Dict, Iterator, List, Set
 
-from . import util
+import util
 
 
 COMMIT_MESSAGE = 'Update {package} package to {version}'

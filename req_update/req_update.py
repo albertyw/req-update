@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 import argparse
+import os
 import subprocess
+import sys
 from typing import Set
 
-from . import python, util
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+import python  # NOQA
+import util  # NOQA
 
 
 VERSION = (1, 5, 2)
