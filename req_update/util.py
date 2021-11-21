@@ -3,6 +3,7 @@ import subprocess
 from typing import List, Optional
 
 
+BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {package} package to {version}'
 
 
@@ -11,6 +12,7 @@ class Util():
         self.push = False
         self.verbose = False
         self.dry_run = True
+        self.branch_exists = False
 
     def commit_dependency_update(self, dependency: str, version: str) -> None:
         """ Create a commit with a dependency update """
@@ -20,6 +22,28 @@ class Util():
         )
         self.log(commit_message)
         command = ['git', 'commit', '-am', commit_message]
+        self.execute_shell(command, False)
+
+    def create_branch(self) -> None:
+        """ Create a new branch for committing dependency updates """
+        # Make sure branch does not already exist
+        command = ['git', 'branch', '--list', BRANCH_NAME]
+        result = self.execute_shell(command, True)
+        output = result.stdout
+        if output.strip() != '':
+            command = ['git', 'checkout', BRANCH_NAME]
+            self.branch_exists = True
+        else:
+            command = ['git', 'checkout', '-b', BRANCH_NAME]
+        self.execute_shell(command, False)
+
+    def rollback_branch(self) -> None:
+        """ Delete the dependency update branch """
+        if self.branch_exists:
+            return
+        command = ['git', 'checkout', '-']
+        self.execute_shell(command, False)
+        command = ['git', 'branch', '-d', BRANCH_NAME]
         self.execute_shell(command, False)
 
     def push_dependency_update(self) -> None:

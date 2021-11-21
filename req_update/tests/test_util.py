@@ -1,6 +1,7 @@
 from __future__ import annotations
 import io
 import subprocess
+from typing import List
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -25,6 +26,65 @@ class TestCommitDependencyUpdate(unittest.TestCase):
         command = self.mock_execute_shell.mock_calls[0][1]
         self.assertIn('varsnap', command[0][3])
         self.assertIn('1.2.3', command[0][3])
+
+
+class TestCreateBranch(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.util, 'execute_shell', self.mock_execute_shell)
+
+    def test_create_branch(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        self.util.create_branch()
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+        branch_call = self.mock_execute_shell.mock_calls[0]
+        self.assertEqual(branch_call[1][0][1], 'branch')
+        create_call = self.mock_execute_shell.mock_calls[1]
+        self.assertIn('-b', create_call[1][0])
+        self.assertFalse(self.util.branch_exists)
+
+    def test_create_branch_exists(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'branch' in command:
+                return MagicMock(stdout='dep-update')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        self.util.create_branch()
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+        branch_call = self.mock_execute_shell.mock_calls[0]
+        self.assertEqual(branch_call[1][0][1], 'branch')
+        create_call = self.mock_execute_shell.mock_calls[1]
+        self.assertNotIn('-b', create_call[1][0])
+        self.assertTrue(self.util.branch_exists)
+
+
+class TestRollbackBranch(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.util, 'execute_shell', self.mock_execute_shell)
+
+    def test_rollback(self) -> None:
+        self.util.rollback_branch()
+        checkout = self.mock_execute_shell.mock_calls[0]
+        self.assertIn('checkout', checkout[1][0])
+        delete = self.mock_execute_shell.mock_calls[1]
+        self.assertIn('branch', delete[1][0])
+        self.assertIn('-d', delete[1][0])
+
+    def test_does_not_rollback_already_exists(self) -> None:
+        self.util.branch_exists = True
+        self.util.rollback_branch()
+        self.assertFalse(self.mock_execute_shell.called)
 
 
 class TestPushDependencyUpdate(unittest.TestCase):

@@ -19,7 +19,6 @@ DESCRIPTION = (
     'Update python dependencies for your project with git integration\n'
     'https://github.com/albertyw/req-update'
 )
-BRANCH_NAME = 'dep-update'
 PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
@@ -44,14 +43,13 @@ class ReqUpdate():
     def __init__(self) -> None:
         self.install = False
         self.updated_files: Set[str] = set([])
-        self.branch_exists = False
         self.util = util.Util()
 
     def main(self) -> None:
         """ Update all dependencies """
         self.get_args()
         self.check_repository_cleanliness()
-        self.create_branch()
+        self.util.create_branch()
         self.update_install_dependencies()
 
     def update_install_dependencies(self) -> None:
@@ -122,28 +120,6 @@ class ReqUpdate():
         if int(pip_major_version) < 9:
             raise RuntimeError('Pip version must be at least v9')
 
-    def create_branch(self) -> None:
-        """ Create a new branch for committing dependency updates """
-        # Make sure branch does not already exist
-        command = ['git', 'branch', '--list', BRANCH_NAME]
-        result = self.util.execute_shell(command, True)
-        output = result.stdout
-        if output.strip() != '':
-            command = ['git', 'checkout', BRANCH_NAME]
-            self.branch_exists = True
-        else:
-            command = ['git', 'checkout', '-b', BRANCH_NAME]
-        self.util.execute_shell(command, False)
-
-    def rollback_branch(self) -> None:
-        """ Delete the dependency update branch """
-        if self.branch_exists:
-            return
-        command = ['git', 'checkout', '-']
-        self.util.execute_shell(command, False)
-        command = ['git', 'branch', '-d', BRANCH_NAME]
-        self.util.execute_shell(command, False)
-
     def update_dependencies(self) -> bool:
         """
         Update and commit a list of dependency updates.
@@ -162,7 +138,7 @@ class ReqUpdate():
                 clean = False
         if clean:
             self.util.log('No updates')
-            self.rollback_branch()
+            self.util.rollback_branch()
         return not clean
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:

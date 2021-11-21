@@ -149,72 +149,15 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
             self.req_update.check_repository_cleanliness()
 
 
-class TestCreateBranch(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.mock_execute_shell = MagicMock()
-        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
-
-    def test_create_branch(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        self.req_update.create_branch()
-        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
-        branch_call = self.mock_execute_shell.mock_calls[0]
-        self.assertEqual(branch_call[1][0][1], 'branch')
-        create_call = self.mock_execute_shell.mock_calls[1]
-        self.assertIn('-b', create_call[1][0])
-        self.assertFalse(self.req_update.branch_exists)
-
-    def test_create_branch_exists(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'branch' in command:
-                return MagicMock(stdout='dep-update')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        self.req_update.create_branch()
-        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
-        branch_call = self.mock_execute_shell.mock_calls[0]
-        self.assertEqual(branch_call[1][0][1], 'branch')
-        create_call = self.mock_execute_shell.mock_calls[1]
-        self.assertNotIn('-b', create_call[1][0])
-        self.assertTrue(self.req_update.branch_exists)
-
-
-class TestRollbackBranch(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.mock_execute_shell = MagicMock()
-        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
-
-    def test_rollback(self) -> None:
-        self.req_update.rollback_branch()
-        checkout = self.mock_execute_shell.mock_calls[0]
-        self.assertIn('checkout', checkout[1][0])
-        delete = self.mock_execute_shell.mock_calls[1]
-        self.assertIn('branch', delete[1][0])
-        self.assertIn('-d', delete[1][0])
-
-    def test_does_not_rollback_already_exists(self) -> None:
-        self.req_update.branch_exists = True
-        self.req_update.rollback_branch()
-        self.assertFalse(self.mock_execute_shell.called)
-
-
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_execute_shell = MagicMock()
         setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
         self.mock_rollback_branch = MagicMock()
-        setattr(self.req_update, 'rollback_branch', self.mock_rollback_branch)
+        setattr(
+            self.req_update.util, 'rollback_branch', self.mock_rollback_branch
+        )
         self.mock_log = MagicMock()
         setattr(self.req_update.util, 'log', self.mock_log)
 
