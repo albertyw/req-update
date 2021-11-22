@@ -87,7 +87,11 @@ class ReqUpdate():
         """
         # Make sure there are no uncommitted files
         command = ['git', 'status', '--porcelain']
-        result = self.util.execute_shell(command, True)
+        try:
+            result = self.util.execute_shell(command, True)
+        except subprocess.CalledProcessError:
+            self.util.log('Must run within a git repository')
+            raise
         lines = result.stdout.split("\n")
         # Do not count untracked files when checking for repository cleanliness
         lines = [line for line in lines if line and line[:2] != '??']
