@@ -1,13 +1,17 @@
 from __future__ import annotations
 from contextlib import contextmanager
 import json
+import os
 import re
+import subprocess
+import sys
 from typing import Dict, Iterator, List, Set
 
-import util
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+import util  # NOQA
 
 
-COMMIT_MESSAGE = 'Update {package} package to {version}'
 PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
@@ -29,6 +33,27 @@ class Python():
         self.install = False
         self.updated_files: Set[str] = set([])
         self.util = util.Util()
+
+    def check_applicable(self) -> bool:
+        # Make sure pip is recent enough
+        command = ['pip', '--version']
+        try:
+            result = self.util.execute_shell(
+                command, True, suppress_output=True
+            )
+        except subprocess.CalledProcessError:
+            # Cannot find pip
+            return False
+        try:
+            pip_version = result.stdout.split(' ')
+            pip_major_version = int(pip_version[1].split('.')[0])
+        except (ValueError, IndexError):
+            # Pip version is not parseable
+            return False
+        if int(pip_major_version) < 9:
+            # Pip version must be at least v9
+            return False
+        return True
 
     def update_install_dependencies(self) -> None:
         """ Update dependencies and install updates """

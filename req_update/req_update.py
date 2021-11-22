@@ -39,6 +39,8 @@ class ReqUpdate():
         """ Update all dependencies """
         self.get_args()
         self.check_repository_cleanliness()
+        if not self.python.check_applicable():
+            return
         self.util.create_branch()
         self.python.update_install_dependencies()
 
@@ -97,17 +99,6 @@ class ReqUpdate():
         lines = [line for line in lines if line and line[:2] != '??']
         if lines:
             raise RuntimeError('Repository not clean')
-
-        # Make sure pip is recent enough
-        command = ['pip', '--version']
-        result = self.util.execute_shell(command, True)
-        try:
-            pip_version = result.stdout.split(' ')
-            pip_major_version = int(pip_version[1].split('.')[0])
-        except (ValueError, IndexError):
-            raise RuntimeError('Pip version is not parseable')
-        if int(pip_major_version) < 9:
-            raise RuntimeError('Pip version must be at least v9')
 
 
 if __name__ == "__main__":

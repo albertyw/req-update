@@ -212,6 +212,11 @@ class TestExecuteShell(unittest.TestCase):
         self.assertTrue(self.mock_log.called)
         self.assertIn('cannot access', self.mock_log.call_args[0][0])
 
+    def test_suppress_output(self) -> None:
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.util.execute_shell(['ls', 'asdf'], True, suppress_output=True)
+        self.assertFalse(self.mock_log.called)
+
 
 class TestLog(unittest.TestCase):
     def setUp(self) -> None:

@@ -16,6 +16,39 @@ PIP_OUTDATED = [
 ]
 
 
+class TestCheckApplicable(unittest.TestCase):
+    def setUp(self) -> None:
+        self.python = python.Python()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
+
+    def test_pip_version_parse(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        applicable = self.python.check_applicable()
+        self.assertFalse(applicable)
+
+    def test_pip_version(self) -> None:
+        def execute_shell_returns(
+            command: List[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            if 'pip' in command:
+                return MagicMock(stdout='pip 7.0.0')
+            return MagicMock(stdout='')
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        applicable = self.python.check_applicable()
+        self.assertFalse(applicable)
+
+
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.python = python.Python()
