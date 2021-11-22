@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 from req_update import util
 
 
-class TestCommitDependencyUpdate(unittest.TestCase):
+class TestCommitGit(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
         self.mock_log = MagicMock()
@@ -16,16 +16,28 @@ class TestCommitDependencyUpdate(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.util, 'execute_shell', self.mock_execute_shell)
 
-    def test_commit_dependency_update(self) -> None:
-        self.util.commit_dependency_update('varsnap', '1.2.3')
+    def test_commit_git(self) -> None:
+        self.util.commit_git('commit message')
         self.assertTrue(self.mock_log.called)
         log_value = self.mock_log.mock_calls[0][1]
-        self.assertIn('varsnap', log_value[0])
-        self.assertIn('1.2.3', log_value[0])
+        self.assertIn('commit message', log_value[0])
         self.assertTrue(self.mock_execute_shell.called)
         command = self.mock_execute_shell.mock_calls[0][1]
-        self.assertIn('varsnap', command[0][3])
-        self.assertIn('1.2.3', command[0][3])
+        self.assertIn('commit message', command[0][3])
+
+
+class TestCommitDependencyUpdate(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_commit_git = MagicMock()
+        setattr(self.util, 'commit_git', self.mock_commit_git)
+
+    def test_commit_dependency_update(self) -> None:
+        self.util.commit_dependency_update('varsnap', '1.2.3')
+        self.assertTrue(self.mock_commit_git.called)
+        commit_message = self.mock_commit_git.mock_calls[0][1]
+        self.assertIn('varsnap', commit_message[0])
+        self.assertIn('1.2.3', commit_message[0])
 
 
 class TestCreateBranch(unittest.TestCase):

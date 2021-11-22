@@ -14,15 +14,19 @@ class Util():
         self.dry_run = True
         self.branch_exists = False
 
+    def commit_git(self, commit_message: str) -> None:
+        """ Create a git commit of all changed files """
+        self.log(commit_message)
+        command = ['git', 'commit', '-am', commit_message]
+        self.execute_shell(command, False)
+
     def commit_dependency_update(self, dependency: str, version: str) -> None:
         """ Create a commit with a dependency update """
         commit_message = COMMIT_MESSAGE.format(
             package=dependency,
             version=version,
         )
-        self.log(commit_message)
-        command = ['git', 'commit', '-am', commit_message]
-        self.execute_shell(command, False)
+        self.commit_git(commit_message)
 
     def create_branch(self) -> None:
         """ Create a new branch for committing dependency updates """
