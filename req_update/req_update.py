@@ -39,7 +39,8 @@ class ReqUpdate():
         """ Update all dependencies """
         self.get_args()
         self.check_repository_cleanliness()
-        self.python.check_applicable()
+        if not self.python.check_applicable():
+            return
         self.util.create_branch()
         self.python.update_install_dependencies()
 

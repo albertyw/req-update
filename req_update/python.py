@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import json
 import os
 import re
+import subprocess
 import sys
 from typing import Dict, Iterator, List, Set
 
@@ -33,17 +34,26 @@ class Python():
         self.updated_files: Set[str] = set([])
         self.util = util.Util()
 
-    def check_applicable(self) -> None:
+    def check_applicable(self) -> bool:
         # Make sure pip is recent enough
         command = ['pip', '--version']
-        result = self.util.execute_shell(command, True)
+        try:
+            result = self.util.execute_shell(
+                command, True, suppress_output=True
+            )
+        except subprocess.CalledProcessError:
+            # Cannot find pip
+            return False
         try:
             pip_version = result.stdout.split(' ')
             pip_major_version = int(pip_version[1].split('.')[0])
         except (ValueError, IndexError):
-            raise RuntimeError('Pip version is not parseable')
+            # Pip version is not parseable
+            return False
         if int(pip_major_version) < 9:
-            raise RuntimeError('Pip version must be at least v9')
+            # Pip version must be at least v9
+            return False
+        return True
 
     def update_install_dependencies(self) -> None:
         """ Update dependencies and install updates """
