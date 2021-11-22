@@ -33,12 +33,15 @@ class TestReqUpdateMain(unittest.TestCase):
         setattr(self.req_update, 'get_args', mock_get_args)
         mock_check = MagicMock()
         setattr(self.req_update, 'check_repository_cleanliness', mock_check)
+        mock_applicable = MagicMock()
+        setattr(self.req_update.python, 'check_applicable', mock_applicable)
         setattr(
             self.req_update.python, 'update_install_dependencies', MagicMock()
         )
         self.req_update.main()
         self.assertTrue(mock_get_args.called)
         self.assertTrue(mock_check.called)
+        self.assertTrue(mock_applicable.called)
 
 
 class TestGetArgs(unittest.TestCase):
@@ -119,29 +122,5 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         self.mock_execute_shell.return_value = MagicMock(
             stdout=' M req_update/req_update.py'
         )
-        with self.assertRaises(RuntimeError):
-            self.req_update.check_repository_cleanliness()
-
-    def test_pip_version_parse(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'pip' in command:
-                return MagicMock(stdout='')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        with self.assertRaises(RuntimeError):
-            self.req_update.check_repository_cleanliness()
-
-    def test_pip_version(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'pip' in command:
-                return MagicMock(stdout='pip 7.0.0')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
         with self.assertRaises(RuntimeError):
             self.req_update.check_repository_cleanliness()
