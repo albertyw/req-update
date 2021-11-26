@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.6.0 (2021-11-25)
+------------------
+
+ - Support updating node dependencies
+ - Refactors
+
+
 1.5.3 (2021-11-21)
 ------------------
 
