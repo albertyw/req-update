@@ -1,7 +1,6 @@
 from __future__ import annotations
 import argparse
 import io
-import subprocess
 import sys
 from typing import List
 import unittest
@@ -32,7 +31,9 @@ class TestReqUpdateMain(unittest.TestCase):
         mock_get_args = MagicMock()
         setattr(self.req_update, 'get_args', mock_get_args)
         mock_check = MagicMock()
-        setattr(self.req_update, 'check_repository_cleanliness', mock_check)
+        setattr(
+            self.req_update.util, 'check_repository_cleanliness', mock_check
+        )
         mock_applicable = MagicMock()
         setattr(self.req_update.python, 'check_applicable', mock_applicable)
         setattr(
@@ -99,28 +100,3 @@ class TestGetArgs(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 self.get_args_with_argv(['--version'])
             self.assertTrue(len(mock_out.getvalue()) > 0)
-
-
-class TestCheckRepositoryCleanliness(unittest.TestCase):
-    def setUp(self) -> None:
-        self.req_update = req_update.ReqUpdate()
-        self.mock_execute_shell = MagicMock()
-        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
-
-    def test_clean(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'pip' in command:
-                return MagicMock(stdout='pip 20.2.4')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        self.req_update.check_repository_cleanliness()
-
-    def test_unclean(self) -> None:
-        self.mock_execute_shell.return_value = MagicMock(
-            stdout=' M req_update/req_update.py'
-        )
-        with self.assertRaises(RuntimeError):
-            self.req_update.check_repository_cleanliness()

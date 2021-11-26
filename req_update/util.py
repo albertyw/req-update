@@ -14,6 +14,24 @@ class Util():
         self.dry_run = True
         self.branch_exists = False
 
+    def check_repository_cleanliness(self) -> None:
+        """
+        Check that the repository is ready for updating dependencies.
+        Non-clean repositories will raise a RuntimeError
+        """
+        # Make sure there are no uncommitted files
+        command = ['git', 'status', '--porcelain']
+        try:
+            result = self.execute_shell(command, True)
+        except subprocess.CalledProcessError:
+            self.log('Must run within a git repository')
+            raise
+        lines = result.stdout.split("\n")
+        # Do not count untracked files when checking for repository cleanliness
+        lines = [line for line in lines if line and line[:2] != '??']
+        if lines:
+            raise RuntimeError('Repository not clean')
+
     def commit_git(self, commit_message: str) -> None:
         """ Create a git commit of all changed files """
         self.log(commit_message)
