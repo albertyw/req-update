@@ -58,8 +58,22 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_commit_git = MagicMock()
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
+        self.mock_clean = MagicMock()
+        setattr(
+            self.node.util, 'check_repository_cleanliness', self.mock_clean
+        )
+        self.mock_push = MagicMock()
+        setattr(self.node.util, 'push_dependency_update', self.mock_push)
 
     def test_install(self) -> None:
         self.node.update_install_dependencies()
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_commit_git.called)
+        self.assertFalse(self.mock_push.called)
+
+    def test_push(self) -> None:
+        self.mock_clean.side_effect = RuntimeError()
+        self.node.update_install_dependencies()
+        self.assertTrue(self.mock_execute_shell.called)
+        self.assertTrue(self.mock_commit_git.called)
+        self.assertTrue(self.mock_push.called)

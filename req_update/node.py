@@ -32,3 +32,7 @@ class Node():
         command = ['npm', 'update']
         self.util.execute_shell(command, False)
         self.util.commit_git('Update npm packages')
+        try:
+            self.util.check_repository_cleanliness()
+        except RuntimeError:
+            self.util.push_dependency_update()
