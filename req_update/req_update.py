@@ -9,6 +9,7 @@ from typing import Set
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+import node  # NOQA
 import python  # NOQA
 import util  # NOQA
 
@@ -34,15 +35,24 @@ class ReqUpdate():
         self.util = util.Util()
         self.python = python.Python()
         self.python.util = self.util
+        self.node = node.Node()
+        self.node.util = self.util
 
     def main(self) -> None:
         """ Update all dependencies """
         self.get_args()
+        branch_created = False
         self.check_repository_cleanliness()
-        if not self.python.check_applicable():
-            return
-        self.util.create_branch()
-        self.python.update_install_dependencies()
+        if self.python.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            self.python.update_install_dependencies()
+        if self.node.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            self.node.update_install_dependencies()
 
     def get_args(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description=DESCRIPTION)
