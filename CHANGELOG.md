@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.6.1 (2021-11-26)
+------------------
+
+ - Fix bug with checking if node dependency update changed files
+
+
 1.6.0 (2021-11-25)
 ------------------
 
