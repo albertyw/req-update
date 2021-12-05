@@ -49,13 +49,30 @@ class TestCheckApplicable(unittest.TestCase):
         self.assertFalse(applicable)
 
 
+class TestUpdateInstallDependencies(unittest.TestCase):
+    def setUp(self) -> None:
+        self.python = python.Python()
+        self.mock_update = MagicMock()
+        setattr(self.python, 'update_dependencies', self.mock_update)
+        self.mock_install = MagicMock()
+        setattr(self.python, 'install_updates', self.mock_install)
+
+    def test_updates_made(self) -> None:
+        self.mock_update.return_value = True
+        self.python.update_install_dependencies()
+        self.assertTrue(self.mock_install.called)
+
+    def test_no_updates_made(self) -> None:
+        self.mock_update.return_value = False
+        self.python.update_install_dependencies()
+        self.assertFalse(self.mock_install.called)
+
+
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.python = python.Python()
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
-        self.mock_rollback_branch = MagicMock()
-        setattr(self.python.util, 'rollback_branch', self.mock_rollback_branch)
         self.mock_log = MagicMock()
         setattr(self.python.util, 'log', self.mock_log)
 
@@ -79,7 +96,6 @@ class TestUpdateDependencies(unittest.TestCase):
         updated = self.python.update_dependencies()
         self.assertFalse(mock_commit.called)
         self.assertTrue(self.mock_log.called)
-        self.assertTrue(self.mock_rollback_branch.called)
         self.assertFalse(updated)
 
     def test_update_dependencies_commit(self) -> None:
@@ -98,7 +114,6 @@ class TestUpdateDependencies(unittest.TestCase):
         updated = self.python.update_dependencies()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
-        self.assertFalse(self.mock_rollback_branch.called)
         self.assertTrue(updated)
 
     def test_update_dependencies_push(self) -> None:
@@ -120,7 +135,6 @@ class TestUpdateDependencies(unittest.TestCase):
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
         self.assertTrue(mock_push.called)
-        self.assertFalse(self.mock_rollback_branch.called)
         self.assertTrue(updated)
 
 

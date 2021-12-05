@@ -57,8 +57,9 @@ class Python():
 
     def update_install_dependencies(self) -> None:
         """ Update dependencies and install updates """
-        self.update_dependencies()
-        self.install_updates()
+        updates_made = self.update_dependencies()
+        if updates_made:
+            self.install_updates()
 
     def update_dependencies(self) -> bool:
         """
@@ -78,7 +79,6 @@ class Python():
                 clean = False
         if clean:
             self.util.log('No updates')
-            self.util.rollback_branch()
         return not clean
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:
