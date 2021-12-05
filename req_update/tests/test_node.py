@@ -66,7 +66,8 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         setattr(self.node.util, 'push_dependency_update', self.mock_push)
 
     def test_install_no_updates(self) -> None:
-        self.node.update_install_dependencies()
+        updates = self.node.update_install_dependencies()
+        self.assertFalse(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertFalse(self.mock_commit_git.called)
@@ -74,7 +75,8 @@ class TestUpdateInstallDependencies(unittest.TestCase):
 
     def test_push(self) -> None:
         self.mock_clean.side_effect = RuntimeError()
-        self.node.update_install_dependencies()
+        updates = self.node.update_install_dependencies()
+        self.assertTrue(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertTrue(self.mock_commit_git.called)

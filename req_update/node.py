@@ -27,13 +27,17 @@ class Node():
             return False
         return True
 
-    def update_install_dependencies(self) -> None:
-        """ Update dependencies and install updates """
+    def update_install_dependencies(self) -> bool:
+        """
+        Update dependencies and install updates
+        Return if updates were made
+        """
         command = ['npm', 'update']
         self.util.execute_shell(command, False)
         try:
             self.util.check_repository_cleanliness()
-            return  # repository is clean so nothing to commit or push
+            return False  # repository is clean so nothing to commit or push
         except RuntimeError:
             self.util.commit_git('Update npm packages')
             self.util.push_dependency_update()
+            return True
