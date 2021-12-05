@@ -22,10 +22,11 @@ commits.
 $ req_update
 usage: req_update.py [-h] [-p] [-i] [-d] [-v] [--version]
 
-Update python dependencies for your project with git integration https://github.com/albertyw/req-
-update
+Update python and node dependencies for your project with git integration
 
-options:
+https://github.com/albertyw/req-update
+
+optional arguments:
   -h, --help     show this help message and exit
   -p, --push     Push commits individually to remote origin
   -i, --install  Install updates

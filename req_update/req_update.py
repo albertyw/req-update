@@ -19,7 +19,8 @@ __version__ = '.'.join(map(str, VERSION))
 
 
 DESCRIPTION = (
-    'Update python dependencies for your project with git integration\n'
+    'Update python and node dependencies for your project with git '
+    'integration\n\n'
     'https://github.com/albertyw/req-update'
 )
 
@@ -64,7 +65,10 @@ class ReqUpdate():
         return updates_made
 
     def get_args(self) -> argparse.Namespace:
-        parser = argparse.ArgumentParser(description=DESCRIPTION)
+        parser = argparse.ArgumentParser(
+            description=DESCRIPTION,
+            formatter_class=argparse.RawTextHelpFormatter,
+        )
         parser.add_argument(
             '-p',
             '--push',
