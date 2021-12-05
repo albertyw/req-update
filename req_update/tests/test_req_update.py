@@ -59,7 +59,8 @@ class TestReqUpdateMain(unittest.TestCase):
     def test_main_no_applicable(self) -> None:
         self.mock_python_applicable.return_value = False
         self.mock_node_applicable.return_value = False
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertFalse(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -73,7 +74,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_applicable.return_value = True
         self.mock_python_update.return_value = False
         self.mock_node_applicable.return_value = False
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertFalse(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -87,7 +89,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_applicable.return_value = True
         self.mock_python_update.return_value = True
         self.mock_node_applicable.return_value = False
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertTrue(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -101,7 +104,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_applicable.return_value = False
         self.mock_node_applicable.return_value = True
         self.mock_node_update.return_value = False
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertFalse(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -115,7 +119,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_applicable.return_value = False
         self.mock_node_applicable.return_value = True
         self.mock_node_update.return_value = True
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertTrue(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -130,7 +135,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_update.return_value = False
         self.mock_node_applicable.return_value = True
         self.mock_node_update.return_value = False
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertFalse(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -145,7 +151,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_update.return_value = True
         self.mock_node_applicable.return_value = True
         self.mock_node_update.return_value = False
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertTrue(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)
@@ -160,7 +167,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_update.return_value = False
         self.mock_node_applicable.return_value = True
         self.mock_node_update.return_value = True
-        self.req_update.main()
+        updated = self.req_update.main()
+        self.assertTrue(updated)
         self.assertTrue(self.mock_get_args.called)
         self.assertTrue(self.mock_check.called)
         self.assertTrue(self.mock_python_applicable.called)

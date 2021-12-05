@@ -38,8 +38,11 @@ class ReqUpdate():
         self.node = node.Node()
         self.node.util = self.util
 
-    def main(self) -> None:
-        """ Update all dependencies """
+    def main(self) -> bool:
+        """
+        Update all dependencies
+        Return if updates were made
+        """
         self.get_args()
         branch_created = False
         self.util.check_repository_cleanliness()
@@ -58,6 +61,7 @@ class ReqUpdate():
             updates_made = updates_made or node_updates
         if branch_created and not updates_made:
             self.util.rollback_branch()
+        return updates_made
 
     def get_args(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description=DESCRIPTION)
