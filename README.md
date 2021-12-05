@@ -20,12 +20,15 @@ commits.
 
 ```
 $ req_update
-usage: req_update.py [-h] [-d] [-v] [--version]
+usage: req_update.py [-h] [-p] [-i] [-d] [-v] [--version]
 
-Update python dependencies for your project with git integration https://github.com/albertyw/req-update
+Update python dependencies for your project with git integration https://github.com/albertyw/req-
+update
 
-optional arguments:
+options:
   -h, --help     show this help message and exit
+  -p, --push     Push commits individually to remote origin
+  -i, --install  Install updates
   -d, --dryrun   Dry run
   -v, --verbose  Verbose output
   --version      show program's version number and exit
