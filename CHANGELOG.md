@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.6.2 (2021-12-05)
+------------------
+
+ - Fix bug with committing node updates on the original branch if there were no python updates
+ - README updates
+ - Surface if dependency updates were made
+
+
 1.6.1 (2021-11-26)
 ------------------
 
