@@ -9,7 +9,7 @@
 [![Code Climate](https://codeclimate.com/github/albertyw/req-update/badges/gpa.svg)](https://codeclimate.com/github/albertyw/req-update)
 [![Test Coverage](https://codeclimate.com/github/albertyw/req-update/badges/coverage.svg)](https://codeclimate.com/github/albertyw/req-update/coverage)
 
-`req-update` is a CLI tool to automatically update dependencies listed in `requirements.txt`.
+`req-update` is a CLI tool to automatically update node and python dependencies.
 
 ## Usage
 
@@ -37,9 +37,11 @@ optional arguments:
 
 ## Features
 
+ - Update python dependencies in `requirements*.txt` pip.
+ - Update node dependencies in `package-lock.json` with npm.
  - Integrates with git, creating a branch with one commit per updated dependency
  - No third party dependencies beyond python 3 standard library
- - Automatic detection of python requirements.txt; no CLI arguments required
+ - Automatic detection of python and node dependencies; no CLI arguments required
 
 ## Comparisons
 
