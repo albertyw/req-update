@@ -56,6 +56,8 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         setattr(self.python, 'update_dependencies', self.mock_update)
         self.mock_install = MagicMock()
         setattr(self.python, 'install_updates', self.mock_install)
+        self.mock_log = MagicMock()
+        setattr(self.python.util, 'log', self.mock_log)
 
     def test_updates_made(self) -> None:
         self.mock_update.return_value = True
@@ -79,7 +81,6 @@ class TestUpdateDependencies(unittest.TestCase):
     def test_update_dependencies_clean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='[]')
         updated = self.python.update_dependencies()
-        self.assertTrue(self.mock_log.called)
         self.assertFalse(updated)
 
     def test_update_dependencies(self) -> None:
@@ -95,7 +96,6 @@ class TestUpdateDependencies(unittest.TestCase):
         setattr(self.python.util, 'commit_dependency_update', mock_commit)
         updated = self.python.update_dependencies()
         self.assertFalse(mock_commit.called)
-        self.assertTrue(self.mock_log.called)
         self.assertFalse(updated)
 
     def test_update_dependencies_commit(self) -> None:

@@ -60,6 +60,8 @@ class Python():
         updates_made = self.update_dependencies()
         if updates_made:
             self.install_updates()
+        else:
+            self.util.log('No updates')
 
     def update_dependencies(self) -> bool:
         """
@@ -77,8 +79,6 @@ class Python():
                 self.util.commit_dependency_update(dependency, version)
                 self.util.push_dependency_update()
                 clean = False
-        if clean:
-            self.util.log('No updates')
         return not clean
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:
