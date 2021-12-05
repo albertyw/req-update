@@ -55,13 +55,17 @@ class Python():
             return False
         return True
 
-    def update_install_dependencies(self) -> None:
-        """ Update dependencies and install updates """
+    def update_install_dependencies(self) -> bool:
+        """
+        Update dependencies and install updates
+        Return if updates were made.
+        """
         updates_made = self.update_dependencies()
         if updates_made:
             self.install_updates()
         else:
             self.util.log('No updates')
+        return updates_made
 
     def update_dependencies(self) -> bool:
         """
