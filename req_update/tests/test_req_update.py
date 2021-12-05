@@ -24,25 +24,151 @@ class TestMain(unittest.TestCase):
 class TestReqUpdateMain(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
-        self.mock_execute_shell = MagicMock()
-        setattr(self.req_update.util, 'execute_shell', self.mock_execute_shell)
+        self.mock_get_args = MagicMock()
+        setattr(self.req_update, 'get_args', self.mock_get_args)
+        self.mock_check = MagicMock()
+        setattr(
+            self.req_update.util, 'check_repository_cleanliness',
+            self.mock_check
+        )
+        self.mock_create_branch = MagicMock()
+        setattr(self.req_update.util, 'create_branch', self.mock_create_branch)
+        self.mock_python_applicable = MagicMock()
+        setattr(
+            self.req_update.python, 'check_applicable',
+            self.mock_python_applicable
+        )
+        self.mock_python_update = MagicMock()
+        setattr(
+            self.req_update.python, 'update_install_dependencies',
+            self.mock_python_update,
+        )
+        self.mock_node_applicable = MagicMock()
+        setattr(
+            self.req_update.node, 'check_applicable',
+            self.mock_node_applicable
+        )
+        self.mock_node_update = MagicMock()
+        setattr(
+            self.req_update.node, 'update_install_dependencies',
+            self.mock_node_update,
+        )
+        self.mock_rollback = MagicMock()
+        setattr(self.req_update.util, 'rollback_branch', self.mock_rollback)
 
-    def test_main(self) -> None:
-        mock_get_args = MagicMock()
-        setattr(self.req_update, 'get_args', mock_get_args)
-        mock_check = MagicMock()
-        setattr(
-            self.req_update.util, 'check_repository_cleanliness', mock_check
-        )
-        mock_applicable = MagicMock()
-        setattr(self.req_update.python, 'check_applicable', mock_applicable)
-        setattr(
-            self.req_update.python, 'update_install_dependencies', MagicMock()
-        )
+    def test_main_no_applicable(self) -> None:
+        self.mock_python_applicable.return_value = False
+        self.mock_node_applicable.return_value = False
         self.req_update.main()
-        self.assertTrue(mock_get_args.called)
-        self.assertTrue(mock_check.called)
-        self.assertTrue(mock_applicable.called)
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertFalse(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertFalse(self.mock_node_update.called)
+        self.assertFalse(self.mock_create_branch.called)
+        self.assertFalse(self.mock_rollback.called)
+
+    def test_main_python_applicable_no_update(self) -> None:
+        self.mock_python_applicable.return_value = True
+        self.mock_python_update.return_value = False
+        self.mock_node_applicable.return_value = False
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertTrue(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertFalse(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertTrue(self.mock_rollback.called)
+
+    def test_main_python_applicable_update(self) -> None:
+        self.mock_python_applicable.return_value = True
+        self.mock_python_update.return_value = True
+        self.mock_node_applicable.return_value = False
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertTrue(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertFalse(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertFalse(self.mock_rollback.called)
+
+    def test_main_node_applicable_no_update(self) -> None:
+        self.mock_python_applicable.return_value = False
+        self.mock_node_applicable.return_value = True
+        self.mock_node_update.return_value = False
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertFalse(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertTrue(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertTrue(self.mock_rollback.called)
+
+    def test_main_node_applicable_update(self) -> None:
+        self.mock_python_applicable.return_value = False
+        self.mock_node_applicable.return_value = True
+        self.mock_node_update.return_value = True
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertFalse(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertTrue(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertFalse(self.mock_rollback.called)
+
+    def test_main_all_applicable_no_update(self) -> None:
+        self.mock_python_applicable.return_value = True
+        self.mock_python_update.return_value = False
+        self.mock_node_applicable.return_value = True
+        self.mock_node_update.return_value = False
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertTrue(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertTrue(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertTrue(self.mock_rollback.called)
+
+    def test_main_all_applicable_python_update(self) -> None:
+        self.mock_python_applicable.return_value = True
+        self.mock_python_update.return_value = True
+        self.mock_node_applicable.return_value = True
+        self.mock_node_update.return_value = False
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertTrue(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertTrue(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertFalse(self.mock_rollback.called)
+
+    def test_main_all_applicable_node_update(self) -> None:
+        self.mock_python_applicable.return_value = True
+        self.mock_python_update.return_value = False
+        self.mock_node_applicable.return_value = True
+        self.mock_node_update.return_value = True
+        self.req_update.main()
+        self.assertTrue(self.mock_get_args.called)
+        self.assertTrue(self.mock_check.called)
+        self.assertTrue(self.mock_python_applicable.called)
+        self.assertTrue(self.mock_python_update.called)
+        self.assertTrue(self.mock_node_applicable.called)
+        self.assertTrue(self.mock_node_update.called)
+        self.assertTrue(self.mock_create_branch.called)
+        self.assertFalse(self.mock_rollback.called)
 
 
 class TestGetArgs(unittest.TestCase):

@@ -43,16 +43,21 @@ class ReqUpdate():
         self.get_args()
         branch_created = False
         self.util.check_repository_cleanliness()
+        updates_made = False
         if self.python.check_applicable():
             if not branch_created:
                 self.util.create_branch()
                 branch_created = True
-            self.python.update_install_dependencies()
+            python_updates = self.python.update_install_dependencies()
+            updates_made = updates_made or python_updates
         if self.node.check_applicable():
             if not branch_created:
                 self.util.create_branch()
                 branch_created = True
-            self.node.update_install_dependencies()
+            node_updates = self.node.update_install_dependencies()
+            updates_made = updates_made or node_updates
+        if branch_created and not updates_made:
+            self.util.rollback_branch()
 
     def get_args(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description=DESCRIPTION)
