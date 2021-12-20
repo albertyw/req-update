@@ -100,6 +100,7 @@ class ReqUpdate():
         )
         args = parser.parse_args()
         self.install = args.install
+        self.python.install = self.install
         self.util.push = args.push
         self.util.verbose = args.verbose
         self.util.dry_run = args.dryrun
