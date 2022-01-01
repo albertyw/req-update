@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 from typing import List
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from req_update import python
 
@@ -40,6 +40,13 @@ class TestCheckApplicable(unittest.TestCase):
 
     def test_pip_version(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='pip 7.0.0')
+        applicable = self.python.check_applicable()
+        self.assertFalse(applicable)
+
+    @patch('os.listdir')
+    def test_requirements_not_exists(self, listdir: MagicMock) -> None:
+        self.mock_execute_shell.return_value = MagicMock(stdout='pip 21.3.1')
+        listdir.return_value = []
         applicable = self.python.check_applicable()
         self.assertFalse(applicable)
 
