@@ -53,6 +53,13 @@ class Python():
         if int(pip_major_version) < 9:
             # Pip version must be at least v9
             return False
+
+        # Make sure there's at least one requirements files
+        for f in REQUIREMENTS_FILES:
+            if f in os.listdir('.'):
+                break
+        else:
+            return False
         return True
 
     def update_install_dependencies(self) -> bool:
