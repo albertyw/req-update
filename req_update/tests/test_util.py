@@ -10,20 +10,21 @@ from req_update import util
 
 class TestCheckRepositoryCleanliness(unittest.TestCase):
     def setUp(self) -> None:
+        self.mock_log = MagicMock()
         self.util = util.Util()
         self.mock_execute_shell = MagicMock()
         setattr(self.util, 'execute_shell', self.mock_execute_shell)
+        setattr(self.util, 'log', self.mock_log)
 
     def test_clean(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'pip' in command:
-                return MagicMock(stdout='pip 20.2.4')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
+        self.mock_execute_shell.return_error = MagicMock(stdout='')
         self.util.check_repository_cleanliness()
+
+    def test_git_error(self) -> None:
+        error = subprocess.CalledProcessError(1, 'git')
+        self.mock_execute_shell.side_effect = error
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.util.check_repository_cleanliness()
 
     def test_unclean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(
