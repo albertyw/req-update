@@ -22,29 +22,24 @@ class TestCheckApplicable(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
 
+    def test_applicable(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(stdout='pip 21.3.1')
+        applicable = self.python.check_applicable()
+        self.assertTrue(applicable)
+
+    def test_pip_error(self) -> None:
+        error = subprocess.CalledProcessError(1, 'error')
+        self.mock_execute_shell.side_effect = error
+        applicable = self.python.check_applicable()
+        self.assertFalse(applicable)
+
     def test_pip_version_parse(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-            suppress_output: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'pip' in command:
-                return MagicMock(stdout='')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
+        self.mock_execute_shell.return_value = MagicMock(stdout='')
         applicable = self.python.check_applicable()
         self.assertFalse(applicable)
 
     def test_pip_version(self) -> None:
-        def execute_shell_returns(
-            command: List[str],
-            readonly: bool,
-            suppress_output: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if 'pip' in command:
-                return MagicMock(stdout='pip 7.0.0')
-            return MagicMock(stdout='')
-        self.mock_execute_shell.side_effect = execute_shell_returns
+        self.mock_execute_shell.return_value = MagicMock(stdout='pip 7.0.0')
         applicable = self.python.check_applicable()
         self.assertFalse(applicable)
 
