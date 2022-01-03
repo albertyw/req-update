@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.6.4 (2022-01-02)
+------------------
+
+ - Limit python dependency update to only when requirements.txt is present
+ - Bring test coverage back to 100%
+ - Update dependencies
+
+
 1.6.3 (2021-12-20)
 ------------------
 
