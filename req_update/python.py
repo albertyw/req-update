@@ -41,7 +41,7 @@ class Python():
             result = self.util.execute_shell(
                 command, True, suppress_output=True
             )
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, FileNotFoundError):
             # Cannot find pip
             return False
         try:
