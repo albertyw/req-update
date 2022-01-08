@@ -130,6 +130,11 @@ class Util():
             raise
         return result
 
+    def warn(self, data: str) -> None:
+        """ Helper method for warn-level logs """
+        data = f'\033[93m{data}\033[0m'
+        return self.log(data)
+
     def log(self, data: str) -> None:
         """ Helper method for taking care of logging statements """
         print(data)
