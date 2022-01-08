@@ -23,7 +23,7 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
     def test_git_error(self) -> None:
         error = subprocess.CalledProcessError(1, 'git')
         self.mock_execute_shell.side_effect = error
-        with self.assertRaises(subprocess.CalledProcessError):
+        with self.assertRaises(RuntimeError):
             self.util.check_repository_cleanliness()
 
     def test_unclean(self) -> None:

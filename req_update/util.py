@@ -23,9 +23,8 @@ class Util():
         command = ['git', 'status', '--porcelain']
         try:
             result = self.execute_shell(command, True)
-        except subprocess.CalledProcessError:
-            self.log('Must run within a git repository')
-            raise
+        except subprocess.CalledProcessError as error:
+            raise RuntimeError('Must run within a git repository') from error
         lines = result.stdout.split("\n")
         # Do not count untracked files when checking for repository cleanliness
         lines = [line for line in lines if line and line[:2] != '??']
