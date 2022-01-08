@@ -256,6 +256,16 @@ class TestExecuteShell(unittest.TestCase):
         self.assertFalse(self.mock_log.called)
 
 
+class TestWarn(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+
+    def test_warn(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.util.log('asdf')
+            self.assertIn(mock_out.getvalue(), 'asdf\n')
+
+
 class TestLog(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
