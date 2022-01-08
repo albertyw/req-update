@@ -99,7 +99,7 @@ class Util():
             return None
         if old_version_major == new_version_major:
             return False
-        self.log(
+        self.warn(
             'Warning: Major version change on %s: %s updated to %s'
             % (dependency, old_version, new_version)
         )
@@ -126,7 +126,7 @@ class Util():
         except subprocess.CalledProcessError as error:
             if not suppress_output:
                 self.log(error.stdout)
-                self.log(error.stderr)
+                self.warn(error.stderr)
             raise
         return result
 
