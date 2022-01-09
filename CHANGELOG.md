@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+1.6.5 (2022-01-08)
+------------------
+
+ - Add color to warning logs
+ - Remove explicit support for EOL python 3.5 and 3.6
+ - Update error outputs
+ - Update dependencies
+
+
 1.6.4 (2022-01-02)
 ------------------
 
