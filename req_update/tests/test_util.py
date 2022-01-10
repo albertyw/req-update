@@ -262,8 +262,9 @@ class TestWarn(unittest.TestCase):
 
     def test_warn(self) -> None:
         with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
-            self.util.log('asdf')
-            self.assertIn(mock_out.getvalue(), 'asdf\n')
+            self.util.warn('asdf')
+            self.assertIn('asdf', mock_out.getvalue())
+            self.assertNotEqual(mock_out.getvalue(), 'asdf\n')
 
 
 class TestLog(unittest.TestCase):
