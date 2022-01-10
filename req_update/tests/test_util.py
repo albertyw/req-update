@@ -1,5 +1,6 @@
 from __future__ import annotations
 import io
+import os
 import subprocess
 from typing import List
 import unittest
@@ -259,12 +260,27 @@ class TestExecuteShell(unittest.TestCase):
 class TestWarn(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
+        self.original_env = os.getenv('NO_COLOR', None)
+
+    def tearDown(self) -> None:
+        if self.original_env is not None:
+            os.environ['NO_COLOR'] = self.original_env  # pragma: no cover
+        elif 'NO_COLOR' in os.environ:
+            del os.environ['NO_COLOR']
 
     def test_warn(self) -> None:
+        if 'NO_COLOR' in os.environ:
+            del os.environ['NO_COLOR']  # pragma: no cover
         with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
             self.util.warn('asdf')
             self.assertIn('asdf', mock_out.getvalue())
             self.assertNotEqual(mock_out.getvalue(), 'asdf\n')
+
+    def test_warn_no_color(self) -> None:
+        os.environ['NO_COLOR'] = 'true'
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.util.warn('asdf')
+            self.assertEqual(mock_out.getvalue(), 'asdf\n')
 
 
 class TestLog(unittest.TestCase):

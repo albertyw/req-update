@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import subprocess
 from typing import List, Optional
 
@@ -130,9 +131,15 @@ class Util():
             raise
         return result
 
+    @staticmethod
+    def is_no_color() -> bool:
+        """ Return if output should have no color: https://no-color.org/ """
+        return 'NO_COLOR' in os.environ
+
     def warn(self, data: str) -> None:
         """ Helper method for warn-level logs """
-        data = f'\033[93m{data}\033[0m'
+        if not Util.is_no_color():
+            data = f'\033[93m{data}\033[0m'
         return self.log(data)
 
     def log(self, data: str) -> None:
