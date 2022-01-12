@@ -32,6 +32,10 @@ class Node():
         Update dependencies and install updates
         Return if updates were made
         """
+        updated = self.update_unpinned_dependencies()
+        return updated
+
+    def update_unpinned_dependencies(self) -> bool:
         command = ['npm', 'update']
         self.util.execute_shell(command, False)
         try:

@@ -54,6 +54,11 @@ class TestCheckApplicable(unittest.TestCase):
 class TestUpdateInstallDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.node = node.Node()
+
+
+class TestUpdateUnpinnedDependencies(unittest.TestCase):
+    def setUp(self) -> None:
+        self.node = node.Node()
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_clean = MagicMock()
@@ -66,7 +71,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         setattr(self.node.util, 'push_dependency_update', self.mock_push)
 
     def test_install_no_updates(self) -> None:
-        updates = self.node.update_install_dependencies()
+        updates = self.node.update_unpinned_dependencies()
         self.assertFalse(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
@@ -75,7 +80,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
 
     def test_push(self) -> None:
         self.mock_clean.side_effect = RuntimeError()
-        updates = self.node.update_install_dependencies()
+        updates = self.node.update_unpinned_dependencies()
         self.assertTrue(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
