@@ -1,8 +1,9 @@
 from __future__ import annotations
+import json
 import os
 import subprocess
 import sys
-from typing import Mapping
+from typing import cast, Mapping
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -56,7 +57,11 @@ class Node():
         return True
 
     def get_outdated(self) -> Mapping[str, Mapping[str, str]]:
-        raise NotImplementedError()
+        command = ['npm', 'outdated', '--json']
+        result = self.util.execute_shell(command, True, ignore_exit_code=True)
+        data = json.loads(result.stdout)
+        packages = cast(Mapping[str, Mapping[str, str]], data)
+        return packages
 
     def update_package(
         self, package_name: str, package: Mapping[str, str]
