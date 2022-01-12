@@ -2,6 +2,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+from typing import Mapping
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -45,3 +46,19 @@ class Node():
             self.util.commit_git('Update npm packages')
             self.util.push_dependency_update()
             return True
+
+    def update_pinned_dependencies(self) -> bool:
+        packages = self.get_outdated()
+        if not packages:
+            return False
+        for package_name, package in packages.items():
+            self.update_package(package_name, package)
+        return True
+
+    def get_outdated(self) -> Mapping[str, Mapping[str, str]]:
+        raise NotImplementedError()
+
+    def update_package(
+        self, package_name: str, package: Mapping[str, str]
+    ) -> bool:
+        raise NotImplementedError()
