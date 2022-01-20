@@ -40,8 +40,9 @@ class Node():
         Update dependencies and install updates
         Return if updates were made
         """
-        updated = self.update_unpinned_dependencies()
-        return updated
+        updated_unpinned = self.update_unpinned_dependencies()
+        updated_pinned = self.update_pinned_dependencies()
+        return updated_unpinned or updated_pinned
 
     def update_unpinned_dependencies(self) -> bool:
         command = ['npm', 'update']
