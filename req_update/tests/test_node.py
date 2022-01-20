@@ -1,7 +1,9 @@
 from __future__ import annotations
 import json
+import os
 import subprocess
-from typing import List
+import tempfile
+from typing import Any, List, Mapping, cast
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -136,3 +138,60 @@ class TestGetOutdated(unittest.TestCase):
         self.mock_execute_shell().stdout = json.dumps(MOCK_NPM_OUTDATED)
         data = self.node.get_outdated()
         self.assertEqual(data, MOCK_NPM_OUTDATED)
+
+
+class TestUpdatePackage(unittest.TestCase):
+    def setUp(self) -> None:
+        self.node = node.Node()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.original_cwd = os.getcwd()
+        os.chdir(self.temp_dir.name)
+
+    def tearDown(self) -> None:
+        os.chdir(self.original_cwd)
+        self.temp_dir.cleanup()
+
+    def write_package(self, data: Mapping[str, Any]) -> None:
+        with open('package.json', 'w') as handle:
+            handle.write(json.dumps(data))
+
+    def read_package(self) -> Mapping[str, Any]:
+        with open('package.json', 'r') as handle:
+            package_string = handle.read()
+        package = cast(Mapping[str, Any], json.loads(package_string))
+        return package
+
+    def test_no_updates(self) -> None:
+        original_package: Mapping[str, Any] = {
+            'dependencies': {},
+            'devDependencies': {},
+        }
+        self.write_package(original_package)
+        mock_update = MagicMock()
+        setattr(self.node, 'update_package_dependencies', mock_update)
+        self.node.update_package('varsnap', MOCK_NPM_OUTDATED['varsnap'])
+        self.assertFalse(mock_update.called)
+        package = self.read_package()
+        self.assertEqual(package, original_package)
+
+    def test_prod_updates(self) -> None:
+        original_package: Mapping[str, Any] = {
+            'dependencies': {'varsnap': '1.0.0'},
+            'devDependencies': {},
+        }
+        self.write_package(original_package)
+        self.node.update_package('varsnap', MOCK_NPM_OUTDATED['varsnap'])
+        package = self.read_package()
+        self.assertNotEqual(package, original_package)
+        self.assertEqual(package['dependencies']['varsnap'], '^1.0.0')
+
+    def test_dev_updates(self) -> None:
+        original_package: Mapping[str, Any] = {
+            'dependencies': {},
+            'devDependencies': {'varsnap': '1.0.0'},
+        }
+        self.write_package(original_package)
+        self.node.update_package('varsnap', MOCK_NPM_OUTDATED['varsnap'])
+        package = self.read_package()
+        self.assertNotEqual(package, original_package)
+        self.assertEqual(package['devDependencies']['varsnap'], '^1.0.0')
