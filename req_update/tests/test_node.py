@@ -1,10 +1,25 @@
 from __future__ import annotations
+import json
 import subprocess
 from typing import List
 import unittest
 from unittest.mock import MagicMock, patch
 
 from req_update import node
+
+
+MOCK_NPM_OUTDATED = {
+    'dotenv': {
+        'current': '5.0.0',
+        'wanted': '5.2.0',
+        'latest': '5.2.0',
+    },
+    'varsnap': {
+        'current': '1.0.0',
+        'wanted': '1.0.1',
+        'latest': '1.0.1',
+    },
+}
 
 
 class TestCheckApplicable(unittest.TestCase):
@@ -102,21 +117,22 @@ class TestUpdatePinnedDependencies(unittest.TestCase):
         self.assertFalse(updated)
 
     def test_update_pinned_dependencies(self) -> None:
-        self.mock_get_outdated.return_value = {
-            'dotenv': {
-                'current': '5.0.0',
-                'wanted': '5.2.0',
-                'latest': '5.2.0',
-            },
-            'varsnap': {
-                'current': '1.0.0',
-                'wanted': '1.0.1',
-                'latest': '1.0.1',
-            },
-        }
+        self.mock_get_outdated.return_value = MOCK_NPM_OUTDATED
         updated = self.node.update_pinned_dependencies()
         self.assertTrue(updated)
         self.assertEqual(len(self.mock_update_package.call_args), 2)
         names = [c[0][0] for c in self.mock_update_package.call_args_list]
         self.assertTrue('dotenv' in names)
         self.assertTrue('varsnap' in names)
+
+
+class TestGetOutdated(unittest.TestCase):
+    def setUp(self) -> None:
+        self.node = node.Node()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
+
+    def test_get_outdated(self) -> None:
+        self.mock_execute_shell().stdout = json.dumps(MOCK_NPM_OUTDATED)
+        data = self.node.get_outdated()
+        self.assertEqual(data, MOCK_NPM_OUTDATED)
