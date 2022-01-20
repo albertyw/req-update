@@ -1,13 +1,19 @@
 from __future__ import annotations
 import json
 import os
+import re
 import subprocess
 import sys
-from typing import cast, Mapping
+from typing import cast, Dict, Mapping
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import util  # NOQA
+
+
+# Copied and simplified from
+# https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+SEMVER = r'^(?P<major>0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$'
 
 
 class Node():
@@ -89,7 +95,12 @@ class Node():
         return True
 
     def update_package_dependencies(
-        self, dependencies: Mapping[str, str], package_name: str,
+        self, dependencies: Dict[str, str], package_name: str,
         package: Mapping[str, str]
     ) -> Mapping[str, str]:
-        raise NotImplementedError()
+        new_version = package['latest']
+        match = re.match(SEMVER, new_version)
+        if match:
+            new_version = '^%s.0.0' % match.groupdict()['major']
+        dependencies[package_name] = new_version
+        return dependencies
