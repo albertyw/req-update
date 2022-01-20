@@ -13,7 +13,7 @@ import util  # NOQA
 
 # Copied and simplified from
 # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-SEMVER = r'^(?P<major>0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$'
+SEMVER = r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$'  # NOQA
 
 
 class Node():
@@ -99,8 +99,24 @@ class Node():
         package: Mapping[str, str]
     ) -> Mapping[str, str]:
         new_version = package['latest']
-        match = re.match(SEMVER, new_version)
-        if match:
-            new_version = '^%s.0.0' % match.groupdict()['major']
+        new_version = Node.generate_package_version(new_version)
         dependencies[package_name] = new_version
         return dependencies
+
+    @staticmethod
+    def generate_package_version(version: str) -> str:
+        """
+        Given a version, generate a version specifier that allows updates
+        within the most recent non-zero version for semver versions
+        """
+        match = re.match(SEMVER, version)
+        if not match:
+            return version
+        versions = match.groupdict()
+        if versions['major'] != '0':
+            return '^%s.0.0' % versions['major']
+        if versions['minor'] != '0':
+            return '^0.%s.0' % versions['minor']
+        if versions['patch'] != '0':
+            return version
+        raise ValueError("Cannot compute version")  # pragma: no cover
