@@ -86,3 +86,37 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         self.assertTrue(self.mock_clean.called)
         self.assertTrue(self.mock_commit_git.called)
         self.assertTrue(self.mock_push.called)
+
+
+class TestUpdatePinnedDependencies(unittest.TestCase):
+    def setUp(self) -> None:
+        self.node = node.Node()
+        self.mock_get_outdated = MagicMock()
+        setattr(self.node, 'get_outdated', self.mock_get_outdated)
+        self.mock_update_package = MagicMock()
+        setattr(self.node, 'update_package', self.mock_update_package)
+
+    def test_update_no_pinned_dependencies(self) -> None:
+        self.mock_get_outdated.return_value = []
+        updated = self.node.update_pinned_dependencies()
+        self.assertFalse(updated)
+
+    def test_update_pinned_dependencies(self) -> None:
+        self.mock_get_outdated.return_value = {
+            'dotenv': {
+                'current': '5.0.0',
+                'wanted': '5.2.0',
+                'latest': '5.2.0',
+            },
+            'varsnap': {
+                'current': '1.0.0',
+                'wanted': '1.0.1',
+                'latest': '1.0.1',
+            },
+        }
+        updated = self.node.update_pinned_dependencies()
+        self.assertTrue(updated)
+        self.assertEqual(len(self.mock_update_package.call_args), 2)
+        names = [c[0][0] for c in self.mock_update_package.call_args_list]
+        self.assertTrue('dotenv' in names)
+        self.assertTrue('varsnap' in names)
