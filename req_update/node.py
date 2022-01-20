@@ -66,4 +66,30 @@ class Node():
     def update_package(
         self, package_name: str, package: Mapping[str, str]
     ) -> bool:
+        with open('package.json', 'r') as handle:
+            package_json_string = handle.read()
+        package_json = json.loads(package_json_string)
+        if package_name in package_json['dependencies']:
+            package_json['dependencies'] = self.update_package_dependencies(
+                package_json['dependencies'],
+                package_name,
+                package,
+            )
+        elif package_name in package_json['devDependencies']:
+            package_json['devDependencies'] = self.update_package_dependencies(
+                package_json['devDependencies'],
+                package_name,
+                package,
+            )
+        else:
+            return False
+        package_json_string = json.dumps(package_json, indent=2)
+        with open('package.json', 'w') as handle:
+            handle.write(package_json_string)
+        return True
+
+    def update_package_dependencies(
+        self, dependencies: Mapping[str, str], package_name: str,
+        package: Mapping[str, str]
+    ) -> Mapping[str, str]:
         raise NotImplementedError()
