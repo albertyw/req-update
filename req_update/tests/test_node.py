@@ -195,3 +195,20 @@ class TestUpdatePackage(unittest.TestCase):
         package = self.read_package()
         self.assertNotEqual(package, original_package)
         self.assertEqual(package['devDependencies']['varsnap'], '^1.0.0')
+
+
+class TestGeneratePackageVersion(unittest.TestCase):
+    def test_major(self) -> None:
+        self.assertEqual(node.Node.generate_package_version('1.0.0'), '^1.0.0')
+        self.assertEqual(node.Node.generate_package_version('1.5.0'), '^1.0.0')
+        self.assertEqual(node.Node.generate_package_version('1.0.5'), '^1.0.0')
+
+    def test_minor(self) -> None:
+        self.assertEqual(node.Node.generate_package_version('0.1.0'), '^0.1.0')
+        self.assertEqual(node.Node.generate_package_version('0.1.5'), '^0.1.0')
+
+    def test_patch(self) -> None:
+        self.assertEqual(node.Node.generate_package_version('0.0.1'), '0.0.1')
+
+    def test_not_semver(self) -> None:
+        self.assertEqual(node.Node.generate_package_version('asdf'), 'asdf')
