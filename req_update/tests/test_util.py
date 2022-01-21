@@ -256,6 +256,13 @@ class TestExecuteShell(unittest.TestCase):
             self.util.execute_shell(['ls', 'asdf'], True, suppress_output=True)
         self.assertFalse(self.mock_log.called)
 
+    def test_ignore_exit_code(self) -> None:
+        command = ['ls', '/asdf']
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.util.execute_shell(command, True)
+        result = self.util.execute_shell(command, True, ignore_exit_code=True)
+        self.assertIn('ls', result.stderr)
+
 
 class TestWarn(unittest.TestCase):
     def setUp(self) -> None:
