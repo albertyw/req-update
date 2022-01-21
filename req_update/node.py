@@ -88,17 +88,21 @@ class Node():
                 package_name,
                 package,
             )
+            new_version = package_json['dependencies'][package_name]
         elif package_name in package_json['devDependencies']:
             package_json['devDependencies'] = self.update_package_dependencies(
                 package_json['devDependencies'],
                 package_name,
                 package,
             )
+            new_version = package_json['devDependencies'][package_name]
         else:
             return False
         package_json_string = json.dumps(package_json, indent=2)
         with open('package.json', 'w') as handle:
             handle.write(package_json_string)
+        self.util.commit_dependency_update(package_name, new_version)
+        self.util.push_dependency_update()
         return True
 
     def update_package_dependencies(
