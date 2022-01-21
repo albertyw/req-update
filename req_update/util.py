@@ -109,6 +109,7 @@ class Util():
     def execute_shell(
         self, command: List[str], readonly: bool,
         suppress_output: bool = False,
+        ignore_exit_code: bool = False,
     ) -> subprocess.CompletedProcess[str]:
         """ Helper method to execute commands in a shell and return output """
         if self.verbose:
@@ -125,6 +126,10 @@ class Util():
                 encoding='utf-8',
             )
         except subprocess.CalledProcessError as error:
+            if ignore_exit_code:
+                # TODO: return a special python type that combines
+                # CalledProcessError and CompletedProcess
+                return error  # type: ignore
             if not suppress_output:
                 self.log(error.stdout)
                 self.warn(error.stderr)
