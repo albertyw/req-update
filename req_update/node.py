@@ -62,9 +62,12 @@ class Node():
         packages = self.get_outdated()
         if not packages:
             return False
+        any_updated = False
         for package_name, package in packages.items():
-            self.update_package(package_name, package)
-        return True
+            updated = self.update_package(package_name, package)
+            if updated:
+                any_updated = True
+        return any_updated
 
     def get_outdated(self) -> Mapping[str, Mapping[str, str]]:
         command = ['npm', 'outdated', '--json']
