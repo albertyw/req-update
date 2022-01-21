@@ -42,7 +42,10 @@ class Node():
         """
         updated_unpinned = self.update_unpinned_dependencies()
         updated_pinned = self.update_pinned_dependencies()
-        return updated_unpinned or updated_pinned
+        updated = updated_unpinned or updated_pinned
+        if not updated:
+            self.util.warn('No node updates')
+        return updated
 
     def update_unpinned_dependencies(self) -> bool:
         command = ['npm', 'update']
