@@ -49,6 +49,7 @@ class Node():
 
     def update_unpinned_dependencies(self) -> bool:
         command = ['npm', 'update']
+        self.util.log('Updating npm packages')
         self.util.execute_shell(command, False)
         try:
             self.util.check_repository_cleanliness()
@@ -79,6 +80,7 @@ class Node():
     def update_package(
         self, package_name: str, package: Mapping[str, str]
     ) -> bool:
+        self.util.log('Updating dependency: %s' % package_name)
         with open('package.json', 'r') as handle:
             package_json_string = handle.read()
         package_json = json.loads(package_json_string)
