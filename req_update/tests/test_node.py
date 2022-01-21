@@ -154,12 +154,19 @@ class TestUpdatePinnedDependencies(unittest.TestCase):
 
     def test_update_pinned_dependencies(self) -> None:
         self.mock_get_outdated.return_value = MOCK_NPM_OUTDATED
+        self.mock_update_package.return_value = True
         updated = self.node.update_pinned_dependencies()
         self.assertTrue(updated)
         self.assertEqual(len(self.mock_update_package.call_args), 2)
         names = [c[0][0] for c in self.mock_update_package.call_args_list]
         self.assertTrue('dotenv' in names)
         self.assertTrue('varsnap' in names)
+
+    def test_update_unknown_dependencies(self) -> None:
+        self.mock_get_outdated.return_value = MOCK_NPM_OUTDATED
+        self.mock_update_package.return_value = False
+        updated = self.node.update_pinned_dependencies()
+        self.assertFalse(updated)
 
 
 class TestGetOutdated(unittest.TestCase):
