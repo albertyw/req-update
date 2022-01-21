@@ -101,6 +101,7 @@ class Node():
         else:
             return False
         package_json_string = json.dumps(package_json, indent=2)
+        package_json_string += "\n"  # Add the traditional EOF newline
         with open('package.json', 'w') as handle:
             handle.write(package_json_string)
         self.util.commit_dependency_update(package_name, new_version)
