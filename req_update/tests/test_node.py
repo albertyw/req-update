@@ -120,6 +120,8 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
         self.mock_push = MagicMock()
         setattr(self.node.util, 'push_dependency_update', self.mock_push)
+        self.mock_log = MagicMock()
+        setattr(self.node.util, 'log', self.mock_log)
 
     def test_install_no_updates(self) -> None:
         updates = self.node.update_unpinned_dependencies()
@@ -184,6 +186,8 @@ class TestGetOutdated(unittest.TestCase):
 class TestUpdatePackage(unittest.TestCase):
     def setUp(self) -> None:
         self.node = node.Node()
+        self.mock_log = MagicMock()
+        setattr(self.node.util, 'log', self.mock_log)
         self.temp_dir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()
         os.chdir(self.temp_dir.name)
