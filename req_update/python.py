@@ -71,7 +71,7 @@ class Python():
         if updates_made:
             self.install_updates()
         else:
-            self.util.warn('No updates')
+            self.util.warn('No python updates')
         return updates_made
 
     def update_dependencies(self) -> bool:
