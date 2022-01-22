@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+1.7.0 (2022-01-21)
+------------------
+
+ - Support updating pinned node dependencies
+ - Add color for warning logs
+ - Clarify logging text
+ - Support the `NO_COLOR` environment variable
+
+
 1.6.5 (2022-01-08)
 ------------------
 

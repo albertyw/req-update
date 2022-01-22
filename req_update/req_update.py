@@ -14,7 +14,7 @@ import python  # NOQA
 import util  # NOQA
 
 
-VERSION = (1, 6, 5)
+VERSION = (1, 7, 0)
 __version__ = '.'.join(map(str, VERSION))
 
 
