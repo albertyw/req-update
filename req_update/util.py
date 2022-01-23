@@ -1,11 +1,15 @@
 from __future__ import annotations
 import os
 import subprocess
-from typing import List, Optional
+from typing import List, Optional, TypeAlias, Union
 
 
 BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {package} package to {version}'
+SubprocessOutput: TypeAlias = Union[
+    subprocess.CalledProcessError,
+    subprocess.CompletedProcess,
+]
 
 
 class Util():
@@ -110,7 +114,7 @@ class Util():
         self, command: List[str], readonly: bool,
         suppress_output: bool = False,
         ignore_exit_code: bool = False,
-    ) -> subprocess.CompletedProcess[str]:
+    ) -> SubprocessOutput:
         """ Helper method to execute commands in a shell and return output """
         if self.verbose:
             self.log(' '.join(command))
@@ -127,9 +131,7 @@ class Util():
             )
         except subprocess.CalledProcessError as error:
             if ignore_exit_code:
-                # TODO: return a special python type that combines
-                # CalledProcessError and CompletedProcess
-                return error  # type: ignore
+                return error
             if not suppress_output:
                 self.log(error.stdout)
                 self.warn(error.stderr)
