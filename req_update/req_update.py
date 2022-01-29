@@ -15,13 +15,13 @@ import util  # NOQA
 
 
 VERSION = (1, 7, 0)
-__version__ = '.'.join(map(str, VERSION))
+__version__ = ".".join(map(str, VERSION))
 
 
 DESCRIPTION = (
-    'Update python and node dependencies for your project with git '
-    'integration\n\n'
-    'https://github.com/albertyw/req-update'
+    "Update python and node dependencies for your project with git "
+    "integration\n\n"
+    "https://github.com/albertyw/req-update"
 )
 
 
@@ -29,7 +29,7 @@ def main() -> None:
     ReqUpdate().main()
 
 
-class ReqUpdate():
+class ReqUpdate:
     def __init__(self) -> None:
         self.install = False
         self.updated_files: Set[str] = set([])
@@ -70,32 +70,32 @@ class ReqUpdate():
             formatter_class=argparse.RawTextHelpFormatter,
         )
         parser.add_argument(
-            '-p',
-            '--push',
-            action='store_true',
-            help='Push commits individually to remote origin',
+            "-p",
+            "--push",
+            action="store_true",
+            help="Push commits individually to remote origin",
         )
         parser.add_argument(
-            '-i',
-            '--install',
-            action='store_true',
-            help='Install updates',
+            "-i",
+            "--install",
+            action="store_true",
+            help="Install updates",
         )
         parser.add_argument(
-            '-d',
-            '--dryrun',
-            action='store_true',
-            help='Dry run',
+            "-d",
+            "--dryrun",
+            action="store_true",
+            help="Dry run",
         )
         parser.add_argument(
-            '-v',
-            '--verbose',
-            action='store_true',
-            help='Verbose output',
+            "-v",
+            "--verbose",
+            action="store_true",
+            help="Verbose output",
         )
         parser.add_argument(
-            '--version',
-            action='version',
+            "--version",
+            action="version",
             version=__version__,
         )
         args = parser.parse_args()
