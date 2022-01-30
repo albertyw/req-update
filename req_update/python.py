@@ -12,23 +12,23 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import util  # NOQA
 
 
-PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
-PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
-PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
-PYTHON_PACKAGE_SPACER_REGEX = r'(?P<spacer>[ ]*)'
-PYTHON_REQUIREMENTS_LINE_REGEX = r'^%s%s%s%s' % (
+PYTHON_PACKAGE_NAME_REGEX = r"(?P<name>[a-zA-Z0-9\-_]+)"
+PYTHON_PACKAGE_OPERATOR_REGEX = r"(?P<operator>[<=>]+)"
+PYTHON_PACKAGE_VERSION_REGEX = r"(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)"  # noqa
+PYTHON_PACKAGE_SPACER_REGEX = r"(?P<spacer>[ ]*)"
+PYTHON_REQUIREMENTS_LINE_REGEX = r"^%s%s%s%s" % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
     PYTHON_PACKAGE_VERSION_REGEX,
     PYTHON_PACKAGE_SPACER_REGEX,
 )
 REQUIREMENTS_FILES = [
-    'requirements.txt',
-    'requirements-test.txt',
+    "requirements.txt",
+    "requirements-test.txt",
 ]
 
 
-class Python():
+class Python:
     def __init__(self) -> None:
         self.install = False
         self.updated_files: Set[str] = set([])
@@ -36,7 +36,7 @@ class Python():
 
     def check_applicable(self) -> bool:
         # Make sure pip is recent enough
-        command = ['pip', '--version']
+        command = ["pip", "--version"]
         try:
             result = self.util.execute_shell(
                 command, True, suppress_output=True
@@ -45,8 +45,8 @@ class Python():
             # Cannot find pip
             return False
         try:
-            pip_version = result.stdout.split(' ')
-            pip_major_version = int(pip_version[1].split('.')[0])
+            pip_version = result.stdout.split(" ")
+            pip_major_version = int(pip_version[1].split(".")[0])
         except (ValueError, IndexError):
             # Pip version is not parseable
             return False
@@ -56,7 +56,7 @@ class Python():
 
         # Make sure there's at least one requirements files
         for f in REQUIREMENTS_FILES:
-            if f in os.listdir('.'):
+            if f in os.listdir("."):
                 break
         else:
             return False
@@ -71,7 +71,7 @@ class Python():
         if updates_made:
             self.install_updates()
         else:
-            self.util.warn('No python updates')
+            self.util.warn("No python updates")
         return updates_made
 
     def update_dependencies(self) -> bool:
@@ -82,9 +82,9 @@ class Python():
         outdated_list = self.get_pip_outdated()
         clean = True
         for outdated in outdated_list:
-            dependency = outdated['name']
-            self.util.log('Checking dependency: %s' % dependency)
-            version = outdated['latest_version']
+            dependency = outdated["name"]
+            self.util.log("Checking dependency: %s" % dependency)
+            version = outdated["latest_version"]
             written = self.write_dependency_update(dependency, version)
             if written:
                 self.util.commit_dependency_update(dependency, version)
@@ -93,11 +93,11 @@ class Python():
         return not clean
 
     def get_pip_outdated(self) -> List[Dict[str, str]]:
-        """ Get a list of outdated pip packages """
-        command = ['pip', 'list', '--outdated', '--format', 'json']
+        """Get a list of outdated pip packages"""
+        command = ["pip", "list", "--outdated", "--format", "json"]
         result = self.util.execute_shell(command, True)
         outdated: List[Dict[str, str]] = json.loads(result.stdout)
-        outdated = sorted(outdated, key=lambda p: p['name'])
+        outdated = sorted(outdated, key=lambda p: p["name"])
         return outdated
 
     @staticmethod
@@ -109,18 +109,18 @@ class Python():
         """
         lines: List[str] = []
         try:
-            with open(file_name, 'r') as handle:
+            with open(file_name, "r") as handle:
                 lines = handle.readlines()
         except FileNotFoundError:
             pass
         yield lines
         if not lines:
             return
-        with open(file_name, 'w') as handle:
-            handle.write(''.join(lines))
+        with open(file_name, "w") as handle:
+            handle.write("".join(lines))
 
     def write_dependency_update(self, dependency: str, version: str) -> bool:
-        """ Given a dependency, update it to a given version """
+        """Given a dependency, update it to a given version"""
         updated = False
         for reqfile in REQUIREMENTS_FILES:
             with Python.edit_requirements(reqfile) as lines:
@@ -139,23 +139,23 @@ class Python():
         Given a dependency and some lines, update the lines.  Return a
         boolean for whether the lines have been updated
         """
-        dependency = dependency.replace('_', '-')
+        dependency = dependency.replace("_", "-")
         for i, line in enumerate(lines):
             match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
             if not match:
                 continue
-            if match.group('name').replace('_', '-') != dependency:
+            if match.group("name").replace("_", "-") != dependency:
                 continue
-            old_version = match.group('version')
-            old_spacer = match.group('spacer')
+            old_version = match.group("version")
+            old_spacer = match.group("spacer")
             if old_spacer:
                 spacing = len(old_version) + len(old_spacer) - len(version)
-                spacer = ' ' * spacing
+                spacer = " " * spacing
             else:
-                spacer = ''
+                spacer = ""
             new_line = re.sub(
                 PYTHON_REQUIREMENTS_LINE_REGEX,
-                r'\g<1>\g<2>%s%s' % (version, spacer),
+                r"\g<1>\g<2>%s%s" % (version, spacer),
                 line,
             )
             if line == new_line:
@@ -168,10 +168,10 @@ class Python():
         return False
 
     def install_updates(self) -> None:
-        """ Install requirements updates """
+        """Install requirements updates"""
         if not self.install:
             return
         for updated_file in self.updated_files:
-            command = ['pip', 'install', '-r', updated_file]
+            command = ["pip", "install", "-r", updated_file]
             self.util.execute_shell(command, False)
-            self.util.log('Installing updated packages in %s' % updated_file)
+            self.util.log("Installing updated packages in %s" % updated_file)
