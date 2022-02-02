@@ -1,5 +1,5 @@
 # Testing
 black==22.1.0                    # Standard python formatter
-coverage==6.3                    # Test coverage
+coverage==6.3.1                    # Test coverage
 flake8==4.0.1                    # Python linting
 mypy==0.931                      # Static typing
