@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.8.0 (2022-02-05)
+------------------
+
+ - Support updating go dependencies
+ - Switch to black python formatter
+ - Dependency updates
+
+
 1.7.0 (2022-01-21)
 ------------------
 
