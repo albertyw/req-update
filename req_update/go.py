@@ -30,4 +30,17 @@ class Go:
         Update dependencies and install updates
         Return if updates were made
         """
-        raise NotImplementedError()
+        command = ["go", "get", "-u", "all"]
+        self.util.log("Updating go packages")
+        self.util.execute_shell(command, False)
+        command = ["go", "mod", "tidy"]
+        self.util.log("Tidying go packages")
+        self.util.execute_shell(command, False)
+        try:
+            self.util.check_repository_cleanliness()
+            self.util.warn("No go updates")
+            return False  # repository is clean so nothing to commit or push
+        except RuntimeError:
+            self.util.commit_git("Update go packages")
+            self.util.push_dependency_update()
+            return True
