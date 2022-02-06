@@ -9,6 +9,7 @@ from typing import Set
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+import go  # NOQA
 import node  # NOQA
 import python  # NOQA
 import util  # NOQA
@@ -19,7 +20,7 @@ __version__ = ".".join(map(str, VERSION))
 
 
 DESCRIPTION = (
-    "Update python and node dependencies for your project with git "
+    "Update python, go, and node dependencies for your project with git "
     "integration\n\n"
     "https://github.com/albertyw/req-update"
 )
@@ -36,6 +37,8 @@ class ReqUpdate:
         self.util = util.Util()
         self.python = python.Python()
         self.python.util = self.util
+        self.go = go.Go()
+        self.go.util = self.util
         self.node = node.Node()
         self.node.util = self.util
 
@@ -60,6 +63,12 @@ class ReqUpdate:
                 branch_created = True
             node_updates = self.node.update_install_dependencies()
             updates_made = updates_made or node_updates
+        if self.go.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            go_updates = self.go.update_install_dependencies()
+            updates_made = updates_made or go_updates
         if branch_created and not updates_made:
             self.util.rollback_branch()
         return updates_made
