@@ -276,14 +276,7 @@ class TestInstallUpdates(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, "execute_shell", self.mock_execute_shell)
 
-    def test_install_updates_noop(self) -> None:
-        self.python.updated_files.add("requirements.txt")
-        self.python.install_updates()
-        self.assertEqual(len(self.mock_log.mock_calls), 0)
-        self.assertEqual(len(self.mock_execute_shell.mock_calls), 0)
-
     def test_install_updates(self) -> None:
-        self.python.install = True
         self.python.updated_files.add("requirements.txt")
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
@@ -294,7 +287,6 @@ class TestInstallUpdates(unittest.TestCase):
         self.assertEqual("requirements.txt", command[0][3])
 
     def test_install_multiple_updates(self) -> None:
-        self.python.install = True
         self.python.updated_files.add("requirements-test.txt")
         self.python.updated_files.add("requirements.txt")
         self.python.install_updates()

@@ -30,7 +30,6 @@ REQUIREMENTS_FILES = [
 
 class Python:
     def __init__(self) -> None:
-        self.install = False
         self.updated_files: Set[str] = set([])
         self.util = util.Util()
 
@@ -64,7 +63,7 @@ class Python:
 
     def update_dependencies(self) -> bool:
         """
-        Update dependencies and install updates
+        Update dependencies
         Return if updates were made.
         """
         updates_made = self.update_dependencies_file()
@@ -169,8 +168,6 @@ class Python:
 
     def install_updates(self) -> None:
         """Install requirements updates"""
-        if not self.install:
-            return
         for updated_file in self.updated_files:
             command = ["pip", "install", "-r", updated_file]
             self.util.execute_shell(command, False)
