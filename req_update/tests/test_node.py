@@ -84,28 +84,28 @@ class TestUpdateInstallDependencies(unittest.TestCase):
     def test_none(self) -> None:
         self.mock_unpinned.return_value = False
         self.mock_pinned.return_value = False
-        updated = self.node.update_install_dependencies()
+        updated = self.node.update_dependencies()
         self.assertFalse(updated)
         self.assertTrue(self.mock_warn.called)
 
     def test_pinned(self) -> None:
         self.mock_unpinned.return_value = False
         self.mock_pinned.return_value = True
-        updated = self.node.update_install_dependencies()
+        updated = self.node.update_dependencies()
         self.assertTrue(updated)
         self.assertFalse(self.mock_warn.called)
 
     def test_unpinned(self) -> None:
         self.mock_unpinned.return_value = True
         self.mock_pinned.return_value = False
-        updated = self.node.update_install_dependencies()
+        updated = self.node.update_dependencies()
         self.assertTrue(updated)
         self.assertFalse(self.mock_warn.called)
 
     def test_all(self) -> None:
         self.mock_unpinned.return_value = True
         self.mock_pinned.return_value = True
-        updated = self.node.update_install_dependencies()
+        updated = self.node.update_dependencies()
         self.assertTrue(updated)
         self.assertFalse(self.mock_warn.called)
 

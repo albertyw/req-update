@@ -63,13 +63,13 @@ class TestUpdateInstallDependencies(unittest.TestCase):
 
     def test_updates_made(self) -> None:
         self.mock_update.return_value = True
-        updates = self.python.update_install_dependencies()
+        updates = self.python.update_dependencies()
         self.assertTrue(updates)
         self.assertTrue(self.mock_install.called)
 
     def test_no_updates_made(self) -> None:
         self.mock_update.return_value = False
-        updates = self.python.update_install_dependencies()
+        updates = self.python.update_dependencies()
         self.assertFalse(updates)
         self.assertFalse(self.mock_install.called)
 

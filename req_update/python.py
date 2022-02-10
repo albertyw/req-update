@@ -62,7 +62,7 @@ class Python:
             return False
         return True
 
-    def update_install_dependencies(self) -> bool:
+    def update_dependencies(self) -> bool:
         """
         Update dependencies and install updates
         Return if updates were made.

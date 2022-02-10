@@ -43,7 +43,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_update = MagicMock()
         setattr(
             self.req_update.python,
-            "update_install_dependencies",
+            "update_dependencies",
             self.mock_python_update,
         )
         self.mock_node_applicable = MagicMock()
@@ -53,7 +53,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_node_update = MagicMock()
         setattr(
             self.req_update.node,
-            "update_install_dependencies",
+            "update_dependencies",
             self.mock_node_update,
         )
         self.mock_go_applicable = MagicMock()
@@ -63,7 +63,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_go_update = MagicMock()
         setattr(
             self.req_update.go,
-            "update_install_dependencies",
+            "update_dependencies",
             self.mock_go_update,
         )
         self.mock_rollback = MagicMock()
