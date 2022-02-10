@@ -51,11 +51,11 @@ class TestCheckApplicable(unittest.TestCase):
         self.assertFalse(applicable)
 
 
-class TestUpdateInstallDependencies(unittest.TestCase):
+class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.python = python.Python()
         self.mock_update = MagicMock()
-        setattr(self.python, "update_dependencies", self.mock_update)
+        setattr(self.python, "update_dependencies_file", self.mock_update)
         self.mock_install = MagicMock()
         setattr(self.python, "install_updates", self.mock_install)
         self.mock_log = MagicMock()
@@ -74,7 +74,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         self.assertFalse(self.mock_install.called)
 
 
-class TestUpdateDependencies(unittest.TestCase):
+class TestUpdateDependenciesFile(unittest.TestCase):
     def setUp(self) -> None:
         self.python = python.Python()
         self.mock_execute_shell = MagicMock()
@@ -82,12 +82,12 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_log = MagicMock()
         setattr(self.python.util, "log", self.mock_log)
 
-    def test_update_dependencies_clean(self) -> None:
+    def test_update_dependencies_file_clean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout="[]")
-        updated = self.python.update_dependencies()
+        updated = self.python.update_dependencies_file()
         self.assertFalse(updated)
 
-    def test_update_dependencies(self) -> None:
+    def test_update_dependencies_file(self) -> None:
         def execute_shell_returns(
             command: List[str],
             readonly: bool,
@@ -99,11 +99,11 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_execute_shell.side_effect = execute_shell_returns
         mock_commit = MagicMock()
         setattr(self.python.util, "commit_dependency_update", mock_commit)
-        updated = self.python.update_dependencies()
+        updated = self.python.update_dependencies_file()
         self.assertFalse(mock_commit.called)
         self.assertFalse(updated)
 
-    def test_update_dependencies_commit(self) -> None:
+    def test_update_dependencies_file_commit(self) -> None:
         def execute_shell_returns(
             command: List[str],
             readonly: bool,
@@ -117,12 +117,12 @@ class TestUpdateDependencies(unittest.TestCase):
         setattr(self.python, "write_dependency_update", mock_write)
         mock_commit = MagicMock()
         setattr(self.python.util, "commit_dependency_update", mock_commit)
-        updated = self.python.update_dependencies()
+        updated = self.python.update_dependencies_file()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
         self.assertTrue(updated)
 
-    def test_update_dependencies_push(self) -> None:
+    def test_update_dependencies_file_push(self) -> None:
         def execute_shell_returns(
             command: List[str],
             readonly: bool,
@@ -138,7 +138,7 @@ class TestUpdateDependencies(unittest.TestCase):
         setattr(self.python.util, "commit_dependency_update", mock_commit)
         mock_push = MagicMock()
         setattr(self.python.util, "push_dependency_update", mock_push)
-        updated = self.python.update_dependencies()
+        updated = self.python.update_dependencies_file()
         self.assertTrue(mock_write.called)
         self.assertTrue(mock_commit.called)
         self.assertTrue(mock_push.called)

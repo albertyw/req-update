@@ -67,14 +67,14 @@ class Python:
         Update dependencies and install updates
         Return if updates were made.
         """
-        updates_made = self.update_dependencies()
+        updates_made = self.update_dependencies_file()
         if updates_made:
             self.install_updates()
         else:
             self.util.warn("No python updates")
         return updates_made
 
-    def update_dependencies(self) -> bool:
+    def update_dependencies_file(self) -> bool:
         """
         Update and commit a list of dependency updates.
         Return if updates were made.
