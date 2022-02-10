@@ -35,7 +35,7 @@ class Node:
 
     def update_dependencies(self) -> bool:
         """
-        Update dependencies and install updates
+        Update dependencies
         Return if updates were made
         """
         updated_unpinned = self.update_unpinned_dependencies()
