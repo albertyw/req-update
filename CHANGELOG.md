@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.0.0 (2022-02-10)
+------------------
+
+ - **Breaking** - Removed the `--install` flag.  Running req-update will always install newly updated packages in all languages.
+
+
 1.8.0 (2022-02-05)
 ------------------
 
