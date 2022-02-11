@@ -14,9 +14,8 @@
 ## Usage
 
 `req-update` requires no command line arguments.  Running `req-update` will
-make it create a branch `dep-update`, check outdated packages (compared against
-your current installed packages), and commit a series of single-package update
-commits.
+create a branch `dep-update`, check for outdated packages, and commit a
+series of commits to update packages.
 
 ```
 $ req_update
@@ -29,7 +28,6 @@ https://github.com/albertyw/req-update
 optional arguments:
   -h, --help     show this help message and exit
   -p, --push     Push commits individually to remote origin
-  -i, --install  Install updates
   -d, --dryrun   Dry run
   -v, --verbose  Verbose output
   --version      show program's version number and exit

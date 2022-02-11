@@ -43,7 +43,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_python_update = MagicMock()
         setattr(
             self.req_update.python,
-            "update_install_dependencies",
+            "update_dependencies",
             self.mock_python_update,
         )
         self.mock_node_applicable = MagicMock()
@@ -53,7 +53,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_node_update = MagicMock()
         setattr(
             self.req_update.node,
-            "update_install_dependencies",
+            "update_dependencies",
             self.mock_node_update,
         )
         self.mock_go_applicable = MagicMock()
@@ -63,7 +63,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.mock_go_update = MagicMock()
         setattr(
             self.req_update.go,
-            "update_install_dependencies",
+            "update_dependencies",
             self.mock_go_update,
         )
         self.mock_rollback = MagicMock()
@@ -298,16 +298,6 @@ class TestGetArgs(unittest.TestCase):
         args = self.get_args_with_argv(["-p"])
         self.assertTrue(args.push)
         self.assertTrue(self.req_update.util.push)
-
-    def test_install(self) -> None:
-        self.assertFalse(self.req_update.install)
-        args = self.get_args_with_argv([])
-        self.assertFalse(args.install)
-        args = self.get_args_with_argv(["--install"])
-        self.assertTrue(args.install)
-        args = self.get_args_with_argv(["-i"])
-        self.assertTrue(args.install)
-        self.assertTrue(self.req_update.install)
 
     def test_dryrun(self) -> None:
         self.assertTrue(self.req_update.util.dry_run)

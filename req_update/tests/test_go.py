@@ -57,7 +57,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
 
     def test_update_clean(self) -> None:
         self.mock_clean.return_value = True
-        updated = self.go.update_install_dependencies()
+        updated = self.go.update_dependencies()
         self.assertFalse(updated)
         calls = self.go.util.execute_shell.call_args_list
         self.assertIn("get", calls[0][0][0])
@@ -67,7 +67,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
 
     def test_update_changed(self) -> None:
         self.mock_clean.side_effect = RuntimeError()
-        updated = self.go.update_install_dependencies()
+        updated = self.go.update_dependencies()
         self.assertTrue(updated)
         calls = self.go.util.execute_shell.call_args_list
         self.assertIn("get", calls[0][0][0])

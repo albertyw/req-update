@@ -32,7 +32,6 @@ def main() -> None:
 
 class ReqUpdate:
     def __init__(self) -> None:
-        self.install = False
         self.updated_files: Set[str] = set([])
         self.util = util.Util()
         self.python = python.Python()
@@ -55,19 +54,19 @@ class ReqUpdate:
             if not branch_created:
                 self.util.create_branch()
                 branch_created = True
-            python_updates = self.python.update_install_dependencies()
+            python_updates = self.python.update_dependencies()
             updates_made = updates_made or python_updates
         if self.node.check_applicable():
             if not branch_created:
                 self.util.create_branch()
                 branch_created = True
-            node_updates = self.node.update_install_dependencies()
+            node_updates = self.node.update_dependencies()
             updates_made = updates_made or node_updates
         if self.go.check_applicable():
             if not branch_created:
                 self.util.create_branch()
                 branch_created = True
-            go_updates = self.go.update_install_dependencies()
+            go_updates = self.go.update_dependencies()
             updates_made = updates_made or go_updates
         if branch_created and not updates_made:
             self.util.rollback_branch()
@@ -83,12 +82,6 @@ class ReqUpdate:
             "--push",
             action="store_true",
             help="Push commits individually to remote origin",
-        )
-        parser.add_argument(
-            "-i",
-            "--install",
-            action="store_true",
-            help="Install updates",
         )
         parser.add_argument(
             "-d",
@@ -108,8 +101,6 @@ class ReqUpdate:
             version=__version__,
         )
         args = parser.parse_args()
-        self.install = args.install
-        self.python.install = self.install
         self.util.push = args.push
         self.util.verbose = args.verbose
         self.util.dry_run = args.dryrun
