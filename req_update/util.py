@@ -1,12 +1,12 @@
 from __future__ import annotations
 import os
 import subprocess
-from typing import List, Optional, TypeAlias, Union
+from typing import List, Optional, Union
 
 
 BRANCH_NAME = "dep-update"
 COMMIT_MESSAGE = "Update {package} package to {version}"
-SubprocessOutput: TypeAlias = Union[
+SubprocessOutput = Union[
     subprocess.CalledProcessError,
     subprocess.CompletedProcess,
 ]
