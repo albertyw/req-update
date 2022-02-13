@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.0.1 (2022-02-12)
+------------------
+
+ - Fix compatibility with python 3.7 through python 3.9
+
+
 2.0.0 (2022-02-10)
 ------------------
 
