@@ -2,4 +2,4 @@
 black==22.1.0                    # Standard python formatter
 coverage==6.3.2                    # Test coverage
 flake8==4.0.1                    # Python linting
-mypy==0.931                      # Static typing
+mypy==0.940                      # Static typing
