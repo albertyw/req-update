@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.0.2 (2022-03-21)
+------------------
+
+ - Fix bug with package.json with no dependencies
+ - Add test for python packaging
+ - Update dependencies
+
+
 2.0.1 (2022-02-12)
 ------------------
 
