@@ -82,14 +82,14 @@ class Node:
         with open("package.json", "r") as handle:
             package_json_string = handle.read()
         package_json = json.loads(package_json_string)
-        if package_name in package_json["dependencies"]:
+        if package_name in package_json.get("dependencies", {}):
             package_json["dependencies"] = self.update_package_dependencies(
                 package_json["dependencies"],
                 package_name,
                 package,
             )
             new_version = package_json["dependencies"][package_name]
-        elif package_name in package_json["devDependencies"]:
+        elif package_name in package_json.get("devDependencies", {}):
             package_json["devDependencies"] = self.update_package_dependencies(
                 package_json["devDependencies"],
                 package_name,
