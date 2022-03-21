@@ -244,6 +244,16 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertNotEqual(package, original_package)
         self.assertEqual(package["devDependencies"]["varsnap"], "^1.0.0")
 
+    def test_no_dependencies(self) -> None:
+        original_package: Mapping[str, Any] = {}
+        self.write_package(original_package)
+        mock_update = MagicMock()
+        setattr(self.node, "update_package_dependencies", mock_update)
+        self.node.update_package("varsnap", MOCK_NPM_OUTDATED["varsnap"])
+        self.assertFalse(mock_update.called)
+        package = self.read_package()
+        self.assertEqual(package, original_package)
+
 
 class TestGeneratePackageVersion(unittest.TestCase):
     def test_major(self) -> None:
