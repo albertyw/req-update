@@ -34,10 +34,18 @@ steps:
     environment:
       CC_TEST_REPORTER_ID: 20588a9f3d871445aaee95c9e3f5799cb13812b98b321a34ecebf503578fa2c8
 
+  - name: Test Python 3.11
+    image: python:3.11-rc
+    commands:
+      - python setup.py develop
+      - pip install -r requirements-test.txt
+      - python3 -m unittest
+
   - name: Test Python Packaging
     depends_on:
       - Test Python 3.7
       - Test Python 3.10
+      - Test Python 3.11
     image: python:3.10
     commands:
       - pip install twine
