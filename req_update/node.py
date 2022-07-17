@@ -145,7 +145,13 @@ class Node:
     def install_dependencies(self) -> bool:
         command = ["npm", "install"]
         try:
-            self.util.execute_shell(command, False, suppress_output=True)
+            result = self.util.execute_shell(
+                command,
+                False,
+                suppress_output=True,
+            )
+            if "Could not resolve dependency" in result.stderr:
+                return False
         except subprocess.CalledProcessError as error:
             if "Could not resolve dependency" in error.stderr:
                 return False
