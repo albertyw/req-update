@@ -292,3 +292,22 @@ class TestGeneratePackageVersion(unittest.TestCase):
 
     def test_not_semver(self) -> None:
         self.assertEqual(node.Node.generate_package_version("asdf"), "asdf")
+
+
+class TestInstallDependencies(unittest.TestCase):
+    def setUp(self) -> None:
+        self.node = node.Node()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.node.util, "execute_shell", self.mock_execute_shell)
+
+    def test_install_dependencies(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock()
+        success = self.node.install_dependencies()
+        self.assertTrue(success)
+
+    def test_install_dependencies_error(self) -> None:
+        error = subprocess.CalledProcessError(1, 'asdf')
+        error.stderr = "Could not resolve dependency"
+        self.mock_execute_shell.side_effect = error
+        success = self.node.install_dependencies()
+        self.assertFalse(success)
