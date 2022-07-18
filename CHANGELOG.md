@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.0.3 (2022-07-17)
+------------------
+
+ - Gracefully deal with node dependency version conflicts
+ - Update dependencies
+ - Test against Python 3.11
+
+
 2.0.2 (2022-03-21)
 ------------------
 
