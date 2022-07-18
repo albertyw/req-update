@@ -194,6 +194,8 @@ class TestUpdatePackage(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()
         os.chdir(self.temp_dir.name)
+        self.mock_reset_changes = MagicMock()
+        setattr(self.node.util, "reset_changes", self.mock_reset_changes)
 
     def tearDown(self) -> None:
         os.chdir(self.original_cwd)
@@ -221,6 +223,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertFalse(mock_update.called)
         package = self.read_package()
         self.assertEqual(package, original_package)
+        self.assertFalse(self.mock_reset_changes.called)
 
     def test_prod_updates(self) -> None:
         original_package: Mapping[str, Any] = {
@@ -232,6 +235,7 @@ class TestUpdatePackage(unittest.TestCase):
         package = self.read_package()
         self.assertNotEqual(package, original_package)
         self.assertEqual(package["dependencies"]["varsnap"], "^1.0.0")
+        self.assertFalse(self.mock_reset_changes.called)
 
     def test_dev_updates(self) -> None:
         original_package: Mapping[str, Any] = {
@@ -243,6 +247,7 @@ class TestUpdatePackage(unittest.TestCase):
         package = self.read_package()
         self.assertNotEqual(package, original_package)
         self.assertEqual(package["devDependencies"]["varsnap"], "^1.0.0")
+        self.assertFalse(self.mock_reset_changes.called)
 
     def test_no_dependencies(self) -> None:
         original_package: Mapping[str, Any] = {}
@@ -253,6 +258,23 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertFalse(mock_update.called)
         package = self.read_package()
         self.assertEqual(package, original_package)
+        self.assertFalse(self.mock_reset_changes.called)
+
+    def test_install_dependencies_failure(self) -> None:
+        original_package: Mapping[str, Any] = {
+            "dependencies": {"varsnap": "1.0.0"},
+            "devDependencies": {},
+        }
+        self.write_package(original_package)
+        mock_install_dependencies = MagicMock()
+        setattr(self.node, "install_dependencies", mock_install_dependencies)
+        mock_install_dependencies.return_value = False
+        updated = self.node.update_package(
+            "varsnap", MOCK_NPM_OUTDATED["varsnap"]
+        )
+        self.assertFalse(updated)
+        self.assertTrue(mock_install_dependencies.called)
+        self.assertTrue(self.mock_reset_changes.called)
 
 
 class TestGeneratePackageVersion(unittest.TestCase):
