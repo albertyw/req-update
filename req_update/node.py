@@ -102,7 +102,13 @@ class Node:
         package_json_string += "\n"  # Add the traditional EOF newline
         with open("package.json", "w") as handle:
             handle.write(package_json_string)
-        self.install_dependencies()
+        success = self.install_dependencies()
+        if not success:
+            self.util.warn(
+                "Dependency conflict; rolling back: %s" % package_name
+            )
+            self.util.reset_changes()
+            return False
         self.util.commit_dependency_update(package_name, new_version)
         self.util.push_dependency_update()
         return True
@@ -136,6 +142,20 @@ class Node:
             return version
         raise ValueError("Cannot compute version")  # pragma: no cover
 
-    def install_dependencies(self) -> None:
+    def install_dependencies(self) -> bool:
         command = ["npm", "install"]
-        self.util.execute_shell(command, False)
+        try:
+            result = self.util.execute_shell(
+                command,
+                False,
+                suppress_output=True,
+            )
+            if "Could not resolve dependency" in result.stderr:
+                return False
+        except subprocess.CalledProcessError as error:
+            if "Could not resolve dependency" in error.stderr:
+                return False
+            self.util.log(error.stdout)
+            self.util.warn(error.stderr)
+            raise
+        return True

@@ -128,6 +128,19 @@ class TestRollbackBranch(unittest.TestCase):
         self.assertFalse(self.mock_execute_shell.called)
 
 
+class TestResetChanges(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_execute_shell = MagicMock()
+        setattr(self.util, "execute_shell", self.mock_execute_shell)
+
+    def test_reset_changes(self) -> None:
+        self.util.reset_changes()
+        checkout = self.mock_execute_shell.mock_calls[0]
+        self.assertIn("checkout", checkout[1][0])
+        self.assertIn(".", checkout[1][0])
+
+
 class TestPushDependencyUpdate(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()

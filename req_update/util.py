@@ -72,6 +72,11 @@ class Util:
         command = ["git", "branch", "-d", BRANCH_NAME]
         self.execute_shell(command, False)
 
+    def reset_changes(self) -> None:
+        """Reset any noncommitted changes to the branch"""
+        command = ["git", "checkout", "."]
+        self.execute_shell(command, False)
+
     def push_dependency_update(self) -> None:
         """Git push any commits to remote"""
         if not self.push:
