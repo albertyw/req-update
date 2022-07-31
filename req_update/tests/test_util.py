@@ -223,6 +223,20 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
         self.assertEqual(result, None)
         self.assertFalse(self.mock_log.called)
 
+    def test_semver_range(self) -> None:
+        result = self.util.check_major_version_update(
+            "sinon", "~13.0.0", "~14.0.0"
+        )
+        self.assertTrue(result)
+        result = self.util.check_major_version_update(
+            "sinon", "^13.0.0", "^14.0.0"
+        )
+        self.assertTrue(result)
+        result = self.util.check_major_version_update(
+            "sinon", "^13.0.0", "^13.1.0"
+        )
+        self.assertFalse(result)
+
 
 class TestExecuteShell(unittest.TestCase):
     def setUp(self) -> None:
