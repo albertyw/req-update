@@ -95,8 +95,8 @@ class Util:
         Returns False if there is not a major version bump
         Returns None if versions are not semver
         """
-        old_version_parsed = old_version.split(".")
-        new_version_parsed = new_version.split(".")
+        old_version_parsed = old_version.lstrip("^~ ").split(".")
+        new_version_parsed = new_version.lstrip("^~ ").split(".")
         if len(old_version_parsed) != 3 or len(new_version_parsed) != 3:
             return None
         try:
