@@ -83,6 +83,7 @@ class Node:
             package_json_string = handle.read()
         package_json = json.loads(package_json_string)
         if package_name in package_json.get("dependencies", {}):
+            old_version = package_json["dependencies"][package_name]
             package_json["dependencies"] = self.update_package_dependencies(
                 package_json["dependencies"],
                 package_name,
@@ -90,6 +91,7 @@ class Node:
             )
             new_version = package_json["dependencies"][package_name]
         elif package_name in package_json.get("devDependencies", {}):
+            old_version = package_json["devDependencies"][package_name]
             package_json["devDependencies"] = self.update_package_dependencies(
                 package_json["devDependencies"],
                 package_name,
@@ -109,6 +111,9 @@ class Node:
             )
             self.util.reset_changes()
             return False
+        self.util.check_major_version_update(
+            package_name, old_version, new_version
+        )
         self.util.commit_dependency_update(package_name, new_version)
         self.util.push_dependency_update()
         return True
