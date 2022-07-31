@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.0.4 (2022-07-31)
+------------------
+
+ - Have node updates warn when making major version changes
+ - Update dependencies
+
+
 2.0.3 (2022-07-17)
 ------------------
 
