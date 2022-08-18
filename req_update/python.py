@@ -5,7 +5,7 @@ import os
 import re
 import subprocess
 import sys
-from typing import Dict, Iterator, List, Set
+from typing import Iterator
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -30,7 +30,7 @@ REQUIREMENTS_FILES = [
 
 class Python:
     def __init__(self) -> None:
-        self.updated_files: Set[str] = set([])
+        self.updated_files: set[str] = set([])
         self.util = util.Util()
 
     def check_applicable(self) -> bool:
@@ -91,22 +91,22 @@ class Python:
                 clean = False
         return not clean
 
-    def get_pip_outdated(self) -> List[Dict[str, str]]:
+    def get_pip_outdated(self) -> list[dict[str, str]]:
         """Get a list of outdated pip packages"""
         command = ["pip", "list", "--outdated", "--format", "json"]
         result = self.util.execute_shell(command, True)
-        outdated: List[Dict[str, str]] = json.loads(result.stdout)
+        outdated: list[dict[str, str]] = json.loads(result.stdout)
         outdated = sorted(outdated, key=lambda p: p["name"])
         return outdated
 
     @staticmethod
     @contextmanager
-    def edit_requirements(file_name: str) -> Iterator[List[str]]:
+    def edit_requirements(file_name: str) -> Iterator[list[str]]:
         """
         This yields lines from a file, which will be written back into
         the file after yielding
         """
-        lines: List[str] = []
+        lines: list[str] = []
         try:
             with open(file_name, "r") as handle:
                 lines = handle.readlines()
@@ -132,7 +132,7 @@ class Python:
         return updated
 
     def write_dependency_update_lines(
-        self, dependency: str, version: str, lines: List[str]
+        self, dependency: str, version: str, lines: list[str]
     ) -> bool:
         """
         Given a dependency and some lines, update the lines.  Return a

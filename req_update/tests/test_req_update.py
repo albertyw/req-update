@@ -2,7 +2,6 @@ from __future__ import annotations
 import argparse
 import io
 import sys
-from typing import List
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -279,7 +278,7 @@ class TestGetArgs(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
 
-    def get_args_with_argv(self, argv: List[str]) -> argparse.Namespace:
+    def get_args_with_argv(self, argv: list[str]) -> argparse.Namespace:
         argv = ["req_update.py"] + argv
         with patch.object(sys, "argv", argv):
             args = self.req_update.get_args()

@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import sys
-from typing import cast, Dict, Mapping
+from typing import cast, Mapping
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -120,7 +120,7 @@ class Node:
 
     def update_package_dependencies(
         self,
-        dependencies: Dict[str, str],
+        dependencies: dict[str, str],
         package_name: str,
         package: Mapping[str, str],
     ) -> Mapping[str, str]:

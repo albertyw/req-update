@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 import subprocess
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 
 BRANCH_NAME = "dep-update"
@@ -117,7 +117,7 @@ class Util:
 
     def execute_shell(
         self,
-        command: List[str],
+        command: list[str],
         readonly: bool,
         suppress_output: bool = False,
         ignore_exit_code: bool = False,
