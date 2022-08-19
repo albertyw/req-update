@@ -4,6 +4,7 @@ import json
 import random
 import subprocess
 import tempfile
+from typing import List
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -88,7 +89,7 @@ class TestUpdateDependenciesFile(unittest.TestCase):
 
     def test_update_dependencies_file(self) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if "--outdated" in command:
@@ -104,7 +105,7 @@ class TestUpdateDependenciesFile(unittest.TestCase):
 
     def test_update_dependencies_file_commit(self) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if "--outdated" in command:
@@ -123,7 +124,7 @@ class TestUpdateDependenciesFile(unittest.TestCase):
 
     def test_update_dependencies_file_push(self) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if "--outdated" in command:

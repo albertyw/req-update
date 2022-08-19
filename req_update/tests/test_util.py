@@ -2,6 +2,7 @@ from __future__ import annotations
 import io
 import os
 import subprocess
+from typing import List
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -74,7 +75,7 @@ class TestCreateBranch(unittest.TestCase):
 
     def test_create_branch(self) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             return MagicMock(stdout="")
@@ -90,7 +91,7 @@ class TestCreateBranch(unittest.TestCase):
 
     def test_create_branch_exists(self) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
         ) -> subprocess.CompletedProcess[bytes]:
             if "branch" in command:
