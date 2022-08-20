@@ -21,5 +21,5 @@ class TestCLI(unittest.TestCase):
         self.util.execute_shell(command, readonly=True)
 
     def test_module(self) -> None:
-        command = ['python3', '-m', 'req_update.req_update']
+        command = ['python3', '-m', 'req_update.req_update', '-d']
         self.util.execute_shell(command, readonly=True)
