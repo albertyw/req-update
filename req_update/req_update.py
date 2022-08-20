@@ -6,7 +6,6 @@ import os
 import pathlib
 import subprocess
 import sys
-from typing import Set
 
 current_path = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
 parent_path = current_path.parent.resolve()
@@ -35,7 +34,7 @@ def main() -> None:
 
 class ReqUpdate:
     def __init__(self) -> None:
-        self.updated_files: Set[str] = set([])
+        self.updated_files: set[str] = set([])
         self.util = Util()
         self.python = Python()
         self.python.util = self.util
