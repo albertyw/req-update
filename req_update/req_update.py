@@ -3,16 +3,19 @@
 from __future__ import annotations
 import argparse
 import os
+import pathlib
 import subprocess
 import sys
 from typing import Set
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+current_path = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
+parent_path = current_path.parent.resolve()
+sys.path.insert(0, str(parent_path))
 
-import go  # NOQA
-import node  # NOQA
-import python  # NOQA
-import util  # NOQA
+from req_update.go import Go  # NOQA
+from req_update.node import Node  # NOQA
+from req_update.python import Python  # NOQA
+from req_update.util import Util  # NOQA
 
 
 VERSION = (2, 0, 4)
@@ -33,12 +36,12 @@ def main() -> None:
 class ReqUpdate:
     def __init__(self) -> None:
         self.updated_files: Set[str] = set([])
-        self.util = util.Util()
-        self.python = python.Python()
+        self.util = Util()
+        self.python = Python()
         self.python.util = self.util
-        self.go = go.Go()
+        self.go = Go()
         self.go.util = self.util
-        self.node = node.Node()
+        self.node = Node()
         self.node.util = self.util
 
     def main(self) -> bool:

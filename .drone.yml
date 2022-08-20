@@ -24,7 +24,7 @@ steps:
       - pip install -r requirements-test.txt
       - flake8
       - black --line-length 79 --check .
-      - mypy . --strict --ignore-missing-imports --exclude build
+      - mypy . --strict
       - cc-test-reporter before-build
       - coverage run -m unittest
       - exitcode="$?"

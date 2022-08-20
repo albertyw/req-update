@@ -59,7 +59,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         self.mock_clean.return_value = True
         updated = self.go.update_dependencies()
         self.assertFalse(updated)
-        calls = self.go.util.execute_shell.call_args_list
+        calls = self.mock_execute_shell.call_args_list
         self.assertIn("get", calls[0][0][0])
         self.assertIn("tidy", calls[1][0][0])
         self.assertTrue(self.mock_warn.called)
@@ -69,7 +69,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         self.mock_clean.side_effect = RuntimeError()
         updated = self.go.update_dependencies()
         self.assertTrue(updated)
-        calls = self.go.util.execute_shell.call_args_list
+        calls = self.mock_execute_shell.call_args_list
         self.assertIn("get", calls[0][0][0])
         self.assertIn("tidy", calls[1][0][0])
         self.assertFalse(self.mock_warn.called)

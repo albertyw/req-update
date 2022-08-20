@@ -1,16 +1,13 @@
 from __future__ import annotations
 import os
 import subprocess
-import sys
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-import util  # NOQA
+from req_update.util import Util
 
 
 class Go:
     def __init__(self) -> None:
-        self.util = util.Util()
+        self.util = Util()
 
     def check_applicable(self) -> bool:
         command = ["which", "go"]

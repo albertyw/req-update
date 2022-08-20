@@ -3,12 +3,9 @@ import json
 import os
 import re
 import subprocess
-import sys
 from typing import cast, Dict, Mapping
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-import util  # NOQA
+from req_update.util import Util
 
 
 # Copied and simplified from
@@ -18,7 +15,7 @@ SEMVER = r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$
 
 class Node:
     def __init__(self) -> None:
-        self.util = util.Util()
+        self.util = Util()
 
     def check_applicable(self) -> bool:
         command = ["which", "npm"]
