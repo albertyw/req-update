@@ -4,12 +4,9 @@ import json
 import os
 import re
 import subprocess
-import sys
 from typing import Dict, Iterator, List, Set
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-import util  # NOQA
+from req_update.util import Util
 
 
 PYTHON_PACKAGE_NAME_REGEX = r"(?P<name>[a-zA-Z0-9\-_]+)"
@@ -31,7 +28,7 @@ REQUIREMENTS_FILES = [
 class Python:
     def __init__(self) -> None:
         self.updated_files: Set[str] = set([])
-        self.util = util.Util()
+        self.util = Util()
 
     def check_applicable(self) -> bool:
         # Make sure pip is recent enough
