@@ -25,6 +25,8 @@ class Util:
         Non-clean repositories will raise a RuntimeError
         """
         # Make sure there are no uncommitted files
+        if self.dry_run:
+            return
         command = ["git", "status", "--porcelain"]
         try:
             result = self.execute_shell(command, True)

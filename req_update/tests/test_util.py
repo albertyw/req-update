@@ -13,9 +13,17 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
     def setUp(self) -> None:
         self.mock_log = MagicMock()
         self.util = util.Util()
+        self.util.dry_run = False
         self.mock_execute_shell = MagicMock()
         setattr(self.util, "execute_shell", self.mock_execute_shell)
         setattr(self.util, "log", self.mock_log)
+
+    def test_dry_run(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(
+            stdout=" M util/util.py"
+        )
+        self.util.dry_run = True
+        self.util.check_repository_cleanliness()
 
     def test_clean(self) -> None:
         self.mock_execute_shell.return_error = MagicMock(stdout="")
