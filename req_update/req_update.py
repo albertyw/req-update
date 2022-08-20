@@ -6,7 +6,6 @@ import os
 import pathlib
 import subprocess
 import sys
-from typing import List, Set
 
 current_path = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
 parent_path = current_path.parent.resolve()
@@ -28,7 +27,7 @@ DESCRIPTION = (
     "project with git integration\n\n"
     "https://github.com/albertyw/req-update"
 )
-UPDATERS: List[type[Updater]] = [
+UPDATERS: list[type[Updater]] = [
     GitSubmodule,
     Go,
     Node,
@@ -42,10 +41,10 @@ def main() -> None:
 
 class ReqUpdate:
     def __init__(self) -> None:
-        self.updated_files: Set[str] = set([])
+        self.updated_files: set[str] = set([])
         self.util = Util()
         self.language: str = ""
-        self.updaters: List[Updater] = []
+        self.updaters: list[Updater] = []
         for updater in UPDATERS:
             u = updater()
             u.util = self.util
@@ -125,7 +124,7 @@ class ReqUpdate:
         return args
 
     @staticmethod
-    def updater_names() -> List[str]:
+    def updater_names() -> list[str]:
         return [u.__name__.lower() for u in UPDATERS]
 
 
