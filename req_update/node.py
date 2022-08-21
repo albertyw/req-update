@@ -5,7 +5,7 @@ import re
 import subprocess
 from typing import cast, Dict, Mapping
 
-from req_update.util import Util
+from req_update.util import Updater
 
 
 # Copied and simplified from
@@ -13,10 +13,7 @@ from req_update.util import Util
 SEMVER = r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$"  # NOQA
 
 
-class Node:
-    def __init__(self) -> None:
-        self.util = Util()
-
+class Node(Updater):
     def check_applicable(self) -> bool:
         command = ["which", "npm"]
         try:
