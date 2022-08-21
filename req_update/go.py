@@ -2,13 +2,10 @@ from __future__ import annotations
 import os
 import subprocess
 
-from req_update.util import Util
+from req_update.util import Updater
 
 
-class Go:
-    def __init__(self) -> None:
-        self.util = Util()
-
+class Go(Updater):
     def check_applicable(self) -> bool:
         command = ["which", "go"]
         try:

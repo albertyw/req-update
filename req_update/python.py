@@ -6,7 +6,7 @@ import re
 import subprocess
 from typing import Dict, Iterator, List, Set
 
-from req_update.util import Util
+from req_update.util import Updater
 
 
 PYTHON_PACKAGE_NAME_REGEX = r"(?P<name>[a-zA-Z0-9\-_]+)"
@@ -25,10 +25,10 @@ REQUIREMENTS_FILES = [
 ]
 
 
-class Python:
+class Python(Updater):
     def __init__(self) -> None:
         self.updated_files: Set[str] = set([])
-        self.util = Util()
+        super().__init__()
 
     def check_applicable(self) -> bool:
         # Make sure pip is recent enough
