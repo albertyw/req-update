@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.0.5 (2022-08-20)
+------------------
+
+ - Do not check repository cleanliness when in dryrun mode
+ - Add an `Updater` skeleton class
+ - Refactor imports and make mypy stricter
+ - Add tests for CLI usage
+ - Update test dependencies
+ - Various cleanup
+
+
 2.0.4 (2022-07-31)
 ------------------
 
