@@ -3,7 +3,7 @@ import json
 import os
 import subprocess
 import tempfile
-from typing import Any, cast
+from typing import Any, List, Mapping, cast
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -33,7 +33,7 @@ class TestCheckApplicable(unittest.TestCase):
     @patch("os.listdir")
     def test_applicable(self, mock_listdir: MagicMock) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
             suppress_output: bool,
         ) -> subprocess.CompletedProcess[bytes]:
@@ -46,7 +46,7 @@ class TestCheckApplicable(unittest.TestCase):
 
     def test_no_npm(self) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
             suppress_output: bool,
         ) -> subprocess.CompletedProcess[bytes]:
@@ -59,7 +59,7 @@ class TestCheckApplicable(unittest.TestCase):
     @patch("os.listdir")
     def test_no_package(self, mock_listdir: MagicMock) -> None:
         def execute_shell_returns(
-            command: list[str],
+            command: List[str],
             readonly: bool,
             suppress_output: bool,
         ) -> subprocess.CompletedProcess[bytes]:
@@ -201,18 +201,18 @@ class TestUpdatePackage(unittest.TestCase):
         os.chdir(self.original_cwd)
         self.temp_dir.cleanup()
 
-    def write_package(self, data: dict[str, Any]) -> None:
+    def write_package(self, data: Mapping[str, Any]) -> None:
         with open("package.json", "w") as handle:
             handle.write(json.dumps(data))
 
-    def read_package(self) -> dict[str, Any]:
+    def read_package(self) -> Mapping[str, Any]:
         with open("package.json", "r") as handle:
             package_string = handle.read()
-        package = cast(dict[str, Any], json.loads(package_string))
+        package = cast(Mapping[str, Any], json.loads(package_string))
         return package
 
     def test_no_updates(self) -> None:
-        original_package: dict[str, Any] = {
+        original_package: Mapping[str, Any] = {
             "dependencies": {},
             "devDependencies": {},
         }
@@ -226,7 +226,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertFalse(self.mock_reset_changes.called)
 
     def test_prod_updates(self) -> None:
-        original_package: dict[str, Any] = {
+        original_package: Mapping[str, Any] = {
             "dependencies": {"varsnap": "1.0.0"},
             "devDependencies": {},
         }
@@ -238,7 +238,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertFalse(self.mock_reset_changes.called)
 
     def test_dev_updates(self) -> None:
-        original_package: dict[str, Any] = {
+        original_package: Mapping[str, Any] = {
             "dependencies": {},
             "devDependencies": {"varsnap": "1.0.0"},
         }
@@ -250,7 +250,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertFalse(self.mock_reset_changes.called)
 
     def test_no_dependencies(self) -> None:
-        original_package: dict[str, Any] = {}
+        original_package: Mapping[str, Any] = {}
         self.write_package(original_package)
         mock_update = MagicMock()
         setattr(self.node, "update_package_dependencies", mock_update)
@@ -261,7 +261,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertFalse(self.mock_reset_changes.called)
 
     def test_install_dependencies_failure(self) -> None:
-        original_package: dict[str, Any] = {
+        original_package: Mapping[str, Any] = {
             "dependencies": {"varsnap": "1.0.0"},
             "devDependencies": {},
         }
