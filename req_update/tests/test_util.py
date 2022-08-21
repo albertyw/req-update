@@ -10,6 +10,14 @@ from unittest.mock import MagicMock, patch
 from req_update import util
 
 
+class TestUpdater(unittest.TestCase):
+    def test(self) -> None:
+        updater = util.Updater()
+        self.assertTrue(updater.util)
+        self.assertFalse(updater.check_applicable())
+        self.assertFalse(updater.update_dependencies())
+
+
 class TestCheckRepositoryCleanliness(unittest.TestCase):
     def setUp(self) -> None:
         self.mock_log = MagicMock()
