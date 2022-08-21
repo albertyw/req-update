@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+from pathlib import Path
 import subprocess
 from typing import List, Optional, Union
 
@@ -139,6 +140,7 @@ class Util:
         self,
         command: List[str],
         readonly: bool,
+        cwd: Optional[Path] = None,
         suppress_output: bool = False,
         ignore_exit_code: bool = False,
     ) -> SubprocessOutput:
@@ -152,6 +154,7 @@ class Util:
         try:
             result = subprocess.run(
                 command,
+                cwd=cwd,
                 capture_output=True,
                 check=True,
                 encoding="utf-8",

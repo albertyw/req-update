@@ -1,6 +1,7 @@
 from __future__ import annotations
 import io
 import os
+from pathlib import Path
 import subprocess
 from typing import List
 import unittest
@@ -299,6 +300,14 @@ class TestExecuteShell(unittest.TestCase):
             self.util.execute_shell(command, True)
         result = self.util.execute_shell(command, True, ignore_exit_code=True)
         self.assertIn("ls", result.stderr)
+
+    def test_execute_shell(self) -> None:
+        command = ["ls"]
+        path = Path("/")
+        result = self.util.execute_shell(command, True, cwd=path)
+        self.assertIn("etc", result.stdout)
+        self.assertIn("home", result.stdout)
+        self.assertIn("var", result.stdout)
 
 
 class TestWarn(unittest.TestCase):
