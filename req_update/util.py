@@ -12,6 +12,24 @@ SubprocessOutput = Union[
 ]
 
 
+class Updater:
+    def __init__(self) -> None:
+        self.util = Util()
+
+    def check_applicable(self) -> bool:
+        """
+        Return if this updater is applicable for the current repository
+        """
+        return False
+
+    def update_dependencies(self) -> bool:
+        """
+        Update dependencies
+        Return if updates were made
+        """
+        return False
+
+
 class Util:
     def __init__(self) -> None:
         self.push = False
