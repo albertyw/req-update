@@ -22,15 +22,23 @@ class GitSubmodule(Updater):
         return len(result.stdout) > 0
 
     def update_dependencies(self) -> bool:
-        # Get a list of submodules and their versions
         submodules = self.get_submodule_info()
+        clean = True
         for submodule in submodules:
-            # Get submodule remote info
+            self.util.log("Checking dependency: %s" % submodule.path)
             submodule = self.annotate_submodule(submodule)
-            # Checkout submodule to a remote version
-            self.update_submodule(submodule)
-            # Commit submodule update
-        return False
+            version = self.update_submodule(submodule)
+            if version:
+                try:
+                    # Not easy to tell if a git submodule has changed
+                    self.util.check_repository_cleanliness()
+                except RuntimeError:
+                    self.util.commit_dependency_update(
+                        str(submodule.path), version
+                    )
+                    self.util.push_dependency_update()
+                    clean = False
+        return not clean
 
     # TODO: Make this a method on Submodule
     def get_submodule_info(self) -> List[Submodule]:
