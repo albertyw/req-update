@@ -16,7 +16,6 @@ MOCK_GITMODULES = """
 
 MOCK_COMMIT_DATA = """
 fc9ab12365ace68f77cc9ac303bbf239d56601db
- (tag: v2.13.4)
 2022-07-30T15:30:22-07:00
 """
 MOCK_COMMIT_TAG = "v2.13.4"
@@ -94,7 +93,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "origin",
                 "--date=iso-strict",
                 "--quiet",
-                "--format=%H%n%d%n%cd",
+                "--format=%H%n%cd",
             ]:
                 stdout = MOCK_COMMIT_DATA
             if args[0] == [
@@ -103,7 +102,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "v2.13.4",
                 "--date=iso-strict",
                 "--quiet",
-                "--format=%H%n%d%n%cd",
+                "--format=%H%n%cd",
             ]:
                 stdout = MOCK_COMMIT_DATA
             if args[0] == ["git", "tag"]:
@@ -140,7 +139,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "origin",
                 "--date=iso-strict",
                 "--quiet",
-                "--format=%H%n%d%n%cd",
+                "--format=%H%n%cd",
             ]:
                 stdout = MOCK_COMMIT_DATA
             if args[0] == ["git", "tag"]:
