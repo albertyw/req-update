@@ -54,7 +54,7 @@ class GitSubmodule(Updater):
         return submodule
 
     def get_remote_commit(self, submodule: Submodule) -> VersionInfo:
-        command = ["git", "show", "origin", "--date=iso-strict"]
+        command = ["git", "show", "origin", "--date=iso-strict", "--quiet"]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         return GitSubmodule.get_version_info(result.stdout)
 
@@ -64,7 +64,7 @@ class GitSubmodule(Updater):
         if not result.stdout.strip():
             return None
         tag = result.stdout.strip().split("\n")[-1]
-        command = ["git", "show", tag, "--date=iso-strict"]
+        command = ["git", "show", tag, "--date=iso-strict", "--quiet"]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         return GitSubmodule.get_version_info(result.stdout)
 

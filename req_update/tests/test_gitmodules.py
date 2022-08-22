@@ -93,9 +93,21 @@ class TestAnnotateSubmodule(unittest.TestCase):
             stdout = None
             if args[0] == ["git", "fetch"]:
                 stdout = ""
-            if args[0] == ["git", "show", "origin", "--date=iso-strict"]:
+            if args[0] == [
+                "git",
+                "show",
+                "origin",
+                "--date=iso-strict",
+                "--quiet",
+            ]:
                 stdout = MOCK_COMMIT
-            if args[0] == ["git", "show", "v2.13.4", "--date=iso-strict"]:
+            if args[0] == [
+                "git",
+                "show",
+                "v2.13.4",
+                "--date=iso-strict",
+                "--quiet",
+            ]:
                 stdout = MOCK_COMMIT
             if args[0] == ["git", "tag"]:
                 stdout = "v1\nv2.13.4"
@@ -125,7 +137,13 @@ class TestAnnotateSubmodule(unittest.TestCase):
             stdout = None
             if args[0] == ["git", "fetch"]:
                 stdout = ""
-            if args[0] == ["git", "show", "origin", "--date=iso-strict"]:
+            if args[0] == [
+                "git",
+                "show",
+                "origin",
+                "--date=iso-strict",
+                "--quiet",
+            ]:
                 stdout = MOCK_COMMIT
             if args[0] == ["git", "tag"]:
                 stdout = ""
