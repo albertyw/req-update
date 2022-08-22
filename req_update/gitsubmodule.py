@@ -70,14 +70,18 @@ class GitSubmodule(Updater):
 
     @staticmethod
     def get_version_info(commit: str) -> VersionInfo:
-        commit_search = re.search(r"commit ([0-9a-f]+) ", commit)
-        if not commit_search:
-            raise RuntimeError("Cannot find commit hash on commit", commit)
-        version_name = commit_search.group(1)
-        if not version_name:
-            raise RuntimeError(
-                "Cannot parse commit hash on commit", commit
-            )  # pragma: no cover
+        commit_search = re.search(r"tag: ([v0-9\.]+)", commit)
+        if commit_search:
+            version_name = commit_search.group(1)
+        else:
+            commit_search = re.search(r"commit ([0-9a-f]+) ", commit)
+            if not commit_search:
+                raise RuntimeError("Cannot find commit hash on commit", commit)
+            version_name = commit_search.group(1)
+            if not version_name:
+                raise RuntimeError(
+                    "Cannot parse commit hash on commit", commit
+                )  # pragma: no cover
         date_search = re.search(r"Date:[ ]+([0-9T\-\+: ]+)", commit)
         if not date_search:
             raise RuntimeError("Cannot find date on commit", commit)
