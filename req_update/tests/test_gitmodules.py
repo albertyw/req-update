@@ -14,13 +14,13 @@ MOCK_GITMODULES = """
  dc9785bfa7b8e0e0b401ff231fb654aea24491cb scripts/git/req-update (v2.0.5)
 """
 
-MOCK_COMMIT = """
+MOCK_COMMIT_DATA = """
 fc9ab12365ace68f77cc9ac303bbf239d56601db
  (tag: v2.13.4)
 2022-07-30T15:30:22-07:00
 """
 MOCK_COMMIT_TAG = "v2.13.4"
-MOCK_COMMIT_HASH = "fc9ab12"
+MOCK_COMMIT_HASH = "fc9ab12365ace68f77cc9ac303bbf239d56601db"
 MOCK_TZINFO = datetime.timezone(-datetime.timedelta(hours=7))
 MOCK_COMMIT_DATE = datetime.datetime(2022, 7, 30, 15, 30, 22, 0, MOCK_TZINFO)
 
@@ -96,7 +96,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "--quiet",
                 "--format=%H%n%d%n%cd",
             ]:
-                stdout = MOCK_COMMIT
+                stdout = MOCK_COMMIT_DATA
             if args[0] == [
                 "git",
                 "show",
@@ -105,7 +105,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "--quiet",
                 "--format=%H%n%d%n%cd",
             ]:
-                stdout = MOCK_COMMIT
+                stdout = MOCK_COMMIT_DATA
             if args[0] == ["git", "tag"]:
                 stdout = "v1\nv2.13.4"
             self.assertNotEqual(stdout, None, args[0])
@@ -119,7 +119,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
         version_info = self.submodule.remote_commit
         self.assertNotEqual(version_info, None)
         assert version_info
-        self.assertEqual(version_info.version_name, MOCK_COMMIT_TAG)
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
         self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
         version_info = self.submodule.remote_tag
         self.assertNotEqual(version_info, None)
@@ -142,7 +142,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "--quiet",
                 "--format=%H%n%d%n%cd",
             ]:
-                stdout = MOCK_COMMIT
+                stdout = MOCK_COMMIT_DATA
             if args[0] == ["git", "tag"]:
                 stdout = ""
             self.assertNotEqual(stdout, None, args[0])
@@ -156,7 +156,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
         version_info = self.submodule.remote_commit
         self.assertNotEqual(version_info, None)
         assert version_info
-        self.assertEqual(version_info.version_name, MOCK_COMMIT_TAG)
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
         self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
         version_info = self.submodule.remote_tag
         self.assertEqual(version_info, None)
@@ -164,15 +164,12 @@ class TestAnnotateSubmodule(unittest.TestCase):
 
 class TestVersionInfo(unittest.TestCase):
     def test_find_tag(self) -> None:
-        info = GitSubmodule.get_version_info(MOCK_COMMIT)
+        info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, MOCK_COMMIT_TAG)
         self.assertEqual(info.version_name, "v2.13.4")
         self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
     def test_find_commit(self) -> None:
-        lines = MOCK_COMMIT.strip().split("\n")
-        lines[1] = ""
-        commit = "\n".join(lines)
-        info = GitSubmodule.get_version_info(commit)
+        info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, "")
         self.assertEqual(
             info.version_name, "fc9ab12365ace68f77cc9ac303bbf239d56601db"
         )

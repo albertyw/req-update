@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 from pathlib import Path
-import re
 import subprocess
 from typing import List, NamedTuple, Optional
 
@@ -63,7 +62,7 @@ class GitSubmodule(Updater):
             "--format=%H%n%d%n%cd",
         ]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
-        return GitSubmodule.get_version_info(result.stdout)
+        return GitSubmodule.get_version_info(result.stdout, "")
 
     def get_remote_tag(self, submodule: Submodule) -> Optional[VersionInfo]:
         command = ["git", "tag"]
@@ -80,14 +79,13 @@ class GitSubmodule(Updater):
             "--format=%H%n%d%n%cd",
         ]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
-        return GitSubmodule.get_version_info(result.stdout)
+        return GitSubmodule.get_version_info(result.stdout, tag)
 
     @staticmethod
-    def get_version_info(commit: str) -> VersionInfo:
-        lines = commit.strip().split("\n")
-        commit_search = re.search(r"tag: ([v0-9\.]+)", lines[1])
-        if commit_search:
-            version_name = commit_search.group(1)
+    def get_version_info(commit_data: str, tag_name: str = "") -> VersionInfo:
+        lines = commit_data.strip().split("\n")
+        if tag_name:
+            version_name = tag_name
         else:
             version_name = lines[0]
         version_date_raw = lines[2]
