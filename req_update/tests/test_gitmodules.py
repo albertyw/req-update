@@ -143,3 +143,15 @@ class TestAnnotateSubmodule(unittest.TestCase):
         self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
         version_info = self.submodule.remote_tag
         self.assertEqual(version_info, None)
+
+
+class TestVersionInfo(unittest.TestCase):
+    def test_cannot_find_hash(self) -> None:
+        commit = ""
+        with self.assertRaises(RuntimeError):
+            GitSubmodule.get_version_info(commit)
+
+    def test_cannot_find_date(self) -> None:
+        commit = "commit 1234 \nDate:"
+        with self.assertRaises(RuntimeError):
+            GitSubmodule.get_version_info(commit)

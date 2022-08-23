@@ -74,13 +74,17 @@ class GitSubmodule(Updater):
             raise RuntimeError("Cannot find commit hash on commit", commit)
         version_name = commit_search.group(1)
         if not version_name:
-            raise RuntimeError("Cannot parse commit hash on commit", commit)
+            raise RuntimeError(
+                "Cannot parse commit hash on commit", commit
+            )  # pragma: no cover
         date_search = re.search(r"Date:[ ]+([0-9T\-\+: ]+)", commit)
         if not date_search:
             raise RuntimeError("Cannot find date on commit", commit)
         version_date_raw = date_search.group(1)
         if not version_date_raw:
-            raise RuntimeError("Cannot parse Date on commit", commit)
+            raise RuntimeError(
+                "Cannot parse Date on commit", commit
+            )  # pragma: no cover
         version_date = datetime.datetime.fromisoformat(version_date_raw)
         version_info = VersionInfo(
             version_name=version_name,
