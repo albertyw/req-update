@@ -59,7 +59,7 @@ class GitSubmodule(Updater):
             "origin",
             "--date=iso-strict",
             "--quiet",
-            "--format=%H%n%d%n%cd",
+            "--format=%H%n%cd",
         ]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         return GitSubmodule.get_version_info(result.stdout, "")
@@ -76,7 +76,7 @@ class GitSubmodule(Updater):
             tag,
             "--date=iso-strict",
             "--quiet",
-            "--format=%H%n%d%n%cd",
+            "--format=%H%n%cd",
         ]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         return GitSubmodule.get_version_info(result.stdout, tag)
@@ -87,8 +87,8 @@ class GitSubmodule(Updater):
         if tag_name:
             version_name = tag_name
         else:
-            version_name = lines[0]
-        version_date_raw = lines[2]
+            version_name = lines[-2]
+        version_date_raw = lines[-1]
         version_date = datetime.datetime.fromisoformat(version_date_raw)
         version_info = VersionInfo(
             version_name=version_name,
