@@ -12,6 +12,7 @@ current_path = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
 parent_path = current_path.parent.resolve()
 sys.path.insert(0, str(parent_path))
 
+from req_update.gitsubmodule import GitSubmodule  # NOQA
 from req_update.go import Go  # NOQA
 from req_update.node import Node  # NOQA
 from req_update.python import Python  # NOQA
@@ -39,6 +40,8 @@ class ReqUpdate:
         self.util = Util()
         self.python = Python()
         self.python.util = self.util
+        self.gitsubmodule = GitSubmodule()
+        self.gitsubmodule.util = self.util
         self.go = Go()
         self.go.util = self.util
         self.node = Node()
@@ -71,6 +74,12 @@ class ReqUpdate:
                 branch_created = True
             go_updates = self.go.update_dependencies()
             updates_made = updates_made or go_updates
+        if self.gitsubmodule.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            gitsubmodule_updates = self.gitsubmodule.update_dependencies()
+            updates_made = updates_made or gitsubmodule_updates
         if branch_created and not updates_made:
             self.util.rollback_branch()
         return updates_made
