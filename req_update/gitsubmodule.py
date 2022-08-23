@@ -27,8 +27,9 @@ class GitSubmodule(Updater):
         submodules = self.get_submodule_info()
         for submodule in submodules:
             # Get submodule remote info
-            submodule = self.annotate_submodule(submodule)  # NOQA
+            submodule = self.annotate_submodule(submodule)
             # Checkout submodule to a remote version
+            self.update_submodule(submodule)
             # Commit submodule update
         return False
 
@@ -91,6 +92,26 @@ class GitSubmodule(Updater):
             version_date=version_date,
         )
         return version_info
+
+    def update_submodule(self, submodule: Submodule) -> Optional[str]:
+        if not submodule.remote_tag and not submodule.remote_commit:
+            return None
+        version = ""
+        if submodule.remote_tag and submodule.remote_commit:
+            if (
+                submodule.remote_tag.version_date + datetime.timedelta(days=30)
+                > submodule.remote_commit.version_date
+            ):
+                version = submodule.remote_tag.version_name
+            else:
+                version = submodule.remote_commit.version_name
+        elif submodule.remote_commit:
+            version = submodule.remote_commit.version_name
+        elif submodule.remote_tag:
+            version = submodule.remote_tag.version_name
+        command = ["git", "checkout", version]
+        self.util.execute_shell(command, False, cwd=submodule.path)
+        return version
 
 
 # TODO: After python 3.7 support is dropped, switch this to a TypedDict
