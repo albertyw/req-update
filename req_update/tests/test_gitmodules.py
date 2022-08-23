@@ -161,6 +161,52 @@ class TestAnnotateSubmodule(unittest.TestCase):
         self.assertEqual(version_info, None)
 
 
+class TestGetRemoteTag(unittest.TestCase):
+    def setUp(self) -> None:
+        self.gitsubmodule = GitSubmodule()
+        self.mock_execute_shell = MagicMock()
+        setattr(
+            self.gitsubmodule.util,
+            "execute_shell",
+            self.mock_execute_shell,
+        )
+        self.submodule = Submodule(Path("./git-browse"))
+        self.original_get_version_info = GitSubmodule.get_version_info
+        self.mock_get_version_info = MagicMock()
+        setattr(
+            GitSubmodule,
+            "get_version_info",
+            self.mock_get_version_info,
+        )
+
+    def tearDown(self) -> None:
+        setattr(
+            GitSubmodule,
+            "get_version_info",
+            self.original_get_version_info,
+        )
+
+    def test_one_tag(self) -> None:
+        self.mock_execute_shell().stdout = "v1"
+        self.gitsubmodule.get_remote_tag(self.submodule)
+        self.assertEqual(self.mock_get_version_info.call_args[0][0], "v1")
+
+    def test_sorted_tags(self) -> None:
+        self.mock_execute_shell().stdout = "a\nb"
+        self.gitsubmodule.get_remote_tag(self.submodule)
+        self.assertEqual(self.mock_get_version_info.call_args[0][1], "b")
+
+    def test_semver_tags(self) -> None:
+        self.mock_execute_shell().stdout = "1.15.0\n1.5.0"
+        self.gitsubmodule.get_remote_tag(self.submodule)
+        self.assertEqual(self.mock_get_version_info.call_args[0][1], "1.15.0")
+
+    def test_semver_v_tags(self) -> None:
+        self.mock_execute_shell().stdout = "v1.15.0\nv1.5.0"
+        self.gitsubmodule.get_remote_tag(self.submodule)
+        self.assertEqual(self.mock_get_version_info.call_args[0][1], "v1.15.0")
+
+
 class TestVersionInfo(unittest.TestCase):
     def test_find_tag(self) -> None:
         info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, MOCK_COMMIT_TAG)
