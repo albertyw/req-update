@@ -24,6 +24,7 @@ Date:   2022-07-30T15:30:22-07:00
 diff --git a/CHANGELOG.md b/CHANGELOG.md
 index 9e16c9b..2350fa3 100644
 """
+MOCK_COMMIT_TAG = "v2.13.4"
 MOCK_COMMIT_HASH = "fc9ab12"
 MOCK_TZINFO = datetime.timezone(-datetime.timedelta(hours=7))
 MOCK_COMMIT_DATE = datetime.datetime(2022, 7, 30, 15, 30, 22, 0, MOCK_TZINFO)
@@ -109,12 +110,12 @@ class TestAnnotateSubmodule(unittest.TestCase):
         version_info = self.submodule.remote_commit
         self.assertNotEqual(version_info, None)
         assert version_info
-        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_TAG)
         self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
         version_info = self.submodule.remote_tag
         self.assertNotEqual(version_info, None)
         assert version_info
-        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_TAG)
         self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
 
     def test_info_no_tag(self) -> None:
@@ -139,7 +140,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
         version_info = self.submodule.remote_commit
         self.assertNotEqual(version_info, None)
         assert version_info
-        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_TAG)
         self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
         version_info = self.submodule.remote_tag
         self.assertEqual(version_info, None)
@@ -155,6 +156,22 @@ class TestVersionInfo(unittest.TestCase):
         commit = "commit 1234 \nDate:"
         with self.assertRaises(RuntimeError):
             GitSubmodule.get_version_info(commit)
+
+    def test_find_tag(self) -> None:
+        commit = (
+            "commit fc9ab12 (HEAD, tag: v2.13.4, origin/master, origin/HEAD)\n"
+        )
+        commit += "Date:   2022-07-30T15:30:22-07:00"
+        info = GitSubmodule.get_version_info(commit)
+        self.assertEqual(info.version_name, "v2.13.4")
+        self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
+
+    def test_find_commit(self) -> None:
+        commit = "commit fc9ab12 (HEAD, origin/master, origin/HEAD)\n"
+        commit += "Date:   2022-07-30T15:30:22-07:00"
+        info = GitSubmodule.get_version_info(commit)
+        self.assertEqual(info.version_name, "fc9ab12")
+        self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
 
 class TestUpdateSubmodule(unittest.TestCase):
