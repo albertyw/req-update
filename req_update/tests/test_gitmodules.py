@@ -15,14 +15,9 @@ MOCK_GITMODULES = """
 """
 
 MOCK_COMMIT = """
-commit fc9ab12 (HEAD, tag: v2.13.4, origin/master, origin/HEAD)
-Author: Albert Wang <git@albertyw.com>
-Date:   2022-07-30T15:30:22-07:00
-
-    Release v2.13.4
-
-diff --git a/CHANGELOG.md b/CHANGELOG.md
-index 9e16c9b..2350fa3 100644
+fc9ab12365ace68f77cc9ac303bbf239d56601db
+ (tag: v2.13.4)
+2022-07-30T15:30:22-07:00
 """
 MOCK_COMMIT_TAG = "v2.13.4"
 MOCK_COMMIT_HASH = "fc9ab12"
@@ -99,6 +94,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "origin",
                 "--date=iso-strict",
                 "--quiet",
+                "--format=%H%n%d%n%cd",
             ]:
                 stdout = MOCK_COMMIT
             if args[0] == [
@@ -107,6 +103,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "v2.13.4",
                 "--date=iso-strict",
                 "--quiet",
+                "--format=%H%n%d%n%cd",
             ]:
                 stdout = MOCK_COMMIT
             if args[0] == ["git", "tag"]:
@@ -143,6 +140,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
                 "origin",
                 "--date=iso-strict",
                 "--quiet",
+                "--format=%H%n%d%n%cd",
             ]:
                 stdout = MOCK_COMMIT
             if args[0] == ["git", "tag"]:
@@ -165,30 +163,19 @@ class TestAnnotateSubmodule(unittest.TestCase):
 
 
 class TestVersionInfo(unittest.TestCase):
-    def test_cannot_find_hash(self) -> None:
-        commit = ""
-        with self.assertRaises(RuntimeError):
-            GitSubmodule.get_version_info(commit)
-
-    def test_cannot_find_date(self) -> None:
-        commit = "commit 1234 \nDate:"
-        with self.assertRaises(RuntimeError):
-            GitSubmodule.get_version_info(commit)
-
     def test_find_tag(self) -> None:
-        commit = (
-            "commit fc9ab12 (HEAD, tag: v2.13.4, origin/master, origin/HEAD)\n"
-        )
-        commit += "Date:   2022-07-30T15:30:22-07:00"
-        info = GitSubmodule.get_version_info(commit)
+        info = GitSubmodule.get_version_info(MOCK_COMMIT)
         self.assertEqual(info.version_name, "v2.13.4")
         self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
     def test_find_commit(self) -> None:
-        commit = "commit fc9ab12 (HEAD, origin/master, origin/HEAD)\n"
-        commit += "Date:   2022-07-30T15:30:22-07:00"
+        lines = MOCK_COMMIT.strip().split("\n")
+        lines[1] = ""
+        commit = "\n".join(lines)
         info = GitSubmodule.get_version_info(commit)
-        self.assertEqual(info.version_name, "fc9ab12")
+        self.assertEqual(
+            info.version_name, "fc9ab12365ace68f77cc9ac303bbf239d56601db"
+        )
         self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
 

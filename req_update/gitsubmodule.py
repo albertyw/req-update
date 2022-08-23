@@ -54,7 +54,14 @@ class GitSubmodule(Updater):
         return submodule
 
     def get_remote_commit(self, submodule: Submodule) -> VersionInfo:
-        command = ["git", "show", "origin", "--date=iso-strict", "--quiet"]
+        command = [
+            "git",
+            "show",
+            "origin",
+            "--date=iso-strict",
+            "--quiet",
+            "--format=%H%n%d%n%cd",
+        ]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         return GitSubmodule.get_version_info(result.stdout)
 
@@ -64,32 +71,26 @@ class GitSubmodule(Updater):
         if not result.stdout.strip():
             return None
         tag = result.stdout.strip().split("\n")[-1]
-        command = ["git", "show", tag, "--date=iso-strict", "--quiet"]
+        command = [
+            "git",
+            "show",
+            tag,
+            "--date=iso-strict",
+            "--quiet",
+            "--format=%H%n%d%n%cd",
+        ]
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         return GitSubmodule.get_version_info(result.stdout)
 
     @staticmethod
     def get_version_info(commit: str) -> VersionInfo:
-        commit_search = re.search(r"tag: ([v0-9\.]+)", commit)
+        lines = commit.strip().split("\n")
+        commit_search = re.search(r"tag: ([v0-9\.]+)", lines[1])
         if commit_search:
             version_name = commit_search.group(1)
         else:
-            commit_search = re.search(r"commit ([0-9a-f]+) ", commit)
-            if not commit_search:
-                raise RuntimeError("Cannot find commit hash on commit", commit)
-            version_name = commit_search.group(1)
-            if not version_name:
-                raise RuntimeError(
-                    "Cannot parse commit hash on commit", commit
-                )  # pragma: no cover
-        date_search = re.search(r"Date:[ ]+([0-9T\-\+: ]+)", commit)
-        if not date_search:
-            raise RuntimeError("Cannot find date on commit", commit)
-        version_date_raw = date_search.group(1)
-        if not version_date_raw:
-            raise RuntimeError(
-                "Cannot parse Date on commit", commit
-            )  # pragma: no cover
+            version_name = lines[0]
+        version_date_raw = lines[2]
         version_date = datetime.datetime.fromisoformat(version_date_raw)
         version_info = VersionInfo(
             version_name=version_name,
