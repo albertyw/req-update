@@ -69,7 +69,15 @@ class GitSubmodule(Updater):
         result = self.util.execute_shell(command, True, cwd=submodule.path)
         if not result.stdout.strip():
             return None
-        tag = result.stdout.strip().split("\n")[-1]
+        tags = result.stdout.strip().split("\n")
+        try:
+            # Attempt to semantically sort tags
+            tags = sorted(tags, key=lambda t: int(t.split(".")[2]))
+            tags = sorted(tags, key=lambda t: int(t.split(".")[1]))
+            tags = sorted(tags, key=lambda t: int(t.strip("v").split(".")[0]))
+        except (IndexError, ValueError):
+            pass
+        tag = tags[-1]
         command = [
             "git",
             "show",
