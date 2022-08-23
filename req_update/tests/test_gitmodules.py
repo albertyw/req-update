@@ -1,8 +1,11 @@
+import datetime
+from pathlib import Path
 import subprocess
+from typing import Any, Dict, List
 import unittest
 from unittest.mock import MagicMock
 
-from req_update.gitsubmodule import GitSubmodule
+from req_update.gitsubmodule import GitSubmodule, Submodule
 
 
 MOCK_GITMODULES = """
@@ -10,6 +13,20 @@ MOCK_GITMODULES = """
  94909552b484d1000d30b6e78a386c911de5bd58 scripts/git/git-reviewers (v0.13.3)
  dc9785bfa7b8e0e0b401ff231fb654aea24491cb scripts/git/req-update (v2.0.5)
 """
+
+MOCK_COMMIT = """
+commit fc9ab12 (HEAD, tag: v2.13.4, origin/master, origin/HEAD)
+Author: Albert Wang <git@albertyw.com>
+Date:   2022-07-30T15:30:22-07:00
+
+    Release v2.13.4
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 9e16c9b..2350fa3 100644
+"""
+MOCK_COMMIT_HASH = "fc9ab12"
+MOCK_TZINFO = datetime.timezone(-datetime.timedelta(hours=7))
+MOCK_COMMIT_DATE = datetime.datetime(2022, 7, 30, 15, 30, 22, 0, MOCK_TZINFO)
 
 
 class TestCheckApplicable(unittest.TestCase):
@@ -55,3 +72,74 @@ class TestGetSubmoduleInfo(unittest.TestCase):
         self.assertEqual(len(submodules), 3)
         for submodule in submodules:
             self.assertIn("scripts/git", str(submodule.path))
+
+
+class TestAnnotateSubmodule(unittest.TestCase):
+    def setUp(self) -> None:
+        self.gitsubmodule = GitSubmodule()
+        self.mock_execute_shell = MagicMock()
+        setattr(
+            self.gitsubmodule.util,
+            "execute_shell",
+            self.mock_execute_shell,
+        )
+        self.submodule = Submodule(Path("./git-browse"))
+
+    def test_get_info(self) -> None:
+        def execute_shell_returns(
+            *args: List[Any], **kwargs: Dict[str, Any]
+        ) -> MagicMock:
+            stdout = None
+            if args[0] == ["git", "fetch"]:
+                stdout = ""
+            if args[0] == ["git", "show", "origin", "--date=iso-strict"]:
+                stdout = MOCK_COMMIT
+            if args[0] == ["git", "show", "v2.13.4", "--date=iso-strict"]:
+                stdout = MOCK_COMMIT
+            if args[0] == ["git", "tag"]:
+                stdout = "v1\nv2.13.4"
+            self.assertNotEqual(stdout, None, args[0])
+            result = MagicMock()
+            result.stdout = stdout
+            return result
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        out = self.gitsubmodule.annotate_submodule(self.submodule)
+        self.assertEqual(out, self.submodule)
+        version_info = self.submodule.remote_commit
+        self.assertNotEqual(version_info, None)
+        assert version_info
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
+        self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
+        version_info = self.submodule.remote_tag
+        self.assertNotEqual(version_info, None)
+        assert version_info
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
+        self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
+
+    def test_info_no_tag(self) -> None:
+        def execute_shell_returns(
+            *args: List[Any], **kwargs: Dict[str, Any]
+        ) -> MagicMock:
+            stdout = None
+            if args[0] == ["git", "fetch"]:
+                stdout = ""
+            if args[0] == ["git", "show", "origin", "--date=iso-strict"]:
+                stdout = MOCK_COMMIT
+            if args[0] == ["git", "tag"]:
+                stdout = ""
+            self.assertNotEqual(stdout, None, args[0])
+            result = MagicMock()
+            result.stdout = stdout
+            return result
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        out = self.gitsubmodule.annotate_submodule(self.submodule)
+        self.assertEqual(out, self.submodule)
+        version_info = self.submodule.remote_commit
+        self.assertNotEqual(version_info, None)
+        assert version_info
+        self.assertEqual(version_info.version_name, MOCK_COMMIT_HASH)
+        self.assertEqual(version_info.version_date, MOCK_COMMIT_DATE)
+        version_info = self.submodule.remote_tag
+        self.assertEqual(version_info, None)
