@@ -37,3 +37,21 @@ class TestCheckApplicable(unittest.TestCase):
         self.mock_execute_shell.side_effect = error
         applicable = self.gitsubmodule.check_applicable()
         self.assertFalse(applicable)
+
+
+class TestGetSubmoduleInfo(unittest.TestCase):
+    def setUp(self) -> None:
+        self.gitsubmodule = GitSubmodule()
+        self.mock_execute_shell = MagicMock()
+        setattr(
+            self.gitsubmodule.util,
+            "execute_shell",
+            self.mock_execute_shell,
+        )
+
+    def test_get_submodule_info(self) -> None:
+        self.mock_execute_shell().stdout = MOCK_GITMODULES
+        submodules = self.gitsubmodule.get_submodule_info()
+        self.assertEqual(len(submodules), 3)
+        for submodule in submodules:
+            self.assertIn("scripts/git", str(submodule.path))
