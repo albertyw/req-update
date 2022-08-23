@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 import unittest
 from unittest.mock import MagicMock
 
-from req_update.gitsubmodule import GitSubmodule, Submodule
+from req_update.gitsubmodule import GitSubmodule, Submodule, VersionInfo
 
 
 MOCK_GITMODULES = """
@@ -155,3 +155,52 @@ class TestVersionInfo(unittest.TestCase):
         commit = "commit 1234 \nDate:"
         with self.assertRaises(RuntimeError):
             GitSubmodule.get_version_info(commit)
+
+
+class TestUpdateSubmodule(unittest.TestCase):
+    def setUp(self) -> None:
+        self.gitsubmodule = GitSubmodule()
+        self.mock_execute_shell = MagicMock()
+        setattr(
+            self.gitsubmodule.util,
+            "execute_shell",
+            self.mock_execute_shell,
+        )
+        self.submodule = Submodule(Path("./git-browse"))
+        now = datetime.datetime.now()
+        old = now - datetime.timedelta(days=60)
+        self.new_tag_version = VersionInfo(
+            version_name="new_tag", version_date=now
+        )
+        self.old_tag_version = VersionInfo(
+            version_name="old_tag", version_date=old
+        )
+        self.commit_version = VersionInfo(
+            version_name="commit", version_date=now
+        )
+
+    def test_update_submodule_none(self) -> None:
+        version = self.gitsubmodule.update_submodule(self.submodule)
+        self.assertEqual(version, None)
+
+    def test_update_submodule_new_tag(self) -> None:
+        self.submodule.remote_tag = self.new_tag_version
+        self.submodule.remote_commit = self.commit_version
+        version = self.gitsubmodule.update_submodule(self.submodule)
+        self.assertEqual(version, "new_tag")
+
+    def test_update_submodule_old_tag(self) -> None:
+        self.submodule.remote_tag = self.old_tag_version
+        self.submodule.remote_commit = self.commit_version
+        version = self.gitsubmodule.update_submodule(self.submodule)
+        self.assertEqual(version, "commit")
+
+    def test_update_submodule_commit(self) -> None:
+        self.submodule.remote_commit = self.commit_version
+        version = self.gitsubmodule.update_submodule(self.submodule)
+        self.assertEqual(version, "commit")
+
+    def test_update_submodule_tag(self) -> None:
+        self.submodule.remote_tag = self.new_tag_version
+        version = self.gitsubmodule.update_submodule(self.submodule)
+        self.assertEqual(version, "new_tag")
