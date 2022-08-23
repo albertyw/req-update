@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import datetime
 from pathlib import Path
 import subprocess
-from typing import NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 from req_update.util import Updater
 
@@ -18,6 +20,26 @@ class GitSubmodule(Updater):
         except subprocess.CalledProcessError:
             return False
         return len(result.stdout) > 0
+
+    def update_dependencies(self) -> bool:
+        # Get a list of submodules and their versions
+        submodules = self.get_submodule_info()  # NOQA
+        # Get submodule remote info
+        # Checkout submodule to a remote version
+        # Commit submodule update
+        return False
+
+    def get_submodule_info(self) -> List[Submodule]:
+        command = ["git", "submodule"]
+        result = self.util.execute_shell(command, True)
+        submodules: List[Submodule] = []
+        for line in result.stdout.split("\n"):
+            if not line:
+                continue
+            location = Path(line.strip().split(" ")[1])
+            submodule = Submodule(path=location)
+            submodules.append(submodule)
+        return submodules
 
 
 # TODO: After python 3.7 support is dropped, switch this to a TypedDict
