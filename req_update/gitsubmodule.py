@@ -46,7 +46,7 @@ class GitSubmodule(Updater):
         return submodules
 
     def annotate_submodule(self, submodule: Submodule) -> Submodule:
-        command = ["git", "fetch"]
+        command = ["git", "fetch", "-tp"]
         self.util.execute_shell(command, True, cwd=submodule.path)
         submodule.remote_commit = self.get_remote_commit(submodule)
         submodule.remote_tag = self.get_remote_tag(submodule)

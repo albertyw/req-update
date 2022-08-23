@@ -85,7 +85,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
             *args: List[Any], **kwargs: Dict[str, Any]
         ) -> MagicMock:
             stdout = None
-            if args[0] == ["git", "fetch"]:
+            if args[0] == ["git", "fetch", "-tp"]:
                 stdout = ""
             if args[0] == [
                 "git",
@@ -131,7 +131,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
             *args: List[Any], **kwargs: Dict[str, Any]
         ) -> MagicMock:
             stdout = None
-            if args[0] == ["git", "fetch"]:
+            if args[0] == ["git", "fetch", "-tp"]:
                 stdout = ""
             if args[0] == [
                 "git",
