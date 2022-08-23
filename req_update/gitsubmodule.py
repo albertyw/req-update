@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from pathlib import Path
+import re
 import subprocess
 from typing import List, NamedTuple, Optional
 
@@ -23,12 +24,15 @@ class GitSubmodule(Updater):
 
     def update_dependencies(self) -> bool:
         # Get a list of submodules and their versions
-        submodules = self.get_submodule_info()  # NOQA
-        # Get submodule remote info
-        # Checkout submodule to a remote version
-        # Commit submodule update
+        submodules = self.get_submodule_info()
+        for submodule in submodules:
+            # Get submodule remote info
+            submodule = self.annotate_submodule(submodule)  # NOQA
+            # Checkout submodule to a remote version
+            # Commit submodule update
         return False
 
+    # TODO: Make this a method on Submodule
     def get_submodule_info(self) -> List[Submodule]:
         command = ["git", "submodule"]
         result = self.util.execute_shell(command, True)
@@ -40,6 +44,49 @@ class GitSubmodule(Updater):
             submodule = Submodule(path=location)
             submodules.append(submodule)
         return submodules
+
+    def annotate_submodule(self, submodule: Submodule) -> Submodule:
+        command = ["git", "fetch"]
+        self.util.execute_shell(command, True, cwd=submodule.path)
+        submodule.remote_commit = self.get_remote_commit(submodule)
+        submodule.remote_tag = self.get_remote_tag(submodule)
+        return submodule
+
+    def get_remote_commit(self, submodule: Submodule) -> VersionInfo:
+        command = ["git", "show", "origin", "--date=iso-strict"]
+        result = self.util.execute_shell(command, True, cwd=submodule.path)
+        return GitSubmodule.get_version_info(result.stdout)
+
+    def get_remote_tag(self, submodule: Submodule) -> Optional[VersionInfo]:
+        command = ["git", "tag"]
+        result = self.util.execute_shell(command, True, cwd=submodule.path)
+        if not result.stdout.strip():
+            return None
+        tag = result.stdout.strip().split("\n")[-1]
+        command = ["git", "show", tag, "--date=iso-strict"]
+        result = self.util.execute_shell(command, True, cwd=submodule.path)
+        return GitSubmodule.get_version_info(result.stdout)
+
+    @staticmethod
+    def get_version_info(commit: str) -> VersionInfo:
+        commit_search = re.search(r"commit ([0-9a-f]+) ", commit)
+        if not commit_search:
+            raise RuntimeError("Cannot find commit hash on commit", commit)
+        version_name = commit_search.group(1)
+        if not version_name:
+            raise RuntimeError("Cannot parse commit hash on commit", commit)
+        date_search = re.search(r"Date:[ ]+([0-9T\-\+: ]+)", commit)
+        if not date_search:
+            raise RuntimeError("Cannot find date on commit", commit)
+        version_date_raw = date_search.group(1)
+        if not version_date_raw:
+            raise RuntimeError("Cannot parse Date on commit", commit)
+        version_date = datetime.datetime.fromisoformat(version_date_raw)
+        version_info = VersionInfo(
+            version_name=version_name,
+            version_date=version_date,
+        )
+        return version_info
 
 
 # TODO: After python 3.7 support is dropped, switch this to a TypedDict
