@@ -68,7 +68,9 @@ class TestReqUpdateMain(unittest.TestCase):
         )
         self.mock_gitsubmodule_applicable = MagicMock()
         setattr(
-            self.req_update.gitsubmodule, "check_applicable", self.mock_gitsubmodule_applicable
+            self.req_update.gitsubmodule,
+            "check_applicable",
+            self.mock_gitsubmodule_applicable,
         )
         self.mock_gitsubmodule_update = MagicMock()
         setattr(
