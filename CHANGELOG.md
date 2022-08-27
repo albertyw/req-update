@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.1.0 (2022-08-27)
+------------------
+
+ - Add support for updating git submodules
+ - Add support for execute_shell in a given cwd
+ - Refactors, cleanup, and testing
+ - Update dependencies
+
 2.0.5 (2022-08-20)
 ------------------
 
