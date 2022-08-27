@@ -51,6 +51,79 @@ class TestCheckApplicable(unittest.TestCase):
         self.assertFalse(applicable)
 
 
+class TestUpdateDependencies(unittest.TestCase):
+    def setUp(self) -> None:
+        self.gitsubmodule = GitSubmodule()
+        self.submodule = Submodule(Path("/"))
+        self.mock_get_submodule_info = MagicMock()
+        setattr(
+            self.gitsubmodule,
+            "get_submodule_info",
+            self.mock_get_submodule_info,
+        )
+        self.mock_annotate_submodule = MagicMock()
+        setattr(
+            self.gitsubmodule,
+            "annotate_submodule",
+            self.mock_annotate_submodule,
+        )
+        self.mock_update_submodule = MagicMock()
+        setattr(
+            self.gitsubmodule, "update_submodule", self.mock_update_submodule
+        )
+        self.mock_check_cleanliness = MagicMock()
+        setattr(
+            self.gitsubmodule.util,
+            "check_repository_cleanliness",
+            self.mock_check_cleanliness,
+        )
+        self.mock_commit = MagicMock()
+        setattr(
+            self.gitsubmodule.util,
+            "commit_dependency_update",
+            self.mock_commit,
+        )
+        self.mock_push = MagicMock()
+        setattr(
+            self.gitsubmodule.util, "push_dependency_update", self.mock_push
+        )
+        self.mock_log = MagicMock()
+        setattr(self.gitsubmodule.util, "log", self.mock_log)
+
+    def test_no_submodule(self) -> None:
+        self.mock_get_submodule_info.return_value = []
+        updates = self.gitsubmodule.update_dependencies()
+        self.assertFalse(self.mock_annotate_submodule.called)
+        self.assertFalse(self.mock_commit.called)
+        self.assertFalse(self.mock_push.called)
+        self.assertFalse(updates)
+
+    def test_no_version(self) -> None:
+        self.mock_get_submodule_info.return_value = [self.submodule]
+        self.mock_update_submodule.return_value = ""
+        updates = self.gitsubmodule.update_dependencies()
+        self.assertFalse(self.mock_commit.called)
+        self.assertFalse(self.mock_push.called)
+        self.assertFalse(updates)
+
+    def test_clean(self) -> None:
+        self.mock_get_submodule_info.return_value = [self.submodule]
+        self.mock_update_submodule.return_value = "v1.2.3"
+        updates = self.gitsubmodule.update_dependencies()
+        self.assertFalse(self.mock_commit.called)
+        self.assertFalse(self.mock_push.called)
+        self.assertFalse(updates)
+
+    def test_updates(self) -> None:
+        self.mock_get_submodule_info.return_value = [self.submodule]
+        self.mock_update_submodule.return_value = "v1.2.3"
+        self.mock_check_cleanliness.side_effect = RuntimeError("asdf")
+        updates = self.gitsubmodule.update_dependencies()
+        self.assertTrue(self.mock_commit.called)
+        self.assertTrue(self.mock_push.called)
+        self.assertTrue(updates)
+
+
 class TestGetSubmoduleInfo(unittest.TestCase):
     def setUp(self) -> None:
         self.gitsubmodule = GitSubmodule()
