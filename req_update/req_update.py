@@ -38,14 +38,14 @@ class ReqUpdate:
     def __init__(self) -> None:
         self.updated_files: Set[str] = set([])
         self.util = Util()
-        self.python = Python()
-        self.python.util = self.util
         self.gitsubmodule = GitSubmodule()
         self.gitsubmodule.util = self.util
         self.go = Go()
         self.go.util = self.util
         self.node = Node()
         self.node.util = self.util
+        self.python = Python()
+        self.python.util = self.util
 
     def main(self) -> bool:
         """
@@ -56,30 +56,30 @@ class ReqUpdate:
         branch_created = False
         self.util.check_repository_cleanliness()
         updates_made = False
-        if self.python.check_applicable():
-            if not branch_created:
-                self.util.create_branch()
-                branch_created = True
-            python_updates = self.python.update_dependencies()
-            updates_made = updates_made or python_updates
-        if self.node.check_applicable():
-            if not branch_created:
-                self.util.create_branch()
-                branch_created = True
-            node_updates = self.node.update_dependencies()
-            updates_made = updates_made or node_updates
-        if self.go.check_applicable():
-            if not branch_created:
-                self.util.create_branch()
-                branch_created = True
-            go_updates = self.go.update_dependencies()
-            updates_made = updates_made or go_updates
         if self.gitsubmodule.check_applicable():
             if not branch_created:
                 self.util.create_branch()
                 branch_created = True
             gitsubmodule_updates = self.gitsubmodule.update_dependencies()
             updates_made = updates_made or gitsubmodule_updates
+        if self.go.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            go_updates = self.go.update_dependencies()
+            updates_made = updates_made or go_updates
+        if self.node.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            node_updates = self.node.update_dependencies()
+            updates_made = updates_made or node_updates
+        if self.python.check_applicable():
+            if not branch_created:
+                self.util.create_branch()
+                branch_created = True
+            python_updates = self.python.update_dependencies()
+            updates_made = updates_made or python_updates
         if branch_created and not updates_made:
             self.util.rollback_branch()
         return updates_made
