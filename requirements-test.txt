@@ -1,6 +1,6 @@
 # Testing
 black==22.8.0                    # Standard python formatter
-coverage==6.4.4                  # Test coverage
+coverage==6.5.0                  # Test coverage
 flake8==5.0.4                    # Python linting
 
 # Types
