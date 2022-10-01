@@ -44,6 +44,7 @@ class ReqUpdate:
     def __init__(self) -> None:
         self.updated_files: Set[str] = set([])
         self.util = Util()
+        self.language: str = ""
         self.updaters: List[Updater] = []
         for updater in UPDATERS:
             u = updater()
@@ -60,6 +61,9 @@ class ReqUpdate:
         self.util.check_repository_cleanliness()
         updates_made = False
         for updater in self.updaters:
+            if self.language:
+                if self.language != updater.__class__.__name__.lower():
+                    continue
             if not updater.check_applicable():
                 continue
             if not branch_created:
@@ -108,6 +112,7 @@ class ReqUpdate:
             version=__version__,
         )
         args = parser.parse_args()
+        self.language = args.language
         self.util.push = args.push
         self.util.verbose = args.verbose
         self.util.dry_run = args.dryrun
