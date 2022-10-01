@@ -120,3 +120,9 @@ class TestGetArgs(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 self.get_args_with_argv(["--version"])
             self.assertTrue(len(mock_out.getvalue()) > 0)
+
+
+class TestUpdaterNames(unittest.TestCase):
+    def test_updater_names(self) -> None:
+        names = req_update.ReqUpdate.updater_names()
+        self.assertEqual(len(names), len(set(names)))
