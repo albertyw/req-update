@@ -19,18 +19,20 @@ series of commits to update packages.
 
 ```
 $ req_update
-usage: req_update.py [-h] [-p] [-i] [-d] [-v] [--version]
+usage: req_update.py [-h] [-l LANGUAGE] [-p] [-d] [-v] [--version]
 
 Update python, go, node, and git submodule dependencies for your project with git integration
 
 https://github.com/albertyw/req-update
 
-optional arguments:
-  -h, --help     show this help message and exit
-  -p, --push     Push commits individually to remote origin
-  -d, --dryrun   Dry run
-  -v, --verbose  Verbose output
-  --version      show program's version number and exit
+options:
+  -h, --help            show this help message and exit
+  -l LANGUAGE, --language LANGUAGE
+                        Language/package manager to update.  Options are: gitsubmodule, go, node, python
+  -p, --push            Push commits individually to remote origin
+  -d, --dryrun          Dry run
+  -v, --verbose         Verbose output
+  --version             show program's version number and exit
 ```
 
 ## Features

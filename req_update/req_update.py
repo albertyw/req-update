@@ -44,6 +44,7 @@ class ReqUpdate:
     def __init__(self) -> None:
         self.updated_files: Set[str] = set([])
         self.util = Util()
+        self.language: str = ""
         self.updaters: List[Updater] = []
         for updater in UPDATERS:
             u = updater()
@@ -60,7 +61,16 @@ class ReqUpdate:
         self.util.check_repository_cleanliness()
         updates_made = False
         for updater in self.updaters:
+            if self.language:
+                if self.language != updater.__class__.__name__.lower():
+                    continue
             if not updater.check_applicable():
+                if self.language:
+                    warn = (
+                        "Selected language %s but language not applicable"
+                        % self.language
+                    )
+                    self.util.warn(warn)
                 continue
             if not branch_created:
                 self.util.create_branch()
@@ -75,6 +85,14 @@ class ReqUpdate:
         parser = argparse.ArgumentParser(
             description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter,
+        )
+        language_help = "Language/package manager to update.  Options are: "
+        language_help += ", ".join(ReqUpdate.updater_names())
+        parser.add_argument(
+            "-l",
+            "--language",
+            type=str,
+            help=language_help,
         )
         parser.add_argument(
             "-p",
@@ -100,10 +118,15 @@ class ReqUpdate:
             version=__version__,
         )
         args = parser.parse_args()
+        self.language = args.language
         self.util.push = args.push
         self.util.verbose = args.verbose
         self.util.dry_run = args.dryrun
         return args
+
+    @staticmethod
+    def updater_names() -> List[str]:
+        return [u.__name__.lower() for u in UPDATERS]
 
 
 if __name__ == "__main__":
