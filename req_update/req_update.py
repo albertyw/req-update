@@ -24,7 +24,7 @@ __version__ = ".".join(map(str, VERSION))
 
 
 DESCRIPTION = (
-    "Update python, go, and node dependencies for your project with git "
+    "Update python, go, node, and git submodule dependencies for your project with git "
     "integration\n\n"
     "https://github.com/albertyw/req-update"
 )

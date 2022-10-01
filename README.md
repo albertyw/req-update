@@ -9,7 +9,7 @@
 [![Code Climate](https://codeclimate.com/github/albertyw/req-update/badges/gpa.svg)](https://codeclimate.com/github/albertyw/req-update)
 [![Test Coverage](https://codeclimate.com/github/albertyw/req-update/badges/coverage.svg)](https://codeclimate.com/github/albertyw/req-update/coverage)
 
-`req-update` is a CLI tool to automatically update python, go, and node dependencies.
+`req-update` is a CLI tool to automatically update python, go, node, and git submodule dependencies.
 
 ## Usage
 
@@ -21,7 +21,7 @@ series of commits to update packages.
 $ req_update
 usage: req_update.py [-h] [-p] [-i] [-d] [-v] [--version]
 
-Update python, go, and node dependencies for your project with git integration
+Update python, go, node, and git submodule dependencies for your project with git integration
 
 https://github.com/albertyw/req-update
 
@@ -38,9 +38,10 @@ optional arguments:
  - Update python dependencies in `requirements*.txt` pip.
  - Update go dependencies in `go.mod` and `go.sum` with go modules.
  - Update node dependencies in `package-lock.json` with npm.
+ - Update git submodules in `.gitmodules` with git.
  - Integrates with git, creating a branch with one commit per updated dependency
  - No third party dependencies beyond python 3 standard library
- - Automatic detection of python, go, and node dependencies; no CLI arguments required
+ - Automatic detection of python, go, node, and git dependencies; no CLI arguments required
 
 ## Comparisons
 
