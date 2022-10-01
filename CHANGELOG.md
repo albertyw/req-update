@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.2.0 (2022-10-01)
+------------------
+
+ - Add `--language` flag to selectively update a single language's dependencies
+ - Update dependencies
+
+
 2.1.0 (2022-08-27)
 ------------------
 
