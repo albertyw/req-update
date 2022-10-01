@@ -76,6 +76,14 @@ class ReqUpdate:
             description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter,
         )
+        language_help = "Language/package manager to update.  Options are: "
+        language_help += ", ".join(ReqUpdate.updater_names())
+        parser.add_argument(
+            "-l",
+            "--language",
+            type=str,
+            help=language_help,
+        )
         parser.add_argument(
             "-p",
             "--push",
@@ -104,6 +112,10 @@ class ReqUpdate:
         self.util.verbose = args.verbose
         self.util.dry_run = args.dryrun
         return args
+
+    @staticmethod
+    def updater_names() -> List[str]:
+        return [u.__name__.lower() for u in UPDATERS]
 
 
 if __name__ == "__main__":
