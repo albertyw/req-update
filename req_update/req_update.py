@@ -65,6 +65,12 @@ class ReqUpdate:
                 if self.language != updater.__class__.__name__.lower():
                     continue
             if not updater.check_applicable():
+                if self.language:
+                    warn = (
+                        "Selected language %s but language not applicable"
+                        % self.language
+                    )
+                    self.util.warn(warn)
                 continue
             if not branch_created:
                 self.util.create_branch()
