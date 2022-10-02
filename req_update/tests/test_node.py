@@ -3,7 +3,7 @@ import json
 import os
 import subprocess
 import tempfile
-from typing import Any, cast
+from typing import Any, TYPE_CHECKING, cast
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -208,8 +208,10 @@ class TestUpdatePackage(unittest.TestCase):
     def read_package(self) -> dict[str, Any]:
         with open("package.json", "r") as handle:
             package_string = handle.read()
-        package = cast(dict[str, Any], json.loads(package_string))
-        return package
+        package_raw = json.loads(package_string)
+        if TYPE_CHECKING:
+            return cast(dict[str, Any], package_raw)
+        return package_raw
 
     def test_no_updates(self) -> None:
         original_package: dict[str, Any] = {

@@ -3,7 +3,7 @@ import json
 import os
 import re
 import subprocess
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from req_update.util import Updater
 
@@ -65,8 +65,9 @@ class Node(Updater):
     def get_outdated(self) -> dict[str, dict[str, str]]:
         command = ["npm", "outdated", "--json"]
         result = self.util.execute_shell(command, True, ignore_exit_code=True)
-        data = json.loads(result.stdout)
-        packages = cast(dict[str, dict[str, str]], data)
+        packages = json.loads(result.stdout)
+        if TYPE_CHECKING:
+            return cast(dict[str, dict[str, str]], packages)
         return packages
 
     def update_package(
