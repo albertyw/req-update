@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import subprocess
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 
 BRANCH_NAME = "dep-update"
@@ -138,7 +138,7 @@ class Util:
 
     def execute_shell(
         self,
-        command: List[str],
+        command: list[str],
         readonly: bool,
         cwd: Optional[Path] = None,
         suppress_output: bool = False,

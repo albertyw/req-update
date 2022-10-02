@@ -3,7 +3,7 @@ import json
 import os
 import re
 import subprocess
-from typing import cast, Dict, Mapping
+from typing import TYPE_CHECKING, cast
 
 from req_update.util import Updater
 
@@ -62,15 +62,16 @@ class Node(Updater):
                 any_updated = True
         return any_updated
 
-    def get_outdated(self) -> Mapping[str, Mapping[str, str]]:
+    def get_outdated(self) -> dict[str, dict[str, str]]:
         command = ["npm", "outdated", "--json"]
         result = self.util.execute_shell(command, True, ignore_exit_code=True)
-        data = json.loads(result.stdout)
-        packages = cast(Mapping[str, Mapping[str, str]], data)
+        packages = json.loads(result.stdout)
+        if TYPE_CHECKING:
+            return cast(dict[str, dict[str, str]], packages)
         return packages
 
     def update_package(
-        self, package_name: str, package: Mapping[str, str]
+        self, package_name: str, package: dict[str, str]
     ) -> bool:
         self.util.log("Updating dependency: %s" % package_name)
         with open("package.json", "r") as handle:
@@ -114,10 +115,10 @@ class Node(Updater):
 
     def update_package_dependencies(
         self,
-        dependencies: Dict[str, str],
+        dependencies: dict[str, str],
         package_name: str,
-        package: Mapping[str, str],
-    ) -> Mapping[str, str]:
+        package: dict[str, str],
+    ) -> dict[str, str]:
         new_version = package["latest"]
         new_version = Node.generate_package_version(new_version)
         dependencies[package_name] = new_version
