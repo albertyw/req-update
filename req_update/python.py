@@ -140,7 +140,7 @@ class Python(Updater):
             match = re.match(PYTHON_REQUIREMENTS_LINE_REGEX, line)
             if not match:
                 continue
-            if match.group("name").replace("_", "-") != dependency:
+            if match.group("name").replace("_", "-").lower() != dependency.lower():
                 continue
             old_version = match.group("version")
             old_spacer = match.group("spacer")
