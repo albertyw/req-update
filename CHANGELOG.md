@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.2.1 (2022-10-29)
+------------------
+
+ - Make sure python package update is case insensitive
+ - Improve python type annotations
+ - Update dependencies
+
+
 2.2.0 (2022-10-01)
 ------------------
 
