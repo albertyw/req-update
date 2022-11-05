@@ -15,8 +15,8 @@ steps:
       - pip install -r requirements-test.txt
       - python3 -m unittest
 
-  - name: Test Python 3.10
-    image: python:3.10
+  - name: Test Python 3.11
+    image: python:3.11
     commands:
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > "${HOME}/bin/cc-test-reporter"
       - chmod +x "${HOME}/bin/cc-test-reporter"
@@ -34,19 +34,11 @@ steps:
     environment:
       CC_TEST_REPORTER_ID: 20588a9f3d871445aaee95c9e3f5799cb13812b98b321a34ecebf503578fa2c8
 
-  - name: Test Python 3.11
-    image: python:3.11-rc
-    commands:
-      - python setup.py develop
-      - pip install -r requirements-test.txt
-      - python3 -m unittest
-
   - name: Test Python Packaging
     depends_on:
       - Test Python 3.7
-      - Test Python 3.10
       - Test Python 3.11
-    image: python:3.10
+    image: python:3.11
     commands:
       - pip install twine
       - python setup.py sdist bdist_wheel
@@ -55,7 +47,7 @@ steps:
   - name: Upload Python
     depends_on:
       - Test Python Packaging
-    image: python:3.10
+    image: python:3.11
     commands:
       - pip install twine
       - python setup.py sdist bdist_wheel
