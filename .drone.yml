@@ -12,7 +12,6 @@ steps:
     image: python:3.7
     commands:
       - python setup.py develop
-      - pip install -r requirements-test.txt
       - python3 -m unittest
 
   - name: Test Python 3.11
