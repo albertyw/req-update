@@ -12,7 +12,7 @@ from req_update.util import Updater
 PYTHON_PACKAGE_NAME_REGEX = r"(?P<name>[a-zA-Z0-9\-_]+)"
 PYTHON_PACKAGE_OPERATOR_REGEX = r"(?P<operator>[<=>]+)"
 PYTHON_PACKAGE_VERSION_REGEX = r"(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)"  # noqa
-PYTHON_PACKAGE_SPACER_REGEX = r"(?P<spacer>[ ]*)"
+PYTHON_PACKAGE_SPACER_REGEX = r"(?P<spacer>([ ]+\#)?)"
 PYTHON_REQUIREMENTS_LINE_REGEX = r"^%s%s%s%s" % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
@@ -148,7 +148,9 @@ class Python(Updater):
             old_spacer = match.group("spacer")
             if old_spacer:
                 spacing = len(old_version) + len(old_spacer) - len(version)
-                spacer = " " * spacing
+                if spacing <= 1:
+                    spacing = 10 - len(version) % 10 + 1
+                spacer = " " * (spacing - 1) + "#"
             else:
                 spacer = ""
             new_line = re.sub(
