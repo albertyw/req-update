@@ -148,6 +148,8 @@ class Python(Updater):
             old_spacer = match.group("spacer")
             if old_spacer:
                 spacing = len(old_version) + len(old_spacer) - len(version)
+                if spacing <= 1:
+                    spacing = 10 - len(version) % 10 + 1
                 spacer = " " * (spacing - 1) + "#"
             else:
                 spacer = ""
