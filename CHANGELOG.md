@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.2.2 (2023-03-13)
+------------------
+
+ - Ensure spacing between version and comment when a version number increases in number of characters
+ - Update dependencies
+ - CI optimizations
+
+
 2.2.1 (2022-10-29)
 ------------------
 
