@@ -16,8 +16,7 @@ steps:
       - chmod +x "${HOME}/bin/cc-test-reporter"
       - python setup.py develop
       - pip install -r requirements-test.txt
-      - flake8
-      - black --line-length 79 --check .
+      - ruff check .
       - mypy . --strict
       - cc-test-reporter before-build
       - coverage run -m unittest

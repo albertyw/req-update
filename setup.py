@@ -43,8 +43,6 @@ setup(
     py_modules=["req_update.req_update"],
     install_requires=[],
     test_suite="req_update.tests",
-    # testing requires flake8 and coverage but they're listed separately
-    # because they need to wrap setup.py
     extras_require={
         "dev": [],
         "test": [],
