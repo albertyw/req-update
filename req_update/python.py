@@ -110,9 +110,7 @@ class Python(Updater):
         except FileNotFoundError:
             pass
         yield lines
-        if not lines:
-            return
-        if dry_run:
+        if dry_run or not lines:
             return
         with open(file_name, "w") as handle:
             handle.write("".join(lines))
