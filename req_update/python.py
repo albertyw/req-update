@@ -98,7 +98,7 @@ class Python(Updater):
 
     @staticmethod
     @contextmanager
-    def edit_requirements(file_name: str) -> Iterator[list[str]]:
+    def edit_requirements(file_name: str, dry_run: bool) -> Iterator[list[str]]:
         """
         This yields lines from a file, which will be written back into
         the file after yielding
@@ -110,7 +110,7 @@ class Python(Updater):
         except FileNotFoundError:
             pass
         yield lines
-        if not lines:
+        if dry_run or not lines:
             return
         with open(file_name, "w") as handle:
             handle.write("".join(lines))
@@ -119,7 +119,7 @@ class Python(Updater):
         """Given a dependency, update it to a given version"""
         updated = False
         for reqfile in REQUIREMENTS_FILES:
-            with Python.edit_requirements(reqfile) as lines:
+            with Python.edit_requirements(reqfile, self.util.dry_run) as lines:
                 updated_file = self.write_dependency_update_lines(
                     dependency, version, lines
                 )

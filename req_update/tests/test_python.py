@@ -185,7 +185,7 @@ class TestEditRequirements(unittest.TestCase):
 
     def test_edit_requirements(self) -> None:
         filename = self.tempfile.name
-        with python.Python.edit_requirements(filename) as lines:
+        with python.Python.edit_requirements(filename, False) as lines:
             lines.append("asdf\n")
             lines.append("qwer\n")
         with open(filename, "r") as handle:
@@ -194,7 +194,7 @@ class TestEditRequirements(unittest.TestCase):
 
     def test_edit_requirements_not_found(self) -> None:
         filename = str(random.randint(10**10, 10**11))
-        with python.Python.edit_requirements(filename):
+        with python.Python.edit_requirements(filename, False):
             pass
         with self.assertRaises(FileNotFoundError):
             open(filename, "r")
@@ -206,6 +206,7 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         self.original_reqfiles = python.REQUIREMENTS_FILES
         python.REQUIREMENTS_FILES = [self.tempfile.name]
         self.python = python.Python()
+        self.python.util.dry_run = False
 
     def tearDown(self) -> None:
         self.tempfile.close()
