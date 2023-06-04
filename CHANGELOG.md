@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.2.3 (2023-06-03)
+------------------
+
+ - Fix python obeying dryrun configuration
+ - Update dependencies
+
+
 2.2.2 (2023-03-13)
 ------------------
 
