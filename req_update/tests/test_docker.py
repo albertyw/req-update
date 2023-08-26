@@ -38,7 +38,8 @@ class TestUpdateDependencies(BaseTest):
 
 class TestReadDockerfile(BaseTest):
     def test_read(self) -> None:
-        self.docker.read_dockerfile()
+        lines = self.docker.read_dockerfile()
+        self.assertEqual(self.lines, lines)
 
 
 class TestAttemptUpdateImage(BaseTest):

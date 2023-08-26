@@ -29,7 +29,9 @@ class Docker(Updater):
         return updates
 
     def read_dockerfile(self) -> list[str]:
-        return []
+        with open('Dockerfile', 'r') as handle:
+            lines = handle.readlines()
+        return lines
 
     def attempt_update_image(self, line: str) -> str:
         return line
