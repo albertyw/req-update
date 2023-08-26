@@ -12,14 +12,17 @@ class TestCLI(unittest.TestCase):
         self.req_update_path = parent / "req_update.py"
         self.util = util.Util()
 
+    @unittest.skipUnless(os.environ.get("CI"), "Optimize to run only in CI")
     def test_cli(self) -> None:
         command = ["python3", str(self.req_update_path), "-d"]
         self.util.execute_shell(command, readonly=True)
 
+    @unittest.skipUnless(os.environ.get("CI"), "Optimize to run only in CI")
     def test_shebang(self) -> None:
         command = [str(self.req_update_path), "-d"]
         self.util.execute_shell(command, readonly=True)
 
+    @unittest.skipUnless(os.environ.get("CI"), "Optimize to run only in CI")
     def test_module(self) -> None:
         command = ["python3", "-m", "req_update.req_update", "-d"]
         self.util.execute_shell(command, readonly=True)
