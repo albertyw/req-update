@@ -35,8 +35,14 @@ class Docker(Updater):
         return lines
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
-        # return line, 'dependency', 'version'
-        return line, '', ''
+        if not line.startswith('FROM'):
+            return line, '', ''
+        base_image = line.split()[1]
+        if base_image.count(':') != 1:
+            return line, base_image, ''
+        dependency = base_image.split(':')[0]
+        version = base_image.split(':')[1]
+        return line, dependency, version
 
     def commit_dockerfile(self,
         dockerfile: list[str],

@@ -43,8 +43,27 @@ class TestReadDockerfile(BaseTest):
 
 
 class TestAttemptUpdateImage(BaseTest):
-    def test_attempt(self) -> None:
-        self.docker.attempt_update_image('')
+    def setUp(self) -> None:
+        super().setUp()
+        self.test_line = 'FROM debian:10  # comment'
+
+    def test_discards_other(self) -> None:
+        new_line, dependency, version = self.docker.attempt_update_image('RUN echo')
+        self.assertEqual(new_line, 'RUN echo')
+        self.assertEqual(dependency, '')
+        self.assertEqual(version, '')
+
+    def test_identifies_image(self) -> None:
+        new_line, dependency, version = self.docker.attempt_update_image('FROM debian')
+        self.assertEqual(new_line, 'FROM debian')
+        self.assertEqual(dependency, 'debian')
+        self.assertEqual(version, '')
+
+    def test_identifies_version(self) -> None:
+        new_line, dependency, version = self.docker.attempt_update_image(self.test_line)
+        self.assertEqual(new_line, 'FROM debian:10  # comment')
+        self.assertEqual(dependency, 'debian')
+        self.assertEqual(version, '10')
 
 
 class TestCommitDockerfile(BaseTest):
