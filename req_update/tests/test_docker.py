@@ -45,6 +45,47 @@ class TestUpdateDependencies(BaseTest):
             {'results': [{'name': '12'}]}
         )
         self.docker.update_dependencies()
+        lines = self.docker.read_dockerfile()
+        self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
+        self.assertEqual(len(self.mock_log.call_args_list), 1)
+        self.assertEqual(
+            self.mock_log.call_args_list[0][0][0],
+            'Update debian package to 12'
+        )
+        self.assertFalse(self.mock_warn.called)
+
+    def test_no_update(self) -> None:
+        self.mock_urlopen().status = 200
+        self.mock_urlopen().read.return_value = json.dumps(
+            {'results': [{'name': '10'}]}
+        )
+        self.docker.update_dependencies()
+        lines = self.docker.read_dockerfile()
+        self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
+        self.assertFalse(self.mock_log.called)
+        self.assertEqual(len(self.mock_warn.call_args_list), 1)
+        self.assertEqual(self.mock_warn.call_args[0][0], 'No dockerfile updates')
+
+    def test_multiple_update(self) -> None:
+        with open('Dockerfile', 'w') as handle:
+            handle.write('FROM debian:10\nFROM debian:11')
+        self.mock_urlopen().status = 200
+        self.mock_urlopen().read.return_value = json.dumps(
+            {'results': [{'name': '12'}]}
+        )
+        self.docker.update_dependencies()
+        lines = self.docker.read_dockerfile()
+        self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
+        self.assertEqual(len(self.mock_log.call_args_list), 2)
+        self.assertEqual(
+            self.mock_log.call_args_list[0][0][0],
+            'Update debian package to 12'
+        )
+        self.assertEqual(
+            self.mock_log.call_args_list[1][0][0],
+            'Update debian package to 12'
+        )
+        self.assertFalse(self.mock_warn.called)
 
 
 class TestReadDockerfile(BaseTest):
