@@ -3,7 +3,7 @@ import json
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from req_update import docker
 
@@ -21,10 +21,14 @@ class BaseTest(unittest.TestCase):
         setattr(self.docker.util, 'log', self.mock_log)
         self.mock_warn = MagicMock()
         setattr(self.docker.util, 'warn', self.mock_warn)
+        self.mock_urlopen = MagicMock()
+        self.original_urlopen = docker.request.urlopen  # type:ignore
+        setattr(docker.request, 'urlopen', self.mock_urlopen)  # type:ignore
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
         os.chdir(self.original_cwd)
+        setattr(docker.request, 'urlopen', self.original_urlopen)  # type:ignore
 
 
 class TestCheckApplicable(BaseTest):
@@ -36,6 +40,10 @@ class TestCheckApplicable(BaseTest):
 
 class TestUpdateDependencies(BaseTest):
     def test_update(self) -> None:
+        self.mock_urlopen().status = 200
+        self.mock_urlopen().read.return_value = json.dumps(
+            {'results': [{'name': '12'}]}
+        )
         self.docker.update_dependencies()
 
 
@@ -76,31 +84,30 @@ class TestAttemptUpdateImage(BaseTest):
 
 
 class TestFindUpdatedVersion(BaseTest):
-    @patch('urllib.request.urlopen')
-    def test_updates(self, mock_urlopen: MagicMock) -> None:
-        mock_urlopen().status = 200
-        mock_urlopen().read.return_value = json.dumps({'results': [{'name': '12'}]})
+    def test_updates(self) -> None:
+        self.mock_urlopen().status = 200
+        self.mock_urlopen().read.return_value = json.dumps(
+            {'results': [{'name': '12'}]}
+        )
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '12')
-        self.assertIn('library/debian', mock_urlopen.call_args[0][0])
-        self.assertTrue(mock_urlopen().read.called)
+        self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
+        self.assertTrue(self.mock_urlopen().read.called)
 
-    @patch('urllib.request.urlopen')
-    def test_warns_on_error(self, mock_urlopen: MagicMock) -> None:
-        mock_urlopen().status = 404
+    def test_warns_on_error(self) -> None:
+        self.mock_urlopen().status = 404
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '')
-        self.assertIn('library/debian', mock_urlopen.call_args[0][0])
-        self.assertFalse(mock_urlopen().read.called)
+        self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
+        self.assertFalse(self.mock_urlopen().read.called)
         self.assertTrue(self.mock_warn.called)
 
-    @patch('urllib.request.urlopen')
-    def test_namespaced_library(self, mock_urlopen: MagicMock) -> None:
-        mock_urlopen().status = 404
+    def test_namespaced_library(self) -> None:
+        self.mock_urlopen().status = 404
         version = self.docker.find_updated_version('albertyw/ssh-client', '10')
         self.assertEqual(version, '')
-        self.assertIn('albertyw/ssh-client', mock_urlopen.call_args[0][0])
-        self.assertFalse(mock_urlopen().read.called)
+        self.assertIn('albertyw/ssh-client', self.mock_urlopen.call_args[0][0])
+        self.assertFalse(self.mock_urlopen().read.called)
         self.assertTrue(self.mock_warn.called)
 
 
