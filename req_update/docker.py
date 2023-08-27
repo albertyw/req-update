@@ -86,4 +86,7 @@ class Docker(Updater):
 
 
 def compare_versions(current: str, proposed: str) -> bool:
-    return current < proposed
+    try:
+        return int(current) < int(proposed)
+    except ValueError:
+        return False

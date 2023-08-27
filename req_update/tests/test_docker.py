@@ -111,3 +111,10 @@ class TestCommitDockerfile(BaseTest):
             self.assertEqual(data, 'asdf\nqwer')
         self.assertEqual(self.docker.read_dockerfile(), lines)
         self.assertTrue(self.mock_commit_dependency_update.called)
+
+
+class TestCompareVersions(unittest.TestCase):
+    def test_ints(self) -> None:
+        self.assertTrue(docker.compare_versions('10', '12'))
+        self.assertFalse(docker.compare_versions('10', '10'))
+        self.assertFalse(docker.compare_versions('a10', 'a12'))
