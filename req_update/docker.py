@@ -6,6 +6,7 @@ from urllib import request
 from req_update.util import Updater
 
 
+# TODO - support .drone.yml files
 class Docker(Updater):
     def check_applicable(self) -> bool:
         return 'Dockerfile' in os.listdir('.')
@@ -89,6 +90,8 @@ class Docker(Updater):
 
 
 def compare_versions(current: str, proposed: str) -> bool:
+    # TODO - support version numbers mixed with strings
+    # TODO - support multiple version numbers
     try:
         return int(current) < int(proposed)
     except ValueError:
