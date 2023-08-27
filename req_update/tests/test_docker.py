@@ -49,4 +49,9 @@ class TestAttemptUpdateImage(BaseTest):
 
 class TestCommitDockerfile(BaseTest):
     def test_commit(self) -> None:
-        self.docker.commit_dockerfile([])
+        lines = ['asdf', 'qwer']
+        self.docker.commit_dockerfile(lines)
+        with open('Dockerfile', 'r') as handle:
+            data = handle.read()
+            self.assertEqual(data, 'asdf\nqwer')
+        self.assertEqual(self.docker.read_dockerfile(), lines)
