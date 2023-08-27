@@ -69,7 +69,7 @@ class TestAttemptUpdateImage(BaseTest):
     def test_identifies_version(self) -> None:
         self.mock_find_updated_version.return_value = '12'
         new_line, dependency, version = self.docker.attempt_update_image(self.test_line)
-        self.assertEqual(new_line, 'FROM debian:10  # comment')
+        self.assertEqual(new_line, 'FROM debian:12  # comment')
         self.assertEqual(dependency, 'debian')
         self.assertTrue(self.mock_find_updated_version.called)
         self.assertEqual(version, '12')

@@ -43,10 +43,10 @@ class Docker(Updater):
             return line, base_image, ''
         dependency = base_image.split(':')[0]
         version = base_image.split(':')[1]
-        version = self.find_updated_version(dependency, version)
-        # TODO - update new_line
-        new_line = line
-        return new_line, dependency, version
+        new_version = self.find_updated_version(dependency, version)
+        if new_version:
+            line = line.replace(':' + version, ':' + new_version)
+        return line, dependency, new_version
 
     def find_updated_version(self, dependency: str, original_version: str) -> str:
         # TODO: parse namespace from dependency name
