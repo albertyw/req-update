@@ -1,8 +1,9 @@
 from __future__ import annotations
+import json
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from req_update import docker
 
@@ -46,24 +47,50 @@ class TestAttemptUpdateImage(BaseTest):
     def setUp(self) -> None:
         super().setUp()
         self.test_line = 'FROM debian:10  # comment'
+        self.mock_find_updated_version = MagicMock()
+        setattr(self.docker, 'find_updated_version', self.mock_find_updated_version)
 
     def test_discards_other(self) -> None:
         new_line, dependency, version = self.docker.attempt_update_image('RUN echo')
         self.assertEqual(new_line, 'RUN echo')
         self.assertEqual(dependency, '')
         self.assertEqual(version, '')
+        self.assertFalse(self.mock_find_updated_version.called)
 
     def test_identifies_image(self) -> None:
         new_line, dependency, version = self.docker.attempt_update_image('FROM debian')
         self.assertEqual(new_line, 'FROM debian')
         self.assertEqual(dependency, 'debian')
         self.assertEqual(version, '')
+        self.assertFalse(self.mock_find_updated_version.called)
 
     def test_identifies_version(self) -> None:
+        self.mock_find_updated_version.return_value = '12'
         new_line, dependency, version = self.docker.attempt_update_image(self.test_line)
         self.assertEqual(new_line, 'FROM debian:10  # comment')
         self.assertEqual(dependency, 'debian')
-        self.assertEqual(version, '10')
+        self.assertTrue(self.mock_find_updated_version.called)
+        self.assertEqual(version, '12')
+
+
+class TestFindUpdatedVersion(BaseTest):
+    @patch('urllib.request.urlopen')
+    def test_updates(self, mock_urlopen: MagicMock) -> None:
+        mock_urlopen().status = 200
+        mock_urlopen().read.return_value = json.dumps({'results': [{'name': '12'}]})
+        version = self.docker.find_updated_version('debian', '10')
+        self.assertEqual(version, '12')
+        self.assertIn('debian', mock_urlopen.call_args[0][0])
+        self.assertTrue(mock_urlopen().read.called)
+
+    @patch('urllib.request.urlopen')
+    def test_warns_on_error(self, mock_urlopen: MagicMock) -> None:
+        mock_urlopen().status = 404
+        version = self.docker.find_updated_version('debian', '10')
+        self.assertEqual(version, '')
+        self.assertIn('debian', mock_urlopen.call_args[0][0])
+        self.assertFalse(mock_urlopen().read.called)
+        self.assertTrue(self.mock_warn.called)
 
 
 class TestCommitDockerfile(BaseTest):

@@ -1,5 +1,7 @@
 from __future__ import annotations
+import json
 import os
+from urllib import request
 
 from req_update.util import Updater
 
@@ -42,7 +44,36 @@ class Docker(Updater):
             return line, base_image, ''
         dependency = base_image.split(':')[0]
         version = base_image.split(':')[1]
-        return line, dependency, version
+        version = self.find_updated_version(dependency, version)
+        # TODO - update new_line
+        new_line = line
+        return new_line, dependency, version
+
+    def find_updated_version(self, dependency: str, original_version: str) -> str:
+        # TODO: parse namespace from dependency name
+        namespace = 'library'
+        # Both seem to work:
+        # https://registry.hub.docker.com/api/content/v1/repositories/public/library/debian/tags
+        # https://hub.docker.com/v2/repositories/library/debian/tags
+        url = (
+            'https://registry.hub.docker.com/api'
+            '/content/v1/repositories/public/%s/%s/tags?page_size=500'
+            % (namespace, dependency)
+        )
+        response = request.urlopen(url)
+        if int(response.status/100) != 2:
+            self.util.warn('Cannot read %s from hub.docker.com' % dependency)
+            return ''
+        data = json.loads(response.read())
+        available_versions = [tag['name'] for tag in data['results']]
+        new_version = original_version
+        for version in available_versions:
+            if compare_versions(new_version, version):
+                new_version = version
+        if new_version == original_version:
+            return ''
+        else:
+            return new_version
 
     def commit_dockerfile(self,
         dockerfile: list[str],
@@ -52,3 +83,7 @@ class Docker(Updater):
         with open('Dockerfile', 'w') as handle:
             handle.write('\n'.join(dockerfile))
         self.util.commit_dependency_update(dependency, version)
+
+
+def compare_versions(current: str, proposed: str) -> bool:
+    return current < proposed
