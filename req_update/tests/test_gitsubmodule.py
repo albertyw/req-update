@@ -18,8 +18,8 @@ MOCK_COMMIT_DATA = """
 fc9ab12365ace68f77cc9ac303bbf239d56601db
 2022-07-30T15:30:22-07:00
 """
-MOCK_COMMIT_TAG = "v2.13.4"
-MOCK_COMMIT_HASH = "fc9ab12365ace68f77cc9ac303bbf239d56601db"
+MOCK_COMMIT_TAG = 'v2.13.4'
+MOCK_COMMIT_HASH = 'fc9ab12365ace68f77cc9ac303bbf239d56601db'
 MOCK_TZINFO = datetime.timezone(-datetime.timedelta(hours=7))
 MOCK_COMMIT_DATE = datetime.datetime(2022, 7, 30, 15, 30, 22, 0, MOCK_TZINFO)
 
@@ -30,12 +30,12 @@ class TestCheckApplicable(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "execute_shell",
+            'execute_shell',
             self.mock_execute_shell,
         )
 
     def test_check_applicable_empty(self) -> None:
-        self.mock_execute_shell().stdout = ""
+        self.mock_execute_shell().stdout = ''
         applicable = self.gitsubmodule.check_applicable()
         self.assertFalse(applicable)
 
@@ -45,7 +45,7 @@ class TestCheckApplicable(unittest.TestCase):
         self.assertTrue(applicable)
 
     def test_error(self) -> None:
-        error = subprocess.CalledProcessError(1, "asdf")
+        error = subprocess.CalledProcessError(1, 'asdf')
         self.mock_execute_shell.side_effect = error
         applicable = self.gitsubmodule.check_applicable()
         self.assertFalse(applicable)
@@ -54,41 +54,41 @@ class TestCheckApplicable(unittest.TestCase):
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
         self.gitsubmodule = GitSubmodule()
-        self.submodule = Submodule(Path("/"))
+        self.submodule = Submodule(Path('/'))
         self.mock_get_submodule_info = MagicMock()
         setattr(
             self.gitsubmodule,
-            "get_submodule_info",
+            'get_submodule_info',
             self.mock_get_submodule_info,
         )
         self.mock_annotate_submodule = MagicMock()
         setattr(
             self.gitsubmodule,
-            "annotate_submodule",
+            'annotate_submodule',
             self.mock_annotate_submodule,
         )
         self.mock_update_submodule = MagicMock()
         setattr(
-            self.gitsubmodule, "update_submodule", self.mock_update_submodule
+            self.gitsubmodule, 'update_submodule', self.mock_update_submodule
         )
         self.mock_check_cleanliness = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "check_repository_cleanliness",
+            'check_repository_cleanliness',
             self.mock_check_cleanliness,
         )
         self.mock_commit = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "commit_dependency_update",
+            'commit_dependency_update',
             self.mock_commit,
         )
         self.mock_push = MagicMock()
         setattr(
-            self.gitsubmodule.util, "push_dependency_update", self.mock_push
+            self.gitsubmodule.util, 'push_dependency_update', self.mock_push
         )
         self.mock_log = MagicMock()
-        setattr(self.gitsubmodule.util, "log", self.mock_log)
+        setattr(self.gitsubmodule.util, 'log', self.mock_log)
 
     def test_no_submodule(self) -> None:
         self.mock_get_submodule_info.return_value = []
@@ -100,7 +100,7 @@ class TestUpdateDependencies(unittest.TestCase):
 
     def test_no_version(self) -> None:
         self.mock_get_submodule_info.return_value = [self.submodule]
-        self.mock_update_submodule.return_value = ""
+        self.mock_update_submodule.return_value = ''
         updates = self.gitsubmodule.update_dependencies()
         self.assertFalse(self.mock_commit.called)
         self.assertFalse(self.mock_push.called)
@@ -108,7 +108,7 @@ class TestUpdateDependencies(unittest.TestCase):
 
     def test_clean(self) -> None:
         self.mock_get_submodule_info.return_value = [self.submodule]
-        self.mock_update_submodule.return_value = "v1.2.3"
+        self.mock_update_submodule.return_value = 'v1.2.3'
         updates = self.gitsubmodule.update_dependencies()
         self.assertFalse(self.mock_commit.called)
         self.assertFalse(self.mock_push.called)
@@ -116,8 +116,8 @@ class TestUpdateDependencies(unittest.TestCase):
 
     def test_updates(self) -> None:
         self.mock_get_submodule_info.return_value = [self.submodule]
-        self.mock_update_submodule.return_value = "v1.2.3"
-        self.mock_check_cleanliness.side_effect = RuntimeError("asdf")
+        self.mock_update_submodule.return_value = 'v1.2.3'
+        self.mock_check_cleanliness.side_effect = RuntimeError('asdf')
         updates = self.gitsubmodule.update_dependencies()
         self.assertTrue(self.mock_commit.called)
         self.assertTrue(self.mock_push.called)
@@ -130,7 +130,7 @@ class TestGetSubmoduleInfo(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "execute_shell",
+            'execute_shell',
             self.mock_execute_shell,
         )
 
@@ -139,7 +139,7 @@ class TestGetSubmoduleInfo(unittest.TestCase):
         submodules = self.gitsubmodule.get_submodule_info()
         self.assertEqual(len(submodules), 3)
         for submodule in submodules:
-            self.assertIn("scripts/git", str(submodule.path))
+            self.assertIn('scripts/git', str(submodule.path))
 
 
 class TestAnnotateSubmodule(unittest.TestCase):
@@ -148,38 +148,38 @@ class TestAnnotateSubmodule(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "execute_shell",
+            'execute_shell',
             self.mock_execute_shell,
         )
-        self.submodule = Submodule(Path("./git-browse"))
+        self.submodule = Submodule(Path('./git-browse'))
 
     def test_get_info(self) -> None:
         def execute_shell_returns(
             *args: List[Any], **kwargs: Dict[str, Any]
         ) -> MagicMock:
             stdout = None
-            if args[0] == ["git", "fetch", "-tp"]:
-                stdout = ""
+            if args[0] == ['git', 'fetch', '-tp']:
+                stdout = ''
             if args[0] == [
-                "git",
-                "show",
-                "origin",
-                "--date=iso-strict",
-                "--quiet",
-                "--format=%H%n%cd",
+                'git',
+                'show',
+                'origin',
+                '--date=iso-strict',
+                '--quiet',
+                '--format=%H%n%cd',
             ]:
                 stdout = MOCK_COMMIT_DATA
             if args[0] == [
-                "git",
-                "show",
-                "v2.13.4",
-                "--date=iso-strict",
-                "--quiet",
-                "--format=%H%n%cd",
+                'git',
+                'show',
+                'v2.13.4',
+                '--date=iso-strict',
+                '--quiet',
+                '--format=%H%n%cd',
             ]:
                 stdout = MOCK_COMMIT_DATA
-            if args[0] == ["git", "tag"]:
-                stdout = "v1\nv2.13.4"
+            if args[0] == ['git', 'tag']:
+                stdout = 'v1\nv2.13.4'
             self.assertNotEqual(stdout, None, args[0])
             result = MagicMock()
             result.stdout = stdout
@@ -204,19 +204,19 @@ class TestAnnotateSubmodule(unittest.TestCase):
             *args: List[Any], **kwargs: Dict[str, Any]
         ) -> MagicMock:
             stdout = None
-            if args[0] == ["git", "fetch", "-tp"]:
-                stdout = ""
+            if args[0] == ['git', 'fetch', '-tp']:
+                stdout = ''
             if args[0] == [
-                "git",
-                "show",
-                "origin",
-                "--date=iso-strict",
-                "--quiet",
-                "--format=%H%n%cd",
+                'git',
+                'show',
+                'origin',
+                '--date=iso-strict',
+                '--quiet',
+                '--format=%H%n%cd',
             ]:
                 stdout = MOCK_COMMIT_DATA
-            if args[0] == ["git", "tag"]:
-                stdout = ""
+            if args[0] == ['git', 'tag']:
+                stdout = ''
             self.assertNotEqual(stdout, None, args[0])
             result = MagicMock()
             result.stdout = stdout
@@ -240,56 +240,56 @@ class TestGetRemoteTag(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "execute_shell",
+            'execute_shell',
             self.mock_execute_shell,
         )
-        self.submodule = Submodule(Path("./git-browse"))
+        self.submodule = Submodule(Path('./git-browse'))
         self.original_get_version_info = GitSubmodule.get_version_info
         self.mock_get_version_info = MagicMock()
         setattr(
             GitSubmodule,
-            "get_version_info",
+            'get_version_info',
             self.mock_get_version_info,
         )
 
     def tearDown(self) -> None:
         setattr(
             GitSubmodule,
-            "get_version_info",
+            'get_version_info',
             self.original_get_version_info,
         )
 
     def test_one_tag(self) -> None:
-        self.mock_execute_shell().stdout = "v1"
+        self.mock_execute_shell().stdout = 'v1'
         self.gitsubmodule.get_remote_tag(self.submodule)
-        self.assertEqual(self.mock_get_version_info.call_args[0][0], "v1")
+        self.assertEqual(self.mock_get_version_info.call_args[0][0], 'v1')
 
     def test_sorted_tags(self) -> None:
-        self.mock_execute_shell().stdout = "a\nb"
+        self.mock_execute_shell().stdout = 'a\nb'
         self.gitsubmodule.get_remote_tag(self.submodule)
-        self.assertEqual(self.mock_get_version_info.call_args[0][1], "b")
+        self.assertEqual(self.mock_get_version_info.call_args[0][1], 'b')
 
     def test_semver_tags(self) -> None:
-        self.mock_execute_shell().stdout = "1.15.0\n1.5.0"
+        self.mock_execute_shell().stdout = '1.15.0\n1.5.0'
         self.gitsubmodule.get_remote_tag(self.submodule)
-        self.assertEqual(self.mock_get_version_info.call_args[0][1], "1.15.0")
+        self.assertEqual(self.mock_get_version_info.call_args[0][1], '1.15.0')
 
     def test_semver_v_tags(self) -> None:
-        self.mock_execute_shell().stdout = "v1.15.0\nv1.5.0"
+        self.mock_execute_shell().stdout = 'v1.15.0\nv1.5.0'
         self.gitsubmodule.get_remote_tag(self.submodule)
-        self.assertEqual(self.mock_get_version_info.call_args[0][1], "v1.15.0")
+        self.assertEqual(self.mock_get_version_info.call_args[0][1], 'v1.15.0')
 
 
 class TestVersionInfo(unittest.TestCase):
     def test_find_tag(self) -> None:
         info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, MOCK_COMMIT_TAG)
-        self.assertEqual(info.version_name, "v2.13.4")
+        self.assertEqual(info.version_name, 'v2.13.4')
         self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
     def test_find_commit(self) -> None:
-        info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, "")
+        info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, '')
         self.assertEqual(
-            info.version_name, "fc9ab12365ace68f77cc9ac303bbf239d56601db"
+            info.version_name, 'fc9ab12365ace68f77cc9ac303bbf239d56601db'
         )
         self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
@@ -300,20 +300,20 @@ class TestUpdateSubmodule(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
-            "execute_shell",
+            'execute_shell',
             self.mock_execute_shell,
         )
-        self.submodule = Submodule(Path("./git-browse"))
+        self.submodule = Submodule(Path('./git-browse'))
         now = datetime.datetime.now()
         old = now - datetime.timedelta(days=60)
         self.new_tag_version = VersionInfo(
-            version_name="new_tag", version_date=now
+            version_name='new_tag', version_date=now
         )
         self.old_tag_version = VersionInfo(
-            version_name="old_tag", version_date=old
+            version_name='old_tag', version_date=old
         )
         self.commit_version = VersionInfo(
-            version_name="commit", version_date=now
+            version_name='commit', version_date=now
         )
 
     def test_update_submodule_none(self) -> None:
@@ -324,20 +324,20 @@ class TestUpdateSubmodule(unittest.TestCase):
         self.submodule.remote_tag = self.new_tag_version
         self.submodule.remote_commit = self.commit_version
         version = self.gitsubmodule.update_submodule(self.submodule)
-        self.assertEqual(version, "new_tag")
+        self.assertEqual(version, 'new_tag')
 
     def test_update_submodule_old_tag(self) -> None:
         self.submodule.remote_tag = self.old_tag_version
         self.submodule.remote_commit = self.commit_version
         version = self.gitsubmodule.update_submodule(self.submodule)
-        self.assertEqual(version, "commit")
+        self.assertEqual(version, 'commit')
 
     def test_update_submodule_commit(self) -> None:
         self.submodule.remote_commit = self.commit_version
         version = self.gitsubmodule.update_submodule(self.submodule)
-        self.assertEqual(version, "commit")
+        self.assertEqual(version, 'commit')
 
     def test_update_submodule_tag(self) -> None:
         self.submodule.remote_tag = self.new_tag_version
         version = self.gitsubmodule.update_submodule(self.submodule)
-        self.assertEqual(version, "new_tag")
+        self.assertEqual(version, 'new_tag')

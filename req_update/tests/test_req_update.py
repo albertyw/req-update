@@ -9,13 +9,13 @@ from req_update import req_update
 
 
 PIP_OUTDATED = [
-    {"name": "varsnap", "version": "1.0.0", "latest_version": "1.2.3"}
+    {'name': 'varsnap', 'version': '1.0.0', 'latest_version': '1.2.3'}
 ]
 
 
 class TestMain(unittest.TestCase):
     def test_main(self) -> None:
-        with patch("req_update.req_update.ReqUpdate") as mock_req_update:
+        with patch('req_update.req_update.ReqUpdate') as mock_req_update:
             req_update.main()
             self.assertTrue(mock_req_update().main.called)
 
@@ -24,19 +24,19 @@ class TestReqUpdateMain(unittest.TestCase):
     def setUp(self) -> None:
         self.req_update = req_update.ReqUpdate()
         self.mock_get_args = MagicMock()
-        setattr(self.req_update, "get_args", self.mock_get_args)
+        setattr(self.req_update, 'get_args', self.mock_get_args)
         self.mock_check = MagicMock()
         setattr(
             self.req_update.util,
-            "check_repository_cleanliness",
+            'check_repository_cleanliness',
             self.mock_check,
         )
         self.mock_create_branch = MagicMock()
-        setattr(self.req_update.util, "create_branch", self.mock_create_branch)
+        setattr(self.req_update.util, 'create_branch', self.mock_create_branch)
         self.mock_updater = MagicMock()
         self.req_update.updaters = [self.mock_updater]
         self.mock_rollback = MagicMock()
-        setattr(self.req_update.util, "rollback_branch", self.mock_rollback)
+        setattr(self.req_update.util, 'rollback_branch', self.mock_rollback)
 
     def test_main_no_applicable(self) -> None:
         self.mock_updater.check_applicable.return_value = False
@@ -79,8 +79,8 @@ class TestGetArgs(unittest.TestCase):
         self.req_update = req_update.ReqUpdate()
 
     def get_args_with_argv(self, argv: list[str]) -> argparse.Namespace:
-        argv = ["req_update.py"] + argv
-        with patch.object(sys, "argv", argv):
+        argv = ['req_update.py'] + argv
+        with patch.object(sys, 'argv', argv):
             args = self.req_update.get_args()
         return args
 
@@ -92,9 +92,9 @@ class TestGetArgs(unittest.TestCase):
         self.assertFalse(self.req_update.util.push)
         args = self.get_args_with_argv([])
         self.assertFalse(args.push)
-        args = self.get_args_with_argv(["--push"])
+        args = self.get_args_with_argv(['--push'])
         self.assertTrue(args.push)
-        args = self.get_args_with_argv(["-p"])
+        args = self.get_args_with_argv(['-p'])
         self.assertTrue(args.push)
         self.assertTrue(self.req_update.util.push)
 
@@ -102,22 +102,22 @@ class TestGetArgs(unittest.TestCase):
         self.assertTrue(self.req_update.util.dry_run)
         args = self.get_args_with_argv([])
         self.assertFalse(args.dryrun)
-        args = self.get_args_with_argv(["--dryrun"])
+        args = self.get_args_with_argv(['--dryrun'])
         self.assertTrue(args.dryrun)
-        args = self.get_args_with_argv(["-d"])
+        args = self.get_args_with_argv(['-d'])
         self.assertTrue(args.dryrun)
         self.assertTrue(self.req_update.util.dry_run)
 
     def test_verbose(self) -> None:
-        args = self.get_args_with_argv(["--verbose"])
+        args = self.get_args_with_argv(['--verbose'])
         self.assertTrue(args.verbose)
-        args = self.get_args_with_argv(["-v"])
+        args = self.get_args_with_argv(['-v'])
         self.assertTrue(args.verbose)
 
     def test_version(self) -> None:
-        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
             with self.assertRaises(SystemExit):
-                self.get_args_with_argv(["--version"])
+                self.get_args_with_argv(['--version'])
             self.assertTrue(len(mock_out.getvalue()) > 0)
 
 

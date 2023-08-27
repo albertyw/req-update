@@ -19,13 +19,13 @@ from req_update.util import Updater, Util  # NOQA
 
 
 VERSION = (2, 2, 3)
-__version__ = ".".join(map(str, VERSION))
+__version__ = '.'.join(map(str, VERSION))
 
 
 DESCRIPTION = (
-    "Update python, go, node, and git submodule dependencies for your "
-    "project with git integration\n\n"
-    "https://github.com/albertyw/req-update"
+    'Update python, go, node, and git submodule dependencies for your '
+    'project with git integration\n\n'
+    'https://github.com/albertyw/req-update'
 )
 UPDATERS: list[type[Updater]] = [
     GitSubmodule,
@@ -43,7 +43,7 @@ class ReqUpdate:
     def __init__(self) -> None:
         self.updated_files: set[str] = set([])
         self.util = Util()
-        self.language: str = ""
+        self.language: str = ''
         self.updaters: list[Updater] = []
         for updater in UPDATERS:
             u = updater()
@@ -66,7 +66,7 @@ class ReqUpdate:
             if not updater.check_applicable():
                 if self.language:
                     warn = (
-                        "Selected language %s but language not applicable"
+                        'Selected language %s but language not applicable'
                         % self.language
                     )
                     self.util.warn(warn)
@@ -85,35 +85,35 @@ class ReqUpdate:
             description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter,
         )
-        language_help = "Language/package manager to update.  Options are: "
-        language_help += ", ".join(ReqUpdate.updater_names())
+        language_help = 'Language/package manager to update.  Options are: '
+        language_help += ', '.join(ReqUpdate.updater_names())
         parser.add_argument(
-            "-l",
-            "--language",
+            '-l',
+            '--language',
             type=str,
             help=language_help,
         )
         parser.add_argument(
-            "-p",
-            "--push",
-            action="store_true",
-            help="Push commits individually to remote origin",
+            '-p',
+            '--push',
+            action='store_true',
+            help='Push commits individually to remote origin',
         )
         parser.add_argument(
-            "-d",
-            "--dryrun",
-            action="store_true",
-            help="Dry run",
+            '-d',
+            '--dryrun',
+            action='store_true',
+            help='Dry run',
         )
         parser.add_argument(
-            "-v",
-            "--verbose",
-            action="store_true",
-            help="Verbose output",
+            '-v',
+            '--verbose',
+            action='store_true',
+            help='Verbose output',
         )
         parser.add_argument(
-            "--version",
-            action="version",
+            '--version',
+            action='version',
             version=__version__,
         )
         args = parser.parse_args()
@@ -128,7 +128,7 @@ class ReqUpdate:
         return [u.__name__.lower() for u in UPDATERS]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         main()
     except subprocess.CalledProcessError:

@@ -10,19 +10,19 @@ from req_update.util import Updater
 
 # Copied and simplified from
 # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-SEMVER = r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$"  # NOQA
+SEMVER = r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$'  # NOQA
 
 
 class Node(Updater):
     def check_applicable(self) -> bool:
-        command = ["which", "npm"]
+        command = ['which', 'npm']
         try:
             self.util.execute_shell(command, True, suppress_output=True)
         except subprocess.CalledProcessError:
             # Cannot find npm
             return False
-        files = os.listdir(".")
-        if "package.json" not in files or "package-lock.json" not in files:
+        files = os.listdir('.')
+        if 'package.json' not in files or 'package-lock.json' not in files:
             # Cannot find npm config files
             return False
         return True
@@ -36,18 +36,18 @@ class Node(Updater):
         updated_pinned = self.update_pinned_dependencies()
         updated = updated_unpinned or updated_pinned
         if not updated:
-            self.util.warn("No node updates")
+            self.util.warn('No node updates')
         return updated
 
     def update_unpinned_dependencies(self) -> bool:
-        command = ["npm", "update"]
-        self.util.log("Updating npm packages")
+        command = ['npm', 'update']
+        self.util.log('Updating npm packages')
         self.util.execute_shell(command, False)
         try:
             self.util.check_repository_cleanliness()
             return False  # repository is clean so nothing to commit or push
         except RuntimeError:
-            self.util.commit_git("Update npm packages")
+            self.util.commit_git('Update npm packages')
             self.util.push_dependency_update()
             return True
 
@@ -63,7 +63,7 @@ class Node(Updater):
         return any_updated
 
     def get_outdated(self) -> dict[str, dict[str, str]]:
-        command = ["npm", "outdated", "--json"]
+        command = ['npm', 'outdated', '--json']
         result = self.util.execute_shell(command, True, ignore_exit_code=True)
         packages = json.loads(result.stdout)
         if TYPE_CHECKING:
@@ -73,36 +73,36 @@ class Node(Updater):
     def update_package(
         self, package_name: str, package: dict[str, str]
     ) -> bool:
-        self.util.log("Updating dependency: %s" % package_name)
-        with open("package.json", "r") as handle:
+        self.util.log('Updating dependency: %s' % package_name)
+        with open('package.json', 'r') as handle:
             package_json_string = handle.read()
         package_json = json.loads(package_json_string)
-        if package_name in package_json.get("dependencies", {}):
-            old_version = package_json["dependencies"][package_name]
-            package_json["dependencies"] = self.update_package_dependencies(
-                package_json["dependencies"],
+        if package_name in package_json.get('dependencies', {}):
+            old_version = package_json['dependencies'][package_name]
+            package_json['dependencies'] = self.update_package_dependencies(
+                package_json['dependencies'],
                 package_name,
                 package,
             )
-            new_version = package_json["dependencies"][package_name]
-        elif package_name in package_json.get("devDependencies", {}):
-            old_version = package_json["devDependencies"][package_name]
-            package_json["devDependencies"] = self.update_package_dependencies(
-                package_json["devDependencies"],
+            new_version = package_json['dependencies'][package_name]
+        elif package_name in package_json.get('devDependencies', {}):
+            old_version = package_json['devDependencies'][package_name]
+            package_json['devDependencies'] = self.update_package_dependencies(
+                package_json['devDependencies'],
                 package_name,
                 package,
             )
-            new_version = package_json["devDependencies"][package_name]
+            new_version = package_json['devDependencies'][package_name]
         else:
             return False
         package_json_string = json.dumps(package_json, indent=2)
-        package_json_string += "\n"  # Add the traditional EOF newline
-        with open("package.json", "w") as handle:
+        package_json_string += '\n'  # Add the traditional EOF newline
+        with open('package.json', 'w') as handle:
             handle.write(package_json_string)
         success = self.install_dependencies()
         if not success:
             self.util.warn(
-                "Dependency conflict; rolling back: %s" % package_name
+                'Dependency conflict; rolling back: %s' % package_name
             )
             self.util.reset_changes()
             return False
@@ -119,7 +119,7 @@ class Node(Updater):
         package_name: str,
         package: dict[str, str],
     ) -> dict[str, str]:
-        new_version = package["latest"]
+        new_version = package['latest']
         new_version = Node.generate_package_version(new_version)
         dependencies[package_name] = new_version
         return dependencies
@@ -134,26 +134,26 @@ class Node(Updater):
         if not match:
             return version
         versions = match.groupdict()
-        if versions["major"] != "0":
-            return "^%s.0.0" % versions["major"]
-        if versions["minor"] != "0":
-            return "^0.%s.0" % versions["minor"]
-        if versions["patch"] != "0":
+        if versions['major'] != '0':
+            return '^%s.0.0' % versions['major']
+        if versions['minor'] != '0':
+            return '^0.%s.0' % versions['minor']
+        if versions['patch'] != '0':
             return version
-        raise ValueError("Cannot compute version")  # pragma: no cover
+        raise ValueError('Cannot compute version')  # pragma: no cover
 
     def install_dependencies(self) -> bool:
-        command = ["npm", "install"]
+        command = ['npm', 'install']
         try:
             result = self.util.execute_shell(
                 command,
                 False,
                 suppress_output=True,
             )
-            if "Could not resolve dependency" in result.stderr:
+            if 'Could not resolve dependency' in result.stderr:
                 return False
         except subprocess.CalledProcessError as error:
-            if "Could not resolve dependency" in error.stderr:
+            if 'Could not resolve dependency' in error.stderr:
                 return False
             self.util.log(error.stdout)
             self.util.warn(error.stderr)
