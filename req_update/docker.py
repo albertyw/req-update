@@ -24,7 +24,6 @@ class Docker(Updater):
                 continue
             updates = True
             dockerfile_lines[i] = new_line
-            self.util.log('Updating dockerfile %s to %s' % (dependency, version))
             self.commit_dockerfile(dockerfile_lines, dependency, version)
         if not updates:
             self.util.warn('No dockerfile updates')

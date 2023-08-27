@@ -17,6 +17,8 @@ class BaseTest(unittest.TestCase):
         os.chdir(self.tempdir.name)
         with open('Dockerfile', 'w') as handle:
             handle.write('\n'.join(self.lines))
+        self.mock_log = MagicMock()
+        setattr(self.docker.util, 'log', self.mock_log)
         self.mock_warn = MagicMock()
         setattr(self.docker.util, 'warn', self.mock_warn)
 
