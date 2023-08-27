@@ -10,7 +10,7 @@ from req_update import docker
 class BaseTest(unittest.TestCase):
     def setUp(self) -> None:
         self.docker = docker.Docker()
-        self.lines = ['FROM debian:10']
+        self.lines = ['FROM debian:10', 'RUN echo']
         self.tempdir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()
         os.chdir(self.tempdir.name)

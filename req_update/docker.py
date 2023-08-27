@@ -31,6 +31,7 @@ class Docker(Updater):
     def read_dockerfile(self) -> list[str]:
         with open('Dockerfile', 'r') as handle:
             lines = handle.readlines()
+        lines = [l.strip() for l in lines]
         return lines
 
     def attempt_update_image(self, line: str) -> str:
