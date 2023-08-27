@@ -17,13 +17,13 @@ class Docker(Updater):
         updates = False
         for i in range(len(dockerfile_lines)):
             line = dockerfile_lines[i]
-            new_line = self.attempt_update_image(line)
-            if new_line == line:
+            new_line, dependency, version = self.attempt_update_image(line)
+            if not dependency or not version:
                 continue
             updates = True
-            dockerfile_lines[i] = line
-            self.util.log('Updating dockerfile %s to %s' % (line, new_line))
-            self.commit_dockerfile(dockerfile_lines)
+            dockerfile_lines[i] = new_line
+            self.util.log('Updating dockerfile %s to %s' % (dependency, version))
+            self.commit_dockerfile(dockerfile_lines, dependency, version)
         if not updates:
             self.util.warn('No dockerfile updates')
         return updates
@@ -34,10 +34,15 @@ class Docker(Updater):
         lines = [line.strip() for line in lines]
         return lines
 
-    def attempt_update_image(self, line: str) -> str:
-        return line
+    def attempt_update_image(self, line: str) -> tuple[str, str, str]:
+        # return line, 'dependency', 'version'
+        return line, '', ''
 
-    def commit_dockerfile(self, dockerfile: list[str]) -> None:
+    def commit_dockerfile(self,
+        dockerfile: list[str],
+        dependency: str,
+        version: str
+    ) -> None:
         with open('Dockerfile', 'w') as handle:
             handle.write('\n'.join(dockerfile))
-        # TODO - git commit
+        self.util.commit_dependency_update(dependency, version)

@@ -48,10 +48,20 @@ class TestAttemptUpdateImage(BaseTest):
 
 
 class TestCommitDockerfile(BaseTest):
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_commit_dependency_update = MagicMock()
+        setattr(
+            self.docker.util,
+            'commit_dependency_update',
+            self.mock_commit_dependency_update,
+        )
+
     def test_commit(self) -> None:
         lines = ['asdf', 'qwer']
-        self.docker.commit_dockerfile(lines)
+        self.docker.commit_dockerfile(lines, 'debian', '12')
         with open('Dockerfile', 'r') as handle:
             data = handle.read()
             self.assertEqual(data, 'asdf\nqwer')
         self.assertEqual(self.docker.read_dockerfile(), lines)
+        self.assertTrue(self.mock_commit_dependency_update.called)
