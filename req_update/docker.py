@@ -49,15 +49,19 @@ class Docker(Updater):
         return line, dependency, new_version
 
     def find_updated_version(self, dependency: str, original_version: str) -> str:
-        # TODO: parse namespace from dependency name
-        namespace = 'library'
+        if dependency.count('/') == 1:
+            namespace = dependency.split('/')[0]
+            dependency_name = dependency.split('/')[1]
+        else:
+            namespace = 'library'
+            dependency_name = dependency
         # Both seem to work:
         # https://registry.hub.docker.com/api/content/v1/repositories/public/library/debian/tags
         # https://hub.docker.com/v2/repositories/library/debian/tags
         url = (
             'https://registry.hub.docker.com/api'
             '/content/v1/repositories/public/%s/%s/tags?page_size=500'
-            % (namespace, dependency)
+            % (namespace, dependency_name)
         )
         response = request.urlopen(url)
         if int(response.status/100) != 2:
