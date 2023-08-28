@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.3.0 (2023-08-28)
+------------------
+
+ - Support updating Dockerfile base images
+ - Speed up tests
+ - Update dependencies
+
+
 2.2.3 (2023-06-03)
 ------------------
 
