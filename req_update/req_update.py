@@ -11,6 +11,7 @@ current_path = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
 parent_path = current_path.parent.resolve()
 sys.path.insert(0, str(parent_path))
 
+from req_update.docker import Docker  # NOQA
 from req_update.gitsubmodule import GitSubmodule  # NOQA
 from req_update.go import Go  # NOQA
 from req_update.node import Node  # NOQA
@@ -28,6 +29,7 @@ DESCRIPTION = (
     'https://github.com/albertyw/req-update'
 )
 UPDATERS: list[type[Updater]] = [
+    Docker,
     GitSubmodule,
     Go,
     Node,
