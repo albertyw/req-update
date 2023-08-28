@@ -33,11 +33,11 @@ class Docker(Updater):
     def read_dockerfile(self) -> list[str]:
         with open('Dockerfile', 'r') as handle:
             lines = handle.readlines()
-        lines = [line.strip() for line in lines]
+        lines = [line.strip('\n') for line in lines]
         return lines
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
-        if not line.startswith('FROM'):
+        if not line.strip().startswith('FROM'):
             return line, '', ''
         base_image = line.split()[1]
         if base_image.count(':') != 1:
