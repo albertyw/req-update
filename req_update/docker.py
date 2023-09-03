@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import os
+import re
 from urllib import request
 
 from req_update.util import Updater
@@ -94,9 +95,15 @@ class Docker(Updater):
 
 
 def compare_versions(current: str, proposed: str) -> bool:
-    # TODO - support version numbers mixed with strings
-    # TODO - support multiple version numbers
-    try:
-        return int(current) < int(proposed)
-    except ValueError:
+    structure_regex = r"[0-9]+"
+    current_structure = re.sub(structure_regex, "", current)
+    proposed_structure = re.sub(structure_regex, "", proposed)
+    if current_structure != proposed_structure:
         return False
+    num_regex = r"(\.|^)([0-9]+)(?![a-zA-Z])"
+    current_nums = [found[1] for found in re.findall(num_regex, current)]
+    proposed_nums = [found[1] for found in re.findall(num_regex, proposed)]
+    for compares in zip(current_nums, proposed_nums):
+        if int(compares[0]) < int(compares[1]):
+            return True
+    return False

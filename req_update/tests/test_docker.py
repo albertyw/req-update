@@ -181,6 +181,38 @@ class TestCommitDockerfile(BaseTest):
 
 class TestCompareVersions(unittest.TestCase):
     def test_ints(self) -> None:
-        self.assertTrue(docker.compare_versions('10', '12'))
-        self.assertFalse(docker.compare_versions('10', '10'))
         self.assertFalse(docker.compare_versions('a10', 'a12'))
+        self.assertFalse(docker.compare_versions('10a', '12a'))
+
+    def test_regex(self) -> None:
+        tests: dict[str, list[str]] = {
+            '12': ['11', '10', '9', '1'],
+            '3.11': ['3.10', '3.9', '3.0'],
+            '1.21': ['1.19', '1.2'],
+            '18-slim': ['16-slim', '15-slim'],
+            '3.11-slim-bookworm': ['3.10-slim-bookworm', '3.9-slim-bookworm'],
+        }
+        for newest, olders in tests.items():
+            for older in olders:
+                self.assertTrue(
+                    docker.compare_versions(older, newest),
+                    '%s->%s' % (older, newest),
+                )
+                self.assertFalse(
+                    docker.compare_versions(newest, older),
+                    '%s->%s' % (newest, older),
+                )
+                self.assertFalse(docker.compare_versions(newest, newest), newest)
+
+    def test_not_upgradable(self) -> None:
+        tests: list[tuple[str, str]] = [
+            ('18', '18.14'),
+            ('18', '18.14.2'),
+            ('18-alpine', '19-debian'),
+            ('3.11-slim-bookworm', 'alpine3.18'),
+        ]
+        for older, newer in tests:
+            self.assertFalse(
+                docker.compare_versions(older, newer),
+                '%s->%s' % (older, newer),
+            )
