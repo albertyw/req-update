@@ -97,8 +97,9 @@ class Node(Updater):
             return False
         package_json_string = json.dumps(package_json, indent=2)
         package_json_string += '\n'  # Add the traditional EOF newline
-        with open('package.json', 'w') as handle:
-            handle.write(package_json_string)
+        if not self.util.dry_run:
+            with open('package.json', 'w') as handle:
+                handle.write(package_json_string)
         success = self.install_dependencies()
         if not success:
             self.util.warn(
