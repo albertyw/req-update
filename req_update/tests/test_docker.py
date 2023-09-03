@@ -203,3 +203,16 @@ class TestCompareVersions(unittest.TestCase):
                     '%s->%s' % (newest, older),
                 )
                 self.assertFalse(docker.compare_versions(newest, newest), newest)
+
+    def test_not_upgradable(self) -> None:
+        tests: list[tuple[str, str]] = [
+            ('18', '18.14'),
+            ('18', '18.14.2'),
+            ('18-alpine', '19-debian'),
+            ('3.11-slim-bookworm', 'alpine3.18'),
+        ]
+        for older, newer in tests:
+            self.assertFalse(
+                docker.compare_versions(older, newer),
+                '%s->%s' % (older, newer),
+            )
