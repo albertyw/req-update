@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 
 BRANCH_NAME = 'dep-update'
-COMMIT_MESSAGE = 'Update {package} package to {version}'
+COMMIT_MESSAGE = 'Update {language} {package} package to {version}'
 SubprocessOutput = Union[
     subprocess.CalledProcessError,
     subprocess.CompletedProcess,
@@ -37,6 +37,7 @@ class Util:
         self.verbose = False
         self.dry_run = True
         self.branch_exists = False
+        self.language = ''
 
     def check_repository_cleanliness(self) -> None:
         """
@@ -66,6 +67,7 @@ class Util:
     def commit_dependency_update(self, dependency: str, version: str) -> None:
         """Create a commit with a dependency update"""
         commit_message = COMMIT_MESSAGE.format(
+            language=self.language,
             package=dependency,
             version=version,
         )

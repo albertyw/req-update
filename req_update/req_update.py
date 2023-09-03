@@ -50,6 +50,7 @@ class ReqUpdate:
         for updater in UPDATERS:
             u = updater()
             u.util = self.util
+            u.util.language = updater.__name__
             self.updaters.append(u)
 
     def main(self) -> bool:
