@@ -95,6 +95,11 @@ class Docker(Updater):
 
 
 def compare_versions(current: str, proposed: str) -> bool:
+    structure_regex = r"[0-9]+"
+    current_structure = re.sub(structure_regex, "", current)
+    proposed_structure = re.sub(structure_regex, "", proposed)
+    if current_structure != proposed_structure:
+        return False
     num_regex = r"(\.|^)([0-9]+)(?![a-zA-Z])"
     current_nums = [found[1] for found in re.findall(num_regex, current)]
     proposed_nums = [found[1] for found in re.findall(num_regex, proposed)]
