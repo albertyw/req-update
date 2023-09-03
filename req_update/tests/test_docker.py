@@ -195,6 +195,12 @@ class TestCompareVersions(unittest.TestCase):
         }
         for newest, olders in tests.items():
             for older in olders:
-                self.assertTrue(docker.compare_versions(older, newest), '%s->%s' % (older, newest))
-                # self.assertFalse(docker.compare_versions(newest, older), '%s->%s' % (newest, older))
-                # self.assertFalse(docker.compare_versions(newest, newest), newest)
+                self.assertTrue(
+                    docker.compare_versions(older, newest),
+                    '%s->%s' % (older, newest),
+                )
+                self.assertFalse(
+                    docker.compare_versions(newest, older),
+                    '%s->%s' % (newest, older),
+                )
+                self.assertFalse(docker.compare_versions(newest, newest), newest)
