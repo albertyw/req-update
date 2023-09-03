@@ -196,6 +196,10 @@ class TestUpdatePackage(unittest.TestCase):
         os.chdir(self.temp_dir.name)
         self.mock_reset_changes = MagicMock()
         setattr(self.node.util, 'reset_changes', self.mock_reset_changes)
+        self.mock_commit = MagicMock()
+        setattr(self.node.util, 'commit_dependency_update', self.mock_commit)
+        setattr(self.node.util, 'execute_shell', MagicMock())
+        self.node.util.dry_run = False
 
     def tearDown(self) -> None:
         os.chdir(self.original_cwd)
@@ -238,6 +242,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertNotEqual(package, original_package)
         self.assertEqual(package['dependencies']['varsnap'], '^1.0.0')
         self.assertFalse(self.mock_reset_changes.called)
+        self.assertTrue(self.mock_commit.called)
 
     def test_dev_updates(self) -> None:
         original_package: dict[str, Any] = {
@@ -250,6 +255,7 @@ class TestUpdatePackage(unittest.TestCase):
         self.assertNotEqual(package, original_package)
         self.assertEqual(package['devDependencies']['varsnap'], '^1.0.0')
         self.assertFalse(self.mock_reset_changes.called)
+        self.assertTrue(self.mock_commit.called)
 
     def test_no_dependencies(self) -> None:
         original_package: dict[str, Any] = {}
@@ -261,6 +267,7 @@ class TestUpdatePackage(unittest.TestCase):
         package = self.read_package()
         self.assertEqual(package, original_package)
         self.assertFalse(self.mock_reset_changes.called)
+        self.assertFalse(self.mock_commit.called)
 
     def test_install_dependencies_failure(self) -> None:
         original_package: dict[str, Any] = {

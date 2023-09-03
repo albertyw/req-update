@@ -24,6 +24,9 @@ class BaseTest(unittest.TestCase):
         self.mock_urlopen = MagicMock()
         self.original_urlopen = docker.request.urlopen  # type:ignore
         setattr(docker.request, 'urlopen', self.mock_urlopen)  # type:ignore
+        self.mock_commit = MagicMock()
+        setattr(self.docker.util, 'commit_dependency_update', self.mock_commit)
+        self.docker.util.dry_run = False
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
@@ -47,10 +50,10 @@ class TestUpdateDependencies(BaseTest):
         self.docker.update_dependencies()
         lines = self.docker.read_dockerfile()
         self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
-        self.assertEqual(len(self.mock_log.call_args_list), 1)
+        self.assertEqual(len(self.mock_commit.call_args_list), 1)
         self.assertEqual(
-            self.mock_log.call_args_list[0][0][0],
-            'Update debian package to 12'
+            self.mock_commit.call_args_list[0][0],
+            ('debian', '12'),
         )
         self.assertFalse(self.mock_warn.called)
 
@@ -76,14 +79,14 @@ class TestUpdateDependencies(BaseTest):
         self.docker.update_dependencies()
         lines = self.docker.read_dockerfile()
         self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
-        self.assertEqual(len(self.mock_log.call_args_list), 2)
+        self.assertEqual(len(self.mock_commit.call_args_list), 2)
         self.assertEqual(
-            self.mock_log.call_args_list[0][0][0],
-            'Update debian package to 12'
+            self.mock_commit.call_args_list[0][0],
+            ('debian', '12'),
         )
         self.assertEqual(
-            self.mock_log.call_args_list[1][0][0],
-            'Update debian package to 12'
+            self.mock_commit.call_args_list[1][0],
+            ('debian', '12'),
         )
         self.assertFalse(self.mock_warn.called)
 
