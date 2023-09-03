@@ -198,6 +198,7 @@ class TestUpdatePackage(unittest.TestCase):
         setattr(self.node.util, 'reset_changes', self.mock_reset_changes)
         self.mock_commit = MagicMock()
         setattr(self.node.util, 'commit_dependency_update', self.mock_commit)
+        setattr(self.node.util, 'execute_shell', MagicMock())
         self.node.util.dry_run = False
 
     def tearDown(self) -> None:
