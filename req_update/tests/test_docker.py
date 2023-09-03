@@ -154,6 +154,10 @@ class TestFindUpdatedVersion(BaseTest):
         self.assertFalse(self.mock_urlopen().read.called)
         self.assertTrue(self.mock_warn.called)
 
+    def test_skips_latest(self) -> None:
+        version = self.docker.find_updated_version('debian', 'latest')
+        self.assertEqual(version, '')
+
 
 class TestCommitDockerfile(BaseTest):
     def setUp(self) -> None:

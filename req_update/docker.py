@@ -50,6 +50,9 @@ class Docker(Updater):
         return line, dependency, new_version
 
     def find_updated_version(self, dependency: str, original_version: str) -> str:
+        if original_version == 'latest':
+            self.util.warn('Cannot update docker image when using "latest"')
+            return ''
         if dependency.count('/') == 1:
             namespace = dependency.split('/')[0]
             dependency_name = dependency.split('/')[1]
