@@ -181,13 +181,12 @@ class TestCommitDockerfile(BaseTest):
 
 class TestCompareVersions(unittest.TestCase):
     def test_ints(self) -> None:
-        self.assertTrue(docker.compare_versions('10', '12'))
-        self.assertFalse(docker.compare_versions('10', '10'))
         self.assertFalse(docker.compare_versions('a10', 'a12'))
         self.assertFalse(docker.compare_versions('10a', '12a'))
 
     def test_regex(self) -> None:
         tests: dict[str, list[str]] = {
+            '12': ['11', '10', '9', '1'],
             '3.11': ['3.10', '3.9', '3.0'],
             '1.21': ['1.19', '1.2'],
             '18-slim': ['16-slim', '15-slim'],
