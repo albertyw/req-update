@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.3.1 (2023-09-03)
+------------------
+
+ - Improve handling versions of docker images
+ - Ensure dryrun does not modify files
+ - Improve logging
+ - Update dependencies
+
+
 2.3.0 (2023-08-28)
 ------------------
 
