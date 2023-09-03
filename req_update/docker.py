@@ -84,8 +84,9 @@ class Docker(Updater):
         dependency: str,
         version: str
     ) -> None:
-        with open('Dockerfile', 'w') as handle:
-            handle.write('\n'.join(dockerfile))
+        if not self.util.dry_run:
+            with open('Dockerfile', 'w') as handle:
+                handle.write('\n'.join(dockerfile))
         self.util.commit_dependency_update(dependency, version)
 
 
