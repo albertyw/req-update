@@ -1,7 +1,6 @@
 from __future__ import annotations
 import json
 import os
-import re
 from urllib import request
 
 from req_update.util import Updater
@@ -76,7 +75,7 @@ class Docker(Updater):
         available_versions = [tag['name'] for tag in data['results']]
         new_version = original_version
         for version in available_versions:
-            if compare_versions(new_version, version):
+            if self.util.compare_versions(new_version, version):
                 new_version = version
         if new_version == original_version:
             return ''
@@ -92,18 +91,3 @@ class Docker(Updater):
             with open('Dockerfile', 'w') as handle:
                 handle.write('\n'.join(dockerfile))
         self.util.commit_dependency_update(dependency, version)
-
-
-def compare_versions(current: str, proposed: str) -> bool:
-    structure_regex = r"[0-9]+"
-    current_structure = re.sub(structure_regex, "", current)
-    proposed_structure = re.sub(structure_regex, "", proposed)
-    if current_structure != proposed_structure:
-        return False
-    num_regex = r"(\.|^)([0-9]+)(?![a-zA-Z])"
-    current_nums = [found[1] for found in re.findall(num_regex, current)]
-    proposed_nums = [found[1] for found in re.findall(num_regex, proposed)]
-    for compares in zip(current_nums, proposed_nums):
-        if int(compares[0]) < int(compares[1]):
-            return True
-    return False
