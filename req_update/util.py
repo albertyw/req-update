@@ -110,6 +110,12 @@ class Util:
         self.execute_shell(command, False)
 
     def compare_versions(self, current: str, proposed: str) -> bool:
+        """
+        Take the current version and a proposed new version and return a bool
+        for whether the new version is a valid upgrade.  The new version is a
+        valid upgrade if the version structure matches and the version numbers
+        are greater.
+        """
         structure_regex = r"[0-9]+"
         current_structure = re.sub(structure_regex, "", current)
         proposed_structure = re.sub(structure_regex, "", proposed)
