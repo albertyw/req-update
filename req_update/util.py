@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 from pathlib import Path
+import re
 import subprocess
 from typing import Optional, Union
 
@@ -107,6 +108,26 @@ class Util:
         self.log('Pushing commit to git remote')
         command = ['git', 'push', '-u', 'origin']
         self.execute_shell(command, False)
+
+    def compare_versions(self, current: str, proposed: str) -> bool:
+        """
+        Take the current version and a proposed new version and return a bool
+        for whether the new version is a valid upgrade.  The new version is a
+        valid upgrade if the version structure matches and the version numbers
+        are greater.
+        """
+        structure_regex = r"[0-9]+"
+        current_structure = re.sub(structure_regex, "", current)
+        proposed_structure = re.sub(structure_regex, "", proposed)
+        if current_structure != proposed_structure:
+            return False
+        num_regex = r"(\.|^)([0-9]+)(?![a-zA-Z])"
+        current_nums = [found[1] for found in re.findall(num_regex, current)]
+        proposed_nums = [found[1] for found in re.findall(num_regex, proposed)]
+        for compares in zip(current_nums, proposed_nums):
+            if int(compares[0]) < int(compares[1]):
+                return True
+        return False
 
     def check_major_version_update(
         self, dependency: str, old_version: str, new_version: str
