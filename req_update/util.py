@@ -45,7 +45,6 @@ class Util:
         self.verbose = False
         self.dry_run = True
         self.branch_exists = False
-        self.language = ''
 
     def check_repository_cleanliness(self) -> None:
         """

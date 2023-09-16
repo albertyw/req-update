@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import argparse
-import copy
 import os
 import pathlib
 import subprocess
@@ -50,8 +49,7 @@ class ReqUpdate:
         self.updaters: list[Updater] = []
         for updater in UPDATERS:
             u = updater()
-            u.util = copy.deepcopy(self.util)
-            u.util.language = updater.__name__
+            u.util = self.util
             self.updaters.append(u)
 
     def main(self) -> bool:
