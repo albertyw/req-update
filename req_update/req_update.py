@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import argparse
+import copy
 import os
 import pathlib
 import subprocess
@@ -49,6 +50,7 @@ class ReqUpdate:
         self.updaters: list[Updater] = []
         for updater in UPDATERS:
             u = updater()
+            u.util = copy.deepcopy(self.util)
             u.util.language = updater.__name__
             self.updaters.append(u)
 
