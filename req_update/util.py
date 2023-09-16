@@ -31,6 +31,13 @@ class Updater:
         """
         return False
 
+    @property
+    def language(self) -> str:
+        """
+        Return the name of the language being updated
+        """
+        return type(self).__name__
+
 
 class Util:
     def __init__(self) -> None:
