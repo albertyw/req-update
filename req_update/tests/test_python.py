@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-from req_update import python
+from req_update import python, util
 
 
 PIP_OUTDATED = [
@@ -17,7 +17,8 @@ PIP_OUTDATED = [
 
 class TestCheckApplicable(unittest.TestCase):
     def setUp(self) -> None:
-        self.python = python.Python()
+        u = util.Util()
+        self.python = python.Python(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
 
@@ -52,7 +53,8 @@ class TestCheckApplicable(unittest.TestCase):
 
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.python = python.Python()
+        u = util.Util()
+        self.python = python.Python(u)
         self.mock_update = MagicMock()
         setattr(self.python, 'update_dependencies_file', self.mock_update)
         self.mock_install = MagicMock()
@@ -75,7 +77,8 @@ class TestUpdateDependencies(unittest.TestCase):
 
 class TestUpdateDependenciesFile(unittest.TestCase):
     def setUp(self) -> None:
-        self.python = python.Python()
+        u = util.Util()
+        self.python = python.Python(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
         self.mock_log = MagicMock()
@@ -146,7 +149,8 @@ class TestUpdateDependenciesFile(unittest.TestCase):
 
 class TestGetPipOutdated(unittest.TestCase):
     def setUp(self) -> None:
-        self.python = python.Python()
+        u = util.Util()
+        self.python = python.Python(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
 
@@ -205,7 +209,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         self.tempfile = tempfile.NamedTemporaryFile()
         self.original_reqfiles = python.REQUIREMENTS_FILES
         python.REQUIREMENTS_FILES = [self.tempfile.name]
-        self.python = python.Python()
+        u = util.Util()
+        self.python = python.Python(u)
         self.python.util.dry_run = False
 
     def tearDown(self) -> None:
@@ -281,7 +286,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
 
 class TestInstallUpdates(unittest.TestCase):
     def setUp(self) -> None:
-        self.python = python.Python()
+        u = util.Util()
+        self.python = python.Python(u)
         self.mock_log = MagicMock()
         setattr(self.python.util, 'log', self.mock_log)
         self.mock_execute_shell = MagicMock()

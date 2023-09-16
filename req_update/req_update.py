@@ -48,8 +48,7 @@ class ReqUpdate:
         self.language: str = ''
         self.updaters: list[Updater] = []
         for updater in UPDATERS:
-            u = updater()
-            u.util = self.util
+            u = updater(self.util)
             self.updaters.append(u)
 
     def main(self) -> bool:

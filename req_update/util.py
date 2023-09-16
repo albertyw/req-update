@@ -15,8 +15,8 @@ SubprocessOutput = Union[
 
 
 class Updater:
-    def __init__(self) -> None:
-        self.util = Util()
+    def __init__(self, util: Util) -> None:
+        self.util = util
 
     def check_applicable(self) -> bool:
         """

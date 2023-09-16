@@ -5,12 +5,13 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock
 
-from req_update import docker
+from req_update import docker, util
 
 
 class BaseTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.docker = docker.Docker()
+        u = util.Util()
+        self.docker = docker.Docker(u)
         self.lines = ['FROM debian:10', 'RUN echo']
         self.tempdir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()

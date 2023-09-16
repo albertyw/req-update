@@ -7,7 +7,7 @@ from typing import Any, TYPE_CHECKING, cast
 import unittest
 from unittest.mock import MagicMock, patch
 
-from req_update import node
+from req_update import node, util
 
 
 MOCK_NPM_OUTDATED = {
@@ -26,7 +26,8 @@ MOCK_NPM_OUTDATED = {
 
 class TestCheckApplicable(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
 
@@ -73,7 +74,8 @@ class TestCheckApplicable(unittest.TestCase):
 
 class TestUpdateInstallDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_unpinned = MagicMock()
         setattr(self.node, 'update_unpinned_dependencies', self.mock_unpinned)
         self.mock_pinned = MagicMock()
@@ -112,7 +114,8 @@ class TestUpdateInstallDependencies(unittest.TestCase):
 
 class TestUpdateUnpinnedDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_clean = MagicMock()
@@ -146,7 +149,8 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
 
 class TestUpdatePinnedDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_get_outdated = MagicMock()
         setattr(self.node, 'get_outdated', self.mock_get_outdated)
         self.mock_update_package = MagicMock()
@@ -176,7 +180,8 @@ class TestUpdatePinnedDependencies(unittest.TestCase):
 
 class TestGetOutdated(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
 
@@ -188,7 +193,8 @@ class TestGetOutdated(unittest.TestCase):
 
 class TestUpdatePackage(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_log = MagicMock()
         setattr(self.node.util, 'log', self.mock_log)
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -305,7 +311,8 @@ class TestGeneratePackageVersion(unittest.TestCase):
 
 class TestInstallDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.node = node.Node()
+        u = util.Util()
+        self.node = node.Node(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_log = MagicMock()

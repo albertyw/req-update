@@ -11,8 +11,9 @@ from req_update import util
 
 class TestUpdater(unittest.TestCase):
     def test(self) -> None:
-        updater = util.Updater()
-        self.assertTrue(updater.util)
+        u = util.Util()
+        updater = util.Updater(u)
+        self.assertEqual(updater.util, u)
         self.assertFalse(updater.check_applicable())
         self.assertFalse(updater.update_dependencies())
 
