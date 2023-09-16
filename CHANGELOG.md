@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.3.2 (2023-09-16)
+------------------
+
+ - Fix bug where update languages would be incorrect in git commit messages
+ - Update dependencies
+
+
 2.3.1 (2023-09-03)
 ------------------
 
