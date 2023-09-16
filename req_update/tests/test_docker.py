@@ -53,7 +53,7 @@ class TestUpdateDependencies(BaseTest):
         self.assertEqual(len(self.mock_commit.call_args_list), 1)
         self.assertEqual(
             self.mock_commit.call_args_list[0][0],
-            ('debian', '12'),
+            ('Docker', 'debian', '12'),
         )
         self.assertFalse(self.mock_warn.called)
 
@@ -82,11 +82,11 @@ class TestUpdateDependencies(BaseTest):
         self.assertEqual(len(self.mock_commit.call_args_list), 2)
         self.assertEqual(
             self.mock_commit.call_args_list[0][0],
-            ('debian', '12'),
+            ('Docker', 'debian', '12'),
         )
         self.assertEqual(
             self.mock_commit.call_args_list[1][0],
-            ('debian', '12'),
+            ('Docker', 'debian', '12'),
         )
         self.assertFalse(self.mock_warn.called)
 

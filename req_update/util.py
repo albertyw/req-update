@@ -72,10 +72,12 @@ class Util:
         command = ['git', 'commit', '-am', commit_message]
         self.execute_shell(command, False)
 
-    def commit_dependency_update(self, dependency: str, version: str) -> None:
+    def commit_dependency_update(
+        self, language: str, dependency: str, version: str
+    ) -> None:
         """Create a commit with a dependency update"""
         commit_message = COMMIT_MESSAGE.format(
-            language=self.language,
+            language=language,
             package=dependency,
             version=version,
         )

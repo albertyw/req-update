@@ -34,7 +34,7 @@ class GitSubmodule(Updater):
                     self.util.check_repository_cleanliness()
                 except RuntimeError:
                     self.util.commit_dependency_update(
-                        str(submodule.path), version
+                        self.language, str(submodule.path), version
                     )
                     self.util.push_dependency_update()
                     clean = False
