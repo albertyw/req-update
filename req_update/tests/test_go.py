@@ -4,12 +4,13 @@ import subprocess
 import unittest
 from unittest.mock import MagicMock, patch
 
-from req_update import go
+from req_update import go, util
 
 
 class TestCheckApplicable(unittest.TestCase):
     def setUp(self) -> None:
-        self.go = go.Go()
+        u = util.Util()
+        self.go = go.Go(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.go.util, 'execute_shell', self.mock_execute_shell)
 
@@ -45,7 +46,8 @@ class TestCheckApplicable(unittest.TestCase):
 
 class TestUpdateInstallDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.go = go.Go()
+        u = util.Util()
+        self.go = go.Go(u)
         self.mock_execute_shell = MagicMock()
         setattr(self.go.util, 'execute_shell', self.mock_execute_shell)
         self.mock_clean = MagicMock()

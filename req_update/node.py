@@ -110,7 +110,7 @@ class Node(Updater):
         self.util.check_major_version_update(
             package_name, old_version, new_version
         )
-        self.util.commit_dependency_update(package_name, new_version)
+        self.util.commit_dependency_update(self.language, package_name, new_version)
         self.util.push_dependency_update()
         return True
 

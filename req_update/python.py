@@ -6,7 +6,7 @@ import re
 import subprocess
 from typing import Iterator
 
-from req_update.util import Updater
+from req_update.util import Updater, Util
 
 
 PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
@@ -26,9 +26,9 @@ REQUIREMENTS_FILES = [
 
 
 class Python(Updater):
-    def __init__(self) -> None:
+    def __init__(self, util: Util) -> None:
         self.updated_files: set[str] = set([])
-        super().__init__()
+        super().__init__(util)
 
     def check_applicable(self) -> bool:
         # Make sure pip is recent enough
@@ -83,7 +83,7 @@ class Python(Updater):
             version = outdated['latest_version']
             written = self.write_dependency_update(dependency, version)
             if written:
-                self.util.commit_dependency_update(dependency, version)
+                self.util.commit_dependency_update(self.language, dependency, version)
                 self.util.push_dependency_update()
                 clean = False
         return not clean

@@ -15,8 +15,8 @@ SubprocessOutput = Union[
 
 
 class Updater:
-    def __init__(self) -> None:
-        self.util = Util()
+    def __init__(self, util: Util) -> None:
+        self.util = util
 
     def check_applicable(self) -> bool:
         """
@@ -31,6 +31,13 @@ class Updater:
         """
         return False
 
+    @property
+    def language(self) -> str:
+        """
+        Return the name of the language being updated
+        """
+        return type(self).__name__
+
 
 class Util:
     def __init__(self) -> None:
@@ -38,7 +45,6 @@ class Util:
         self.verbose = False
         self.dry_run = True
         self.branch_exists = False
-        self.language = ''
 
     def check_repository_cleanliness(self) -> None:
         """
@@ -65,10 +71,12 @@ class Util:
         command = ['git', 'commit', '-am', commit_message]
         self.execute_shell(command, False)
 
-    def commit_dependency_update(self, dependency: str, version: str) -> None:
+    def commit_dependency_update(
+        self, language: str, dependency: str, version: str
+    ) -> None:
         """Create a commit with a dependency update"""
         commit_message = COMMIT_MESSAGE.format(
-            language=self.language,
+            language=language,
             package=dependency,
             version=version,
         )

@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import unittest
 from unittest.mock import MagicMock
 
+from req_update import util
 from req_update.gitsubmodule import GitSubmodule, Submodule, VersionInfo
 
 
@@ -26,7 +27,8 @@ MOCK_COMMIT_DATE = datetime.datetime(2022, 7, 30, 15, 30, 22, 0, MOCK_TZINFO)
 
 class TestCheckApplicable(unittest.TestCase):
     def setUp(self) -> None:
-        self.gitsubmodule = GitSubmodule()
+        u = util.Util()
+        self.gitsubmodule = GitSubmodule(u)
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
@@ -53,7 +55,8 @@ class TestCheckApplicable(unittest.TestCase):
 
 class TestUpdateDependencies(unittest.TestCase):
     def setUp(self) -> None:
-        self.gitsubmodule = GitSubmodule()
+        u = util.Util()
+        self.gitsubmodule = GitSubmodule(u)
         self.submodule = Submodule(Path('/'))
         self.mock_get_submodule_info = MagicMock()
         setattr(
@@ -126,7 +129,8 @@ class TestUpdateDependencies(unittest.TestCase):
 
 class TestGetSubmoduleInfo(unittest.TestCase):
     def setUp(self) -> None:
-        self.gitsubmodule = GitSubmodule()
+        u = util.Util()
+        self.gitsubmodule = GitSubmodule(u)
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
@@ -144,7 +148,8 @@ class TestGetSubmoduleInfo(unittest.TestCase):
 
 class TestAnnotateSubmodule(unittest.TestCase):
     def setUp(self) -> None:
-        self.gitsubmodule = GitSubmodule()
+        u = util.Util()
+        self.gitsubmodule = GitSubmodule(u)
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
@@ -236,7 +241,8 @@ class TestAnnotateSubmodule(unittest.TestCase):
 
 class TestGetRemoteTag(unittest.TestCase):
     def setUp(self) -> None:
-        self.gitsubmodule = GitSubmodule()
+        u = util.Util()
+        self.gitsubmodule = GitSubmodule(u)
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,
@@ -296,7 +302,8 @@ class TestVersionInfo(unittest.TestCase):
 
 class TestUpdateSubmodule(unittest.TestCase):
     def setUp(self) -> None:
-        self.gitsubmodule = GitSubmodule()
+        u = util.Util()
+        self.gitsubmodule = GitSubmodule(u)
         self.mock_execute_shell = MagicMock()
         setattr(
             self.gitsubmodule.util,

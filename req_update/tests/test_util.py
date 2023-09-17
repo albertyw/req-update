@@ -11,8 +11,9 @@ from req_update import util
 
 class TestUpdater(unittest.TestCase):
     def test(self) -> None:
-        updater = util.Updater()
-        self.assertTrue(updater.util)
+        u = util.Util()
+        updater = util.Updater(u)
+        self.assertEqual(updater.util, u)
         self.assertFalse(updater.check_applicable())
         self.assertFalse(updater.update_dependencies())
 
@@ -76,7 +77,7 @@ class TestCommitDependencyUpdate(unittest.TestCase):
         setattr(self.util, 'commit_git', self.mock_commit_git)
 
     def test_commit_dependency_update(self) -> None:
-        self.util.commit_dependency_update('varsnap', '1.2.3')
+        self.util.commit_dependency_update('python', 'varsnap', '1.2.3')
         self.assertTrue(self.mock_commit_git.called)
         commit_message = self.mock_commit_git.mock_calls[0][1]
         self.assertIn('varsnap', commit_message[0])
