@@ -5,8 +5,10 @@ from req_update.docker import Docker
 
 
 class Drone(Docker):
+    UPDATE_FILE = '.drone.yml'
+
     def check_applicable(self) -> bool:
-        return '.drone.yml' in os.listdir('.')
+        return self.UPDATE_FILE in os.listdir('.')
 
     def update_dependencies(self) -> bool:
         """
@@ -28,7 +30,7 @@ class Drone(Docker):
         return updates
 
     def read_drone(self) -> list[str]:
-        with open('.drone.yml', 'r') as handle:
+        with open(self.UPDATE_FILE, 'r') as handle:
             lines = handle.readlines()
         lines = [line.strip('\n') for line in lines]
         return lines
@@ -52,6 +54,6 @@ class Drone(Docker):
         version: str
     ) -> None:
         if not self.util.dry_run:
-            with open('.drone.yml', 'w') as handle:
+            with open(self.UPDATE_FILE, 'w') as handle:
                 handle.write('\n'.join(drone_lines))
         self.util.commit_dependency_update(self.language, dependency, version)

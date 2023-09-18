@@ -7,8 +7,10 @@ from req_update.util import Updater
 
 
 class Docker(Updater):
+    UPDATE_FILE = 'Dockerfile'
+
     def check_applicable(self) -> bool:
-        return 'Dockerfile' in os.listdir('.')
+        return self.UPDATE_FILE in os.listdir('.')
 
     def update_dependencies(self) -> bool:
         """
@@ -30,7 +32,7 @@ class Docker(Updater):
         return updates
 
     def read_dockerfile(self) -> list[str]:
-        with open('Dockerfile', 'r') as handle:
+        with open(self.UPDATE_FILE, 'r') as handle:
             lines = handle.readlines()
         lines = [line.strip('\n') for line in lines]
         return lines
@@ -87,6 +89,6 @@ class Docker(Updater):
         version: str
     ) -> None:
         if not self.util.dry_run:
-            with open('Dockerfile', 'w') as handle:
+            with open(self.UPDATE_FILE, 'w') as handle:
                 handle.write('\n'.join(dockerfile))
         self.util.commit_dependency_update(self.language, dependency, version)
