@@ -68,7 +68,7 @@ class TestUpdateDependencies(BaseTest):
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
         self.assertFalse(self.mock_log.called)
         self.assertEqual(len(self.mock_warn.call_args_list), 1)
-        self.assertEqual(self.mock_warn.call_args[0][0], 'No dockerfile updates')
+        self.assertEqual(self.mock_warn.call_args[0][0], 'No Docker updates')
 
     def test_multiple_update(self) -> None:
         with open('Dockerfile', 'w') as handle:
