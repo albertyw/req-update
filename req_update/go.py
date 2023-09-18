@@ -32,7 +32,7 @@ class Go(Updater):
         self.util.execute_shell(command, False)
         try:
             self.util.check_repository_cleanliness()
-            self.util.warn('No go updates')
+            self.util.warn('No %s updates' % self.language)
             return False  # repository is clean so nothing to commit or push
         except RuntimeError:
             self.util.commit_git('Update go packages')
