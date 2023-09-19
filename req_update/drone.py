@@ -26,19 +26,6 @@ class Drone(Docker):
             self.util.warn('No %s updates' % self.language)
         return updates
 
-    def attempt_update_image(self, line: str) -> tuple[str, str, str]:
-        if not line.strip().startswith(self.LINE_HEADER):
-            return line, '', ''
-        base_image = line.split()[1]
-        if base_image.count(':') != 1:
-            return line, base_image, ''
-        dependency = base_image.split(':')[0]
-        version = base_image.split(':')[1]
-        new_version = self.find_updated_version(dependency, version)
-        if new_version:
-            line = line.replace(':' + version, ':' + new_version)
-        return line, dependency, new_version
-
     def commit_drone(self,
         drone_lines: list[str],
         dependency: str,
