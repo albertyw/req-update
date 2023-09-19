@@ -6,17 +6,19 @@ from urllib import request
 from req_update.util import Updater
 
 
-# TODO - support .drone.yml files
 class Docker(Updater):
+    UPDATE_FILE = 'Dockerfile'
+    LINE_HEADER = 'FROM'
+
     def check_applicable(self) -> bool:
-        return 'Dockerfile' in os.listdir('.')
+        return self.UPDATE_FILE in os.listdir('.')
 
     def update_dependencies(self) -> bool:
         """
         Update dependencies
         Return if updates were made
         """
-        dockerfile_lines = self.read_dockerfile()
+        dockerfile_lines = self.read_update_file()
         updates = False
         for i in range(len(dockerfile_lines)):
             line = dockerfile_lines[i]
@@ -30,14 +32,14 @@ class Docker(Updater):
             self.util.warn('No %s updates' % self.language)
         return updates
 
-    def read_dockerfile(self) -> list[str]:
-        with open('Dockerfile', 'r') as handle:
+    def read_update_file(self) -> list[str]:
+        with open(self.UPDATE_FILE, 'r') as handle:
             lines = handle.readlines()
         lines = [line.strip('\n') for line in lines]
         return lines
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
-        if not line.strip().startswith('FROM'):
+        if not line.strip().startswith(self.LINE_HEADER):
             return line, '', ''
         base_image = line.split()[1]
         if base_image.count(':') != 1:
@@ -88,6 +90,6 @@ class Docker(Updater):
         version: str
     ) -> None:
         if not self.util.dry_run:
-            with open('Dockerfile', 'w') as handle:
+            with open(self.UPDATE_FILE, 'w') as handle:
                 handle.write('\n'.join(dockerfile))
         self.util.commit_dependency_update(self.language, dependency, version)
