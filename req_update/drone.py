@@ -1,14 +1,10 @@
 from __future__ import annotations
-import os
 
 from req_update.docker import Docker
 
 
 class Drone(Docker):
     UPDATE_FILE = '.drone.yml'
-
-    def check_applicable(self) -> bool:
-        return self.UPDATE_FILE in os.listdir('.')
 
     def update_dependencies(self) -> bool:
         """
@@ -28,12 +24,6 @@ class Drone(Docker):
         if not updates:
             self.util.warn('No %s updates' % self.language)
         return updates
-
-    def read_update_file(self) -> list[str]:
-        with open(self.UPDATE_FILE, 'r') as handle:
-            lines = handle.readlines()
-        lines = [line.strip('\n') for line in lines]
-        return lines
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
         if not line.strip().startswith('image:'):
