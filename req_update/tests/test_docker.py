@@ -49,7 +49,7 @@ class TestUpdateDependencies(BaseTest):
             {'results': [{'name': '12'}]}
         )
         self.docker.update_dependencies()
-        lines = self.docker.read_dockerfile()
+        lines = self.docker.read_update_file()
         self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
         self.assertEqual(len(self.mock_commit.call_args_list), 1)
         self.assertEqual(
@@ -64,7 +64,7 @@ class TestUpdateDependencies(BaseTest):
             {'results': [{'name': '10'}]}
         )
         self.docker.update_dependencies()
-        lines = self.docker.read_dockerfile()
+        lines = self.docker.read_update_file()
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
         self.assertFalse(self.mock_log.called)
         self.assertEqual(len(self.mock_warn.call_args_list), 1)
@@ -78,7 +78,7 @@ class TestUpdateDependencies(BaseTest):
             {'results': [{'name': '12'}]}
         )
         self.docker.update_dependencies()
-        lines = self.docker.read_dockerfile()
+        lines = self.docker.read_update_file()
         self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
         self.assertEqual(len(self.mock_commit.call_args_list), 2)
         self.assertEqual(
@@ -94,7 +94,7 @@ class TestUpdateDependencies(BaseTest):
 
 class TestReadDockerfile(BaseTest):
     def test_read(self) -> None:
-        lines = self.docker.read_dockerfile()
+        lines = self.docker.read_update_file()
         self.assertEqual(self.lines, lines)
 
 
@@ -176,5 +176,5 @@ class TestCommitDockerfile(BaseTest):
         with open('Dockerfile', 'r') as handle:
             data = handle.read()
             self.assertEqual(data, 'asdf\nqwer')
-        self.assertEqual(self.docker.read_dockerfile(), lines)
+        self.assertEqual(self.docker.read_update_file(), lines)
         self.assertTrue(self.mock_commit_dependency_update.called)

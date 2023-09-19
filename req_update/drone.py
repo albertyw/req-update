@@ -15,7 +15,7 @@ class Drone(Docker):
         Update dependencies
         Return if updates were made
         """
-        drone_lines = self.read_drone()
+        drone_lines = self.read_update_file()
         updates = False
         for i in range(len(drone_lines)):
             line = drone_lines[i]
@@ -29,7 +29,7 @@ class Drone(Docker):
             self.util.warn('No %s updates' % self.language)
         return updates
 
-    def read_drone(self) -> list[str]:
+    def read_update_file(self) -> list[str]:
         with open(self.UPDATE_FILE, 'r') as handle:
             lines = handle.readlines()
         lines = [line.strip('\n') for line in lines]
