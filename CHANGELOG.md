@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.4.0 (2023-09-18)
+------------------
+
+ - Support updating drone configs
+ - Refactors
+
+
 2.3.3 (2023-09-17)
 ------------------
 
