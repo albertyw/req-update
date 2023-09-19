@@ -8,6 +8,7 @@ from req_update.util import Updater
 
 class Docker(Updater):
     UPDATE_FILE = 'Dockerfile'
+    LINE_HEADER = 'FROM'
 
     def check_applicable(self) -> bool:
         return self.UPDATE_FILE in os.listdir('.')
@@ -38,7 +39,7 @@ class Docker(Updater):
         return lines
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
-        if not line.strip().startswith('FROM'):
+        if not line.strip().startswith(self.LINE_HEADER):
             return line, '', ''
         base_image = line.split()[1]
         if base_image.count(':') != 1:
