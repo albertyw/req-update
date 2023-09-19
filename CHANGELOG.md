@@ -216,7 +216,7 @@ CHANGELOG
 ------------------
 
  - Add a new `--push` option to git push each commit to the default remote
- - Switch CI platform from CirlcCI to Drone
+ - Switch CI platform from CircleCI to Drone
  - Update dependencies
 
 
