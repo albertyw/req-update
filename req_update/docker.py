@@ -1,6 +1,6 @@
 from __future__ import annotations
 import json
-import os
+import subprocess
 from urllib import request
 
 from req_update.util import Updater
@@ -11,7 +11,13 @@ class Docker(Updater):
     LINE_HEADER = 'FROM'
 
     def check_applicable(self) -> bool:
-        return self.UPDATE_FILE in os.listdir('.')
+        command = ['git', 'ls-files']
+        try:
+            shell = self.util.execute_shell(command, True)
+        except subprocess.CalledProcessError:
+            return False
+        files = shell.stdout.split('\n')
+        return self.UPDATE_FILE in files
 
     def update_dependencies(self) -> bool:
         """

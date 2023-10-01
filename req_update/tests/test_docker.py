@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import os
+from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import MagicMock
@@ -12,10 +13,12 @@ class BaseTest(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()
         self.docker = docker.Docker(u)
+        self.docker.util.dry_run = False
         self.lines = ['FROM debian:10', 'RUN echo']
         self.tempdir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()
         os.chdir(self.tempdir.name)
+        self.docker.util.execute_shell(['git', 'init'], False)
         with open('Dockerfile', 'w') as handle:
             handle.write('\n'.join(self.lines))
         self.mock_log = MagicMock()
@@ -27,7 +30,6 @@ class BaseTest(unittest.TestCase):
         setattr(docker.request, 'urlopen', self.mock_urlopen)  # type:ignore
         self.mock_commit = MagicMock()
         setattr(self.docker.util, 'commit_dependency_update', self.mock_commit)
-        self.docker.util.dry_run = False
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
@@ -37,6 +39,9 @@ class BaseTest(unittest.TestCase):
 
 class TestCheckApplicable(BaseTest):
     def test_check(self) -> None:
+        self.assertFalse(self.docker.check_applicable())
+        (Path(os.getcwd()) / self.docker.UPDATE_FILE).touch()
+        self.docker.util.execute_shell(['git', 'add', '.'], False)
         self.assertTrue(self.docker.check_applicable())
         os.chdir('/')
         self.assertFalse(self.docker.check_applicable())
