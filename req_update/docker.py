@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+from pathlib import Path
 import subprocess
 from urllib import request
 
@@ -11,13 +12,17 @@ class Docker(Updater):
     LINE_HEADER = 'FROM'
 
     def check_applicable(self) -> bool:
+        return len(self.get_update_files()) > 0
+
+    def get_update_files(self) -> list[Path]:
         command = ['git', 'ls-files']
         try:
             shell = self.util.execute_shell(command, True)
         except subprocess.CalledProcessError:
-            return False
-        files = shell.stdout.split('\n')
-        return self.UPDATE_FILE in files
+            return []
+        files = [Path(f) for f in shell.stdout.split('\n')]
+        files = [f for f in files if f.name == self.UPDATE_FILE]
+        return files
 
     def update_dependencies(self) -> bool:
         """
