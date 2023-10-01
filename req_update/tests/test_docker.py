@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import os
+from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import MagicMock
@@ -12,12 +13,15 @@ class BaseTest(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()
         self.docker = docker.Docker(u)
-        self.lines = ['FROM debian:10', 'RUN echo']
+        self.docker.util.dry_run = False
         self.tempdir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()
         os.chdir(self.tempdir.name)
-        with open('Dockerfile', 'w') as handle:
-            handle.write('\n'.join(self.lines))
+        self.docker.util.execute_shell(['git', 'init'], False)
+
+        self.lines = ['FROM debian:10', 'RUN echo']
+        self.update_file = self.add_update_file('Dockerfile', '\n'.join(self.lines))
+
         self.mock_log = MagicMock()
         setattr(self.docker.util, 'log', self.mock_log)
         self.mock_warn = MagicMock()
@@ -27,16 +31,27 @@ class BaseTest(unittest.TestCase):
         setattr(docker.request, 'urlopen', self.mock_urlopen)  # type:ignore
         self.mock_commit = MagicMock()
         setattr(self.docker.util, 'commit_dependency_update', self.mock_commit)
-        self.docker.util.dry_run = False
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
         os.chdir(self.original_cwd)
         setattr(docker.request, 'urlopen', self.original_urlopen)  # type:ignore
 
+    def add_update_file(self, relative_path: str, contents: str) -> Path:
+        absolute_path = Path(os.getcwd()) / relative_path
+        absolute_path.touch()
+        with open(absolute_path, 'w') as handle:
+            handle.write(contents)
+        self.docker.util.execute_shell(['git', 'add', '.'], False)
+        return absolute_path
+
 
 class TestCheckApplicable(BaseTest):
     def test_check(self) -> None:
+        command = ['git', 'rm', '--force', str(self.update_file)]
+        self.docker.util.execute_shell(command, False)
+        self.assertFalse(self.docker.check_applicable())
+        self.add_update_file(self.docker.UPDATE_FILE, '')
         self.assertTrue(self.docker.check_applicable())
         os.chdir('/')
         self.assertFalse(self.docker.check_applicable())
@@ -49,7 +64,7 @@ class TestUpdateDependencies(BaseTest):
             {'results': [{'name': '12'}]}
         )
         self.docker.update_dependencies()
-        lines = self.docker.read_update_file()
+        lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
         self.assertEqual(len(self.mock_commit.call_args_list), 1)
         self.assertEqual(
@@ -64,21 +79,21 @@ class TestUpdateDependencies(BaseTest):
             {'results': [{'name': '10'}]}
         )
         self.docker.update_dependencies()
-        lines = self.docker.read_update_file()
+        lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
         self.assertFalse(self.mock_log.called)
         self.assertEqual(len(self.mock_warn.call_args_list), 1)
         self.assertEqual(self.mock_warn.call_args[0][0], 'No Docker updates')
 
     def test_multiple_update(self) -> None:
-        with open('Dockerfile', 'w') as handle:
+        with open(self.update_file, 'w') as handle:
             handle.write('FROM debian:10\nFROM debian:11')
         self.mock_urlopen().status = 200
         self.mock_urlopen().read.return_value = json.dumps(
             {'results': [{'name': '12'}]}
         )
         self.docker.update_dependencies()
-        lines = self.docker.read_update_file()
+        lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
         self.assertEqual(len(self.mock_commit.call_args_list), 2)
         self.assertEqual(
@@ -94,7 +109,7 @@ class TestUpdateDependencies(BaseTest):
 
 class TestReadDockerfile(BaseTest):
     def test_read(self) -> None:
-        lines = self.docker.read_update_file()
+        lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(self.lines, lines)
 
 
@@ -173,8 +188,8 @@ class TestCommitDockerfile(BaseTest):
     def test_commit(self) -> None:
         lines = ['asdf', 'qwer']
         self.docker.commit_dockerfile(lines, 'debian', '12')
-        with open('Dockerfile', 'r') as handle:
+        with open(self.update_file, 'r') as handle:
             data = handle.read()
             self.assertEqual(data, 'asdf\nqwer')
-        self.assertEqual(self.docker.read_update_file(), lines)
+        self.assertEqual(self.docker.read_update_file(self.update_file), lines)
         self.assertTrue(self.mock_commit_dependency_update.called)
