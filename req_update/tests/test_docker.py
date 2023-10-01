@@ -36,12 +36,16 @@ class BaseTest(unittest.TestCase):
         os.chdir(self.original_cwd)
         setattr(docker.request, 'urlopen', self.original_urlopen)  # type:ignore
 
+    def add_update_file(self, relative_path: str, contents: str) -> None:
+        absolute_path = Path(os.getcwd()) / relative_path
+        absolute_path.touch()
+        self.docker.util.execute_shell(['git', 'add', '.'], False)
+
 
 class TestCheckApplicable(BaseTest):
     def test_check(self) -> None:
         self.assertFalse(self.docker.check_applicable())
-        (Path(os.getcwd()) / self.docker.UPDATE_FILE).touch()
-        self.docker.util.execute_shell(['git', 'add', '.'], False)
+        self.add_update_file(self.docker.UPDATE_FILE, '')
         self.assertTrue(self.docker.check_applicable())
         os.chdir('/')
         self.assertFalse(self.docker.check_applicable())
