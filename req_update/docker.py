@@ -29,7 +29,16 @@ class Docker(Updater):
         Update dependencies
         Return if updates were made
         """
-        dockerfile_lines = self.read_update_file()
+        update_files = self.get_update_files()
+        updates = False
+        for f in update_files:
+            update = self.update_dependencies_file(f)
+            if update:
+                updates = True
+        return updates
+
+    def update_dependencies_file(self, update_file: Path) -> bool:
+        dockerfile_lines = self.read_update_file(update_file)
         updates = False
         for i in range(len(dockerfile_lines)):
             line = dockerfile_lines[i]
@@ -43,8 +52,8 @@ class Docker(Updater):
             self.util.warn('No %s updates' % self.language)
         return updates
 
-    def read_update_file(self) -> list[str]:
-        with open(self.UPDATE_FILE, 'r') as handle:
+    def read_update_file(self, update_file: Path) -> list[str]:
+        with open(update_file, 'r') as handle:
             lines = handle.readlines()
         lines = [line.strip('\n') for line in lines]
         return lines
