@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.4.1 (2023-10-01)
+------------------
+
+ - Support updating all Dockerfile and drone.yml files in a repository
+
+
 2.4.0 (2023-09-18)
 ------------------
 
