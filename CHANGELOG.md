@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.4.2 (2023-10-02)
+------------------
+
+ - Fix git pushing updates for docker and drone
+ - Update dependencies
+ - Explicitly support python 3.12
+
+
 2.4.1 (2023-10-01)
 ------------------
 
