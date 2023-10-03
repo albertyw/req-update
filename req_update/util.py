@@ -70,6 +70,7 @@ class Util:
         self.log(commit_message)
         command = ['git', 'commit', '-am', commit_message]
         self.execute_shell(command, False)
+        self.push_dependency_update()
 
     def commit_dependency_update(
         self, language: str, dependency: str, version: str

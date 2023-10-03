@@ -124,8 +124,6 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         )
         self.mock_commit_git = MagicMock()
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
-        self.mock_push = MagicMock()
-        setattr(self.node.util, 'push_dependency_update', self.mock_push)
         self.mock_log = MagicMock()
         setattr(self.node.util, 'log', self.mock_log)
 
@@ -135,16 +133,14 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertFalse(self.mock_commit_git.called)
-        self.assertFalse(self.mock_push.called)
 
-    def test_push(self) -> None:
+    def test_commit(self) -> None:
         self.mock_clean.side_effect = RuntimeError()
         updates = self.node.update_unpinned_dependencies()
         self.assertTrue(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertTrue(self.mock_commit_git.called)
-        self.assertTrue(self.mock_push.called)
 
 
 class TestUpdatePinnedDependencies(unittest.TestCase):

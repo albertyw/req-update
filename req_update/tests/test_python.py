@@ -124,28 +124,6 @@ class TestUpdateDependenciesFile(unittest.TestCase):
         self.assertTrue(mock_commit.called)
         self.assertTrue(updated)
 
-    def test_update_dependencies_file_push(self) -> None:
-        def execute_shell_returns(
-            command: list[str],
-            readonly: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            if '--outdated' in command:
-                return MagicMock(stdout=json.dumps(PIP_OUTDATED))
-            raise ValueError()  # pragma: no cover
-
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        mock_write = MagicMock(return_value=True)
-        setattr(self.python, 'write_dependency_update', mock_write)
-        mock_commit = MagicMock()
-        setattr(self.python.util, 'commit_dependency_update', mock_commit)
-        mock_push = MagicMock()
-        setattr(self.python.util, 'push_dependency_update', mock_push)
-        updated = self.python.update_dependencies_file()
-        self.assertTrue(mock_write.called)
-        self.assertTrue(mock_commit.called)
-        self.assertTrue(mock_push.called)
-        self.assertTrue(updated)
-
 
 class TestGetPipOutdated(unittest.TestCase):
     def setUp(self) -> None:

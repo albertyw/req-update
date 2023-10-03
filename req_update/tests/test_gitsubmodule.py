@@ -86,10 +86,6 @@ class TestUpdateDependencies(unittest.TestCase):
             'commit_dependency_update',
             self.mock_commit,
         )
-        self.mock_push = MagicMock()
-        setattr(
-            self.gitsubmodule.util, 'push_dependency_update', self.mock_push
-        )
         self.mock_log = MagicMock()
         setattr(self.gitsubmodule.util, 'log', self.mock_log)
 
@@ -98,7 +94,6 @@ class TestUpdateDependencies(unittest.TestCase):
         updates = self.gitsubmodule.update_dependencies()
         self.assertFalse(self.mock_annotate_submodule.called)
         self.assertFalse(self.mock_commit.called)
-        self.assertFalse(self.mock_push.called)
         self.assertFalse(updates)
 
     def test_no_version(self) -> None:
@@ -106,7 +101,6 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_update_submodule.return_value = ''
         updates = self.gitsubmodule.update_dependencies()
         self.assertFalse(self.mock_commit.called)
-        self.assertFalse(self.mock_push.called)
         self.assertFalse(updates)
 
     def test_clean(self) -> None:
@@ -114,7 +108,6 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_update_submodule.return_value = 'v1.2.3'
         updates = self.gitsubmodule.update_dependencies()
         self.assertFalse(self.mock_commit.called)
-        self.assertFalse(self.mock_push.called)
         self.assertFalse(updates)
 
     def test_updates(self) -> None:
@@ -123,7 +116,6 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_check_cleanliness.side_effect = RuntimeError('asdf')
         updates = self.gitsubmodule.update_dependencies()
         self.assertTrue(self.mock_commit.called)
-        self.assertTrue(self.mock_push.called)
         self.assertTrue(updates)
 
 

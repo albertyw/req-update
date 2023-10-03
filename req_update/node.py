@@ -48,7 +48,6 @@ class Node(Updater):
             return False  # repository is clean so nothing to commit or push
         except RuntimeError:
             self.util.commit_git('Update npm packages')
-            self.util.push_dependency_update()
             return True
 
     def update_pinned_dependencies(self) -> bool:
@@ -111,7 +110,6 @@ class Node(Updater):
             package_name, old_version, new_version
         )
         self.util.commit_dependency_update(self.language, package_name, new_version)
-        self.util.push_dependency_update()
         return True
 
     def update_package_dependencies(

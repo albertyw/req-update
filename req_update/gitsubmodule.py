@@ -36,7 +36,6 @@ class GitSubmodule(Updater):
                     self.util.commit_dependency_update(
                         self.language, str(submodule.path), version
                     )
-                    self.util.push_dependency_update()
                     clean = False
         return not clean
 

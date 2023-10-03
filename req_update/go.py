@@ -36,5 +36,4 @@ class Go(Updater):
             return False  # repository is clean so nothing to commit or push
         except RuntimeError:
             self.util.commit_git('Update go packages')
-            self.util.push_dependency_update()
             return True

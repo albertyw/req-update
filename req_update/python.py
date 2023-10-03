@@ -84,7 +84,6 @@ class Python(Updater):
             written = self.write_dependency_update(dependency, version)
             if written:
                 self.util.commit_dependency_update(self.language, dependency, version)
-                self.util.push_dependency_update()
                 clean = False
         return not clean
 
