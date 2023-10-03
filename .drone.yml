@@ -31,7 +31,7 @@ steps:
     depends_on:
       - Test Python 3.7
       - Test Python 3.12
-    image: python:3.11
+    image: python:3.12
     commands:
       - pip install twine
       - python setup.py sdist bdist_wheel
