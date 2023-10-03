@@ -9,8 +9,8 @@ steps:
       - python setup.py develop
       - python3 -m unittest
 
-  - name: Test Python 3.11
-    image: python:3.11
+  - name: Test Python 3.12
+    image: python:3.12
     commands:
       - curl -L "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-$(dpkg --print-architecture)" > "${HOME}/bin/cc-test-reporter"
       - chmod +x "${HOME}/bin/cc-test-reporter"
@@ -30,8 +30,8 @@ steps:
   - name: Test Python Packaging
     depends_on:
       - Test Python 3.7
-      - Test Python 3.11
-    image: python:3.11
+      - Test Python 3.12
+    image: python:3.12
     commands:
       - pip install twine
       - python setup.py sdist bdist_wheel
@@ -45,7 +45,7 @@ steps:
         from_secret: twine_username
       TWINE_PASSWORD:
         from_secret: twine_password
-    image: python:3.11
+    image: python:3.12
     commands:
       - pip install twine
       - python setup.py sdist bdist_wheel
