@@ -187,8 +187,8 @@ class TestCompareVersions(unittest.TestCase):
         self.util = util.Util()
 
     def test_ints(self) -> None:
-        self.assertFalse(self.util.compare_versions('a10', 'a12'))
-        self.assertFalse(self.util.compare_versions('10a', '12a'))
+        self.assertTrue(self.util.compare_versions('a10', 'a12'))
+        self.assertTrue(self.util.compare_versions('10a', '12a'))
 
     def test_regex(self) -> None:
         tests: dict[str, list[str]] = {
@@ -197,6 +197,9 @@ class TestCompareVersions(unittest.TestCase):
             '1.21': ['1.19', '1.2'],
             '18-slim': ['16-slim', '15-slim'],
             '3.11-slim-bookworm': ['3.10-slim-bookworm', '3.9-slim-bookworm'],
+            '2.12.0': ['1.17.7'],
+            'v2.12.0': ['v1.17.7'],
+            'v2.12.0-alpine': ['v1.17.7-alpine'],
         }
         for newest, olders in tests.items():
             for older in olders:
