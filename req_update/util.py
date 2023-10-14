@@ -125,14 +125,14 @@ class Util:
         valid upgrade if the version structure matches and the version numbers
         are greater.
         """
-        structure_regex = r"[0-9]+"
-        current_structure = re.sub(structure_regex, "", current)
-        proposed_structure = re.sub(structure_regex, "", proposed)
+        structure_regex = re.compile(r"[0-9]+")
+        current_structure = structure_regex.sub("", current)
+        proposed_structure = structure_regex.sub("", proposed)
         if current_structure != proposed_structure:
             return False
-        num_regex = r"\d+"
-        current_nums = re.findall(num_regex, current)
-        proposed_nums = re.findall(num_regex, proposed)
+        num_regex = re.compile(r"\d+")
+        current_nums = num_regex.findall(current)
+        proposed_nums = num_regex.findall(proposed)
         for compares in zip(current_nums, proposed_nums):
             if int(compares[0]) < int(compares[1]):
                 return True
