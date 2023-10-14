@@ -136,6 +136,8 @@ class Util:
         for compares in zip(current_nums, proposed_nums):
             if int(compares[0]) < int(compares[1]):
                 return True
+            if int(compares[0]) > int(compares[1]):
+                return False
         return False
 
     def check_major_version_update(
