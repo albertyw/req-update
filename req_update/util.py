@@ -130,9 +130,9 @@ class Util:
         proposed_structure = re.sub(structure_regex, "", proposed)
         if current_structure != proposed_structure:
             return False
-        num_regex = r"(\.|^)([0-9]+)(?![a-zA-Z])"
-        current_nums = [found[1] for found in re.findall(num_regex, current)]
-        proposed_nums = [found[1] for found in re.findall(num_regex, proposed)]
+        num_regex = r"\d+"
+        current_nums = re.findall(num_regex, current)
+        proposed_nums = re.findall(num_regex, proposed)
         for compares in zip(current_nums, proposed_nums):
             if int(compares[0]) < int(compares[1]):
                 return True
