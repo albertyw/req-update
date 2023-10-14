@@ -10,7 +10,7 @@ from req_update.util import Updater
 
 # Copied and simplified from
 # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-SEMVER = r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$'  # NOQA
+SEMVER = re.compile(r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$')  # NOQA
 
 
 class Node(Updater):
@@ -129,7 +129,7 @@ class Node(Updater):
         Given a version, generate a version specifier that allows updates
         within the most recent non-zero version for semver versions
         """
-        match = re.match(SEMVER, version)
+        match = SEMVER.match(version)
         if not match:
             return version
         versions = match.groupdict()
