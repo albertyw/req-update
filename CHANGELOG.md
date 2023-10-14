@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.4.3 (2023-10-14)
+------------------
+
+ - Fix version comparison for docker images
+ - Remove setup.py
+ - Update dependencies
+
+
 2.4.2 (2023-10-02)
 ------------------
 
