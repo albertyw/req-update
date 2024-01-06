@@ -10,7 +10,7 @@ BRANCH_NAME = 'dep-update'
 COMMIT_MESSAGE = 'Update {language} {package} package to {version}'
 SubprocessOutput = Union[
     subprocess.CalledProcessError,
-    subprocess.CompletedProcess,
+    subprocess.CompletedProcess[str],
 ]
 
 
