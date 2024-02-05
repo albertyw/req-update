@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+import tomllib
 from typing import Iterator
 
 from req_update.util import Updater, Util
@@ -175,10 +176,16 @@ class Python(Updater):
                 spacer = ' ' * (spacing - 1) + '#'
             else:
                 spacer = ''
-            new_line = line_regex.sub(
-                r'\g<1>\g<2>%s%s' % (version, spacer),
-                line,
-            )
+            if file_type == REQUIREMENTS:
+                new_line = line_regex.sub(
+                    r'\g<1>\g<2>%s%s' % (version, spacer),
+                    line,
+                )
+            elif file_type == PYPROJECT:
+                new_line = line_regex.sub(
+                    r'"\g<1>\g<2>%s",%s' % (version, spacer),
+                    line,
+                )
             if line == new_line:
                 continue
             self.util.check_major_version_update(
