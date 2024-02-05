@@ -206,9 +206,9 @@ class Python(Updater):
             elif updated_file in PYPROJECT_FILES:
                 command = ['pip', 'install', '-e', '.']
                 self.util.execute_shell(command, False)
-                with open('pyproject.toml', 'rb') as handle:
+                with open(updated_file, 'rb') as handle:
                     data = tomllib.load(handle)
-                    optionals = data['project']['optional-dependencies'].keys()
+                    optionals = data['project'].get('optional-dependencies', {}).keys()
                     for optional in optionals:
                         command = ['pip', 'install', '-e', '.[%s]' % optional]
                         self.util.execute_shell(command, False)
