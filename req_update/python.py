@@ -9,6 +9,8 @@ from typing import Iterator
 from req_update.util import Updater, Util
 
 
+PYPROJECT = 'pyproject'
+REQUIREMENTS = 'requirements'
 PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
@@ -19,9 +21,18 @@ PYTHON_REQUIREMENTS_LINE_REGEX = re.compile('^%s%s%s%s' % (
     PYTHON_PACKAGE_VERSION_REGEX,
     PYTHON_PACKAGE_SPACER_REGEX,
 ))
+PYTHON_PYPROJECT_LINE_REGEX = re.compile('"%s%s%s",%s' % (
+    PYTHON_PACKAGE_NAME_REGEX,
+    PYTHON_PACKAGE_OPERATOR_REGEX,
+    PYTHON_PACKAGE_VERSION_REGEX,
+    PYTHON_PACKAGE_SPACER_REGEX,
+))
 REQUIREMENTS_FILES = [
     'requirements.txt',
     'requirements-test.txt',
+]
+PYPROJECT_FILES = [
+    'pyproject.toml',
 ]
 
 
