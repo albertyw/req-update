@@ -198,6 +198,16 @@ class Python(Updater):
     def install_updates(self) -> None:
         """Install requirements updates"""
         for updated_file in self.updated_files:
-            command = ['pip', 'install', '-r', updated_file]
-            self.util.execute_shell(command, False)
+            if updated_file in REQUIREMENTS_FILES:
+                command = ['pip', 'install', '-r', updated_file]
+                self.util.execute_shell(command, False)
+            elif updated_file in PYPROJECT_FILES:
+                command = ['pip', 'install', '-e', '.']
+                self.util.execute_shell(command, False)
+                with open('pyproject.toml', 'rb') as handle:
+                    data = tomllib.load(handle)
+                    optionals = data['project']['optional-dependencies'].keys()
+                    for optional in optionals:
+                        command = ['pip', 'install', '-e', '.[%s]' % optional]
+                        self.util.execute_shell(command, False)
             self.util.log('Installing updated packages in %s' % updated_file)
