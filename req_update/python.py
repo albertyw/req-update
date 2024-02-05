@@ -62,7 +62,7 @@ class Python(Updater):
             return False
 
         # Make sure there's at least one requirements files
-        for f in REQUIREMENTS_FILES:
+        for f in REQUIREMENTS_FILES + PYPROJECT_FILES:
             if f in os.listdir('.'):
                 break
         else:
@@ -131,23 +131,35 @@ class Python(Updater):
         for reqfile in REQUIREMENTS_FILES:
             with Python.edit_requirements(reqfile, self.util.dry_run) as lines:
                 updated_file = self.write_dependency_update_lines(
-                    dependency, version, lines
+                    dependency, version, lines, REQUIREMENTS,
                 )
                 if updated_file:
                     self.updated_files.add(reqfile)
                     updated = True
+        for pyproject in PYPROJECT_FILES:
+            with Python.edit_requirements(pyproject, self.util.dry_run) as lines:
+                updated_file = self.write_dependency_update_lines(
+                    dependency, version, lines, PYPROJECT,
+                )
+                if updated_file:
+                    self.updated_files.add(pyproject)
+                    updated = True
         return updated
 
     def write_dependency_update_lines(
-        self, dependency: str, version: str, lines: list[str]
+        self, dependency: str, version: str, lines: list[str], file_type: str,
     ) -> bool:
         """
         Given a dependency and some lines, update the lines.  Return a
         boolean for whether the lines have been updated
         """
+        if file_type == REQUIREMENTS:
+            line_regex = PYTHON_REQUIREMENTS_LINE_REGEX
+        elif file_type == PYPROJECT:
+            line_regex = PYTHON_PYPROJECT_LINE_REGEX
         dependency = dependency.replace('_', '-')
         for i, line in enumerate(lines):
-            match = PYTHON_REQUIREMENTS_LINE_REGEX.match(line)
+            match = line_regex.match(line.strip())
             if not match:
                 continue
             dependency_file = match.group('name').replace('_', '-').lower()
@@ -163,7 +175,7 @@ class Python(Updater):
                 spacer = ' ' * (spacing - 1) + '#'
             else:
                 spacer = ''
-            new_line = PYTHON_REQUIREMENTS_LINE_REGEX.sub(
+            new_line = line_regex.sub(
                 r'\g<1>\g<2>%s%s' % (version, spacer),
                 line,
             )
