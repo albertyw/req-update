@@ -15,14 +15,14 @@ REQUIREMENTS = 'requirements'
 PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
-PYTHON_PACKAGE_SPACER_REGEX = r'(?P<spacer>([ ]+\#)?)'
+PYTHON_PACKAGE_SPACER_REGEX = r'(?P<spacer>(,?[ ]+\#)?)'
 PYTHON_REQUIREMENTS_LINE_REGEX = re.compile('^%s%s%s%s' % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
     PYTHON_PACKAGE_VERSION_REGEX,
     PYTHON_PACKAGE_SPACER_REGEX,
 ))
-PYTHON_PYPROJECT_LINE_REGEX = re.compile('"%s%s%s",%s' % (
+PYTHON_PYPROJECT_LINE_REGEX = re.compile('"%s%s%s"%s' % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
     PYTHON_PACKAGE_VERSION_REGEX,
@@ -176,6 +176,8 @@ class Python(Updater):
                 spacer = ' ' * (spacing - 1) + '#'
             else:
                 spacer = ''
+            if file_type == PYPROJECT:
+                spacer = ',' + spacer[1:]
             if file_type == REQUIREMENTS:
                 new_line = line_regex.sub(
                     r'\g<1>\g<2>%s%s' % (version, spacer),
@@ -183,7 +185,7 @@ class Python(Updater):
                 )
             elif file_type == PYPROJECT:
                 new_line = line_regex.sub(
-                    r'"\g<1>\g<2>%s",%s' % (version, spacer),
+                    r'"\g<1>\g<2>%s"%s' % (version, spacer),
                     line,
                 )
             if line == new_line:
