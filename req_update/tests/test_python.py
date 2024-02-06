@@ -184,82 +184,132 @@ class TestEditRequirements(unittest.TestCase):
 
 class TestWriteDependencyUpdate(unittest.TestCase):
     def setUp(self) -> None:
-        self.tempfile = tempfile.NamedTemporaryFile()
+        self.tempfile_requirements = tempfile.NamedTemporaryFile()
         self.original_reqfiles = python.REQUIREMENTS_FILES
-        python.REQUIREMENTS_FILES = [self.tempfile.name]
+        python.REQUIREMENTS_FILES = [self.tempfile_requirements.name]
+        self.tempfile_pyproject = tempfile.NamedTemporaryFile()
+        self.original_pyprojectfiles = python.PYPROJECT_FILES
+        python.PYPROJECT_FILES = [self.tempfile_pyproject.name]
         u = util.Util()
         self.python = python.Python(u)
         self.python.util.dry_run = False
 
     def tearDown(self) -> None:
-        self.tempfile.close()
+        self.tempfile_requirements.close()
+        self.tempfile_pyproject.close()
         python.REQUIREMENTS_FILES = self.original_reqfiles
+        python.PYPROJECT_FILES = self.original_pyprojectfiles
 
     def test_write_dependency_update_no_comment(self) -> None:
-        with open(self.tempfile.name, 'w') as handle:
+        with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0.0')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "abcd==0.0.1",\n    "varsnap==1.0.0"')
         updated = self.python.write_dependency_update('varsnap', '1.2.3')
         self.assertTrue(updated)
-        with open(self.tempfile.name, 'r') as handle:
+        with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3')
-        self.assertIn(self.tempfile.name, self.python.updated_files)
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
+            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",')
+        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
     def test_write_dependency_update(self) -> None:
-        with open(self.tempfile.name, 'w') as handle:
+        with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0.0    # qwer')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "abcd==0.0.1",\n    "varsnap==1.0.0",    # qwer')
         updated = self.python.write_dependency_update('varsnap', '1.2.3')
         self.assertTrue(updated)
-        with open(self.tempfile.name, 'r') as handle:
+        with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3    # qwer')
-        self.assertIn(self.tempfile.name, self.python.updated_files)
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
+            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",    # qwer')
+        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
     def test_write_dependency_update_aligned(self) -> None:
-        with open(self.tempfile.name, 'w') as handle:
+        with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0    # qwer')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "abcd==0.0.1",\n    "varsnap==1.0",    # qwer')
         updated = self.python.write_dependency_update('varsnap', '1.2.3')
         self.assertTrue(updated)
-        with open(self.tempfile.name, 'r') as handle:
+        with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3  # qwer')
-        self.assertIn(self.tempfile.name, self.python.updated_files)
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
+            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",  # qwer')
+        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
     def test_write_dependency_update_no_op(self) -> None:
-        with open(self.tempfile.name, 'w') as handle:
+        with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0.0    # qwer')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "abcd==0.0.1",\n    "varsnap==1.0.0",    # qwer')
         updated = self.python.write_dependency_update('varsnap', '1.0.0')
         self.assertFalse(updated)
-        with open(self.tempfile.name, 'r') as handle:
+        with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip('\n'), 'varsnap==1.0.0    # qwer')
-        self.assertNotIn(self.tempfile.name, self.python.updated_files)
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
+            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.0.0",    # qwer')
+        self.assertNotIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertNotIn(self.tempfile_pyproject.name, self.python.updated_files)
 
     def test_write_dependency_update_post(self) -> None:
-        with open(self.tempfile.name, 'w') as handle:
+        with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0.0post0    # qwer')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "abcd==0.0.1",\n    "varsnap==1.0.0post0",    # qwer')
         updated = self.python.write_dependency_update('varsnap', '1.2.3')
         self.assertTrue(updated)
-        with open(self.tempfile.name, 'r') as handle:
+        with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3         # qwer')
-        self.assertIn(self.tempfile.name, self.python.updated_files)
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
+            self.assertEqual(
+                lines[1].strip("\n"),
+                '    "varsnap==1.2.3",         # qwer',
+            )
+        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
     def test_add_spacing(self) -> None:
-        with open(self.tempfile.name, 'w') as handle:
+        with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('abcd==0.0.1\nvarsnap==1.0 # qwer')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "abcd==0.0.1",\n    "varsnap==1.0", # qwer')
         updated = self.python.write_dependency_update('varsnap', '1.2.3')
         self.assertTrue(updated)
-        with open(self.tempfile.name, 'r') as handle:
+        with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
             self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3     # qwer')
-        self.assertIn(self.tempfile.name, self.python.updated_files)
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
+            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",    # qwer')
+        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
 
 class TestInstallUpdates(unittest.TestCase):
@@ -270,8 +320,20 @@ class TestInstallUpdates(unittest.TestCase):
         setattr(self.python.util, 'log', self.mock_log)
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
+        self.tempfile_pyproject = tempfile.NamedTemporaryFile()
+        self.original_pyprojectfiles = python.PYPROJECT_FILES
+        python.PYPROJECT_FILES = [self.tempfile_pyproject.name]
 
-    def test_install_updates(self) -> None:
+    def tearDown(self) -> None:
+        self.tempfile_pyproject.close()
+        python.PYPROJECT_FILES = self.original_pyprojectfiles
+
+    def test_install_no_updates(self) -> None:
+        self.python.install_updates()
+        self.assertEqual(len(self.mock_log.mock_calls), 0)
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 0)
+
+    def test_install_requirements_updates(self) -> None:
         self.python.updated_files.add('requirements.txt')
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
@@ -281,9 +343,40 @@ class TestInstallUpdates(unittest.TestCase):
         command = self.mock_execute_shell.mock_calls[0][1]
         self.assertEqual('requirements.txt', command[0][3])
 
-    def test_install_multiple_updates(self) -> None:
+    def test_install_multiple_requirements_updates(self) -> None:
         self.python.updated_files.add('requirements-test.txt')
         self.python.updated_files.add('requirements.txt')
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 2)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+
+    def test_install_pyproject_updates(self) -> None:
+        pyproject = (
+            '[project]\n'
+            'dependencies = [\n'
+            '    "varsnap==1.0.0",\n'
+            ']'
+        )
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write(pyproject)
+        self.python.updated_files.add(self.tempfile_pyproject.name)
+        self.python.install_updates()
+        self.assertEqual(len(self.mock_log.mock_calls), 1)
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 1)
+        self.assertEqual(self.mock_execute_shell.mock_calls[0][1][0][3], '.')
+
+    def test_install_pyproject_optional_updates(self) -> None:
+        pyproject = (
+            '[project.optional-dependencies]\n'
+            'test = [\n'
+            '    "varsnap==1.0.0",\n'
+           ']'
+       )
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write(pyproject)
+        self.python.updated_files.add(self.tempfile_pyproject.name)
+        self.python.install_updates()
+        self.assertEqual(len(self.mock_log.mock_calls), 1)
+        self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+        self.assertEqual(self.mock_execute_shell.mock_calls[0][1][0][3], '.')
+        self.assertEqual(self.mock_execute_shell.mock_calls[1][1][0][3], '.[test]')
