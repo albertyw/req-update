@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.5.0 (2024-02-05)
+------------------
+
+ - Support updating dependencies in pyproject.toml
+ - Cleanup testing and types
+ - Update dependencies
+
+
 2.4.3 (2023-10-14)
 ------------------
 
