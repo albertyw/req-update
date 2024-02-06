@@ -363,6 +363,7 @@ class TestInstallUpdates(unittest.TestCase):
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 1)
+        self.assertEqual(self.mock_execute_shell.mock_calls[0][1][0][3], '.')
 
     def test_install_pyproject_optional_updates(self) -> None:
         pyproject = (
@@ -377,3 +378,5 @@ class TestInstallUpdates(unittest.TestCase):
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
+        self.assertEqual(self.mock_execute_shell.mock_calls[0][1][0][3], '.')
+        self.assertEqual(self.mock_execute_shell.mock_calls[1][1][0][3], '.[test]')

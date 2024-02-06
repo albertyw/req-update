@@ -4,7 +4,6 @@ import json
 import os
 import re
 import subprocess
-import tomllib
 from typing import Iterator
 
 from req_update.util import Updater, Util
@@ -16,6 +15,7 @@ PYTHON_PACKAGE_NAME_REGEX = r'(?P<name>[a-zA-Z0-9\-_]+)'
 PYTHON_PACKAGE_OPERATOR_REGEX = r'(?P<operator>[<=>]+)'
 PYTHON_PACKAGE_VERSION_REGEX = r'(?P<version>(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?)'  # noqa
 PYTHON_PACKAGE_SPACER_REGEX = r'(?P<spacer>(,?[ ]+\#)?)'
+PYPROJECT_OPTIONAL_DEPS_REGEX = re.compile(r'^([a-zA-Z0-9_]+) = \[')
 PYTHON_REQUIREMENTS_LINE_REGEX = re.compile('^%s%s%s%s' % (
     PYTHON_PACKAGE_NAME_REGEX,
     PYTHON_PACKAGE_OPERATOR_REGEX,
@@ -206,10 +206,23 @@ class Python(Updater):
             elif updated_file in PYPROJECT_FILES:
                 command = ['pip', 'install', '-e', '.']
                 self.util.execute_shell(command, False)
-                with open(updated_file, 'rb') as handle:
-                    data = tomllib.load(handle)
-                    optionals = data['project'].get('optional-dependencies', {}).keys()
-                    for optional in optionals:
-                        command = ['pip', 'install', '-e', '.[%s]' % optional]
-                        self.util.execute_shell(command, False)
+
+                # Install optional dependencies
+                with open(updated_file, 'r') as handle:
+                    lines = handle.readlines()
+                optional_dependencies = False
+                for line in lines:
+                    if line.strip() == '[project.optional-dependencies]':
+                        optional_dependencies = True
+                        continue
+                    if not optional_dependencies:
+                        continue
+                    if line[0] == '[':
+                        break
+                    match = PYPROJECT_OPTIONAL_DEPS_REGEX.match(line)
+                    if not match:
+                        continue
+                    optional = match.group(1)
+                    command = ['pip', 'install', '-e', '.[%s]' % optional]
+                    self.util.execute_shell(command, False)
             self.util.log('Installing updated packages in %s' % updated_file)
