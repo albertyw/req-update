@@ -13,6 +13,7 @@ sys.path.insert(0, str(parent_path))
 
 from req_update.docker import Docker  # NOQA
 from req_update.drone import Drone  # NOQA
+from req_update.githubworkflow import GithubWorkflow  # NOQA
 from req_update.gitsubmodule import GitSubmodule  # NOQA
 from req_update.go import Go  # NOQA
 from req_update.node import Node  # NOQA
@@ -32,6 +33,7 @@ DESCRIPTION = (
 UPDATERS: list[type[Updater]] = [
     Docker,
     Drone,
+    GithubWorkflow,
     GitSubmodule,
     Go,
     Node,
