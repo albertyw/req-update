@@ -11,6 +11,7 @@ from req_update.util import Updater
 class Docker(Updater):
     UPDATE_FILE = 'Dockerfile'
     LINE_HEADER = 'FROM'
+    DEPENDENCY_VERSION_SEPARATOR = ':'
 
     def check_applicable(self) -> bool:
         return len(self.get_update_files()) > 0
@@ -61,13 +62,16 @@ class Docker(Updater):
         if not line.strip().startswith(self.LINE_HEADER):
             return line, '', ''
         base_image = line.split()[1]
-        if base_image.count(':') != 1:
+        if base_image.count(self.DEPENDENCY_VERSION_SEPARATOR) != 1:
             return line, base_image, ''
-        dependency = base_image.split(':')[0]
-        version = base_image.split(':')[1]
+        dependency = base_image.split(self.DEPENDENCY_VERSION_SEPARATOR)[0]
+        version = base_image.split(self.DEPENDENCY_VERSION_SEPARATOR)[1]
         new_version = self.find_updated_version(dependency, version)
         if new_version:
-            line = line.replace(':' + version, ':' + new_version)
+            line = line.replace(
+                self.DEPENDENCY_VERSION_SEPARATOR + version,
+                self.DEPENDENCY_VERSION_SEPARATOR + new_version,
+            )
         return line, dependency, new_version
 
     def find_updated_version(self, dependency: str, original_version: str) -> str:
