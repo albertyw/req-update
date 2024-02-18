@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from urllib.error import HTTPError
 from unittest.mock import MagicMock
 
 from req_update import docker, util
@@ -160,6 +161,13 @@ class TestFindUpdatedVersion(BaseTest):
         self.assertEqual(version, '')
         self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
         self.assertFalse(self.mock_urlopen().read.called)
+        self.assertTrue(self.mock_warn.called)
+
+    def test_warns_on_exception(self) -> None:
+        self.mock_urlopen.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
+        version = self.docker.find_updated_version('debian', '10')
+        self.assertEqual(version, '')
+        self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
         self.assertTrue(self.mock_warn.called)
 
     def test_namespaced_library(self) -> None:

@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import subprocess
 from urllib import request
+from urllib.error import HTTPError
 
 from req_update.util import Updater
 
@@ -89,8 +90,12 @@ class Docker(Updater):
             '/content/v1/repositories/public/%s/%s/tags?page_size=500'
             % (namespace, dependency_name)
         )
-        response = request.urlopen(url)
-        if int(response.status/100) != 2:
+        response = None
+        try:
+            response = request.urlopen(url)
+        except HTTPError:
+            pass
+        if not response or int(response.status/100) != 2:
             self.util.warn('Cannot read %s from hub.docker.com' % dependency)
             return ''
         data = json.loads(response.read())
