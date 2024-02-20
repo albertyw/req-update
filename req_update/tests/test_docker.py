@@ -195,7 +195,7 @@ class TestCommitDockerfile(BaseTest):
 
     def test_commit(self) -> None:
         lines = ['asdf', 'qwer']
-        self.docker.commit_dockerfile(lines, 'debian', '12')
+        self.docker.commit_dockerfile(self.update_file, lines, 'debian', '12')
         with open(self.update_file, 'r') as handle:
             data = handle.read()
             self.assertEqual(data, 'asdf\nqwer')

@@ -48,7 +48,7 @@ class Docker(Updater):
                 continue
             updates = True
             dockerfile_lines[i] = new_line
-            self.commit_dockerfile(dockerfile_lines, dependency, version)
+            self.commit_dockerfile(update_file, dockerfile_lines, dependency, version)
         if not updates:
             self.util.warn('No %s updates' % self.language)
         return updates
@@ -110,11 +110,12 @@ class Docker(Updater):
             return new_version
 
     def commit_dockerfile(self,
+        update_file: Path,
         dockerfile: list[str],
         dependency: str,
         version: str
     ) -> None:
         if not self.util.dry_run:
-            with open(self.UPDATE_FILE, 'w') as handle:
+            with open(update_file, 'w') as handle:
                 handle.write('\n'.join(dockerfile))
         self.util.commit_dependency_update(self.language, dependency, version)
