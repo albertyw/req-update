@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.5.1 (2024-02-20)
+------------------
+
+ - Fix docker writing updates to the wrong path
+ - Fix erroring out on docker hub errors
+ - Update and clean up dependencies
+
+
 2.5.0 (2024-02-05)
 ------------------
 
