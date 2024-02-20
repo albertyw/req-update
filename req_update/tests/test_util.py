@@ -314,7 +314,7 @@ class TestExecuteShell(unittest.TestCase):
         self.assertEqual(result.stderr, '')
         self.assertTrue(len(result.stdout) > 0)
         files = result.stdout.split('\n')
-        self.assertIn('requirements-test.txt', files)
+        self.assertIn('pyproject.toml', files)
         self.assertFalse(self.mock_log.called)
 
     def test_dry_run(self) -> None:
