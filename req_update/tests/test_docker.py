@@ -44,6 +44,13 @@ class BaseTest(unittest.TestCase):
 
 
 class TestCheckApplicable(BaseTest):
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_log = MagicMock()
+        setattr(self.docker.util, 'log', self.mock_log)
+        self.mock_warn = MagicMock()
+        setattr(self.docker.util, 'warn', self.mock_warn)
+
     def test_check(self) -> None:
         command = ['git', 'rm', '--force', str(self.update_file)]
         self.docker.util.execute_shell(command, False)
