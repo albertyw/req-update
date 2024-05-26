@@ -78,6 +78,8 @@ class ReqUpdate:
                 self.util.create_branch()
                 branch_created = True
             updates = updater.update_dependencies()
+            if not updates:
+                self.util.warn('No %s updates' % updater.language)
             updates_made = updates_made or updates
         if branch_created and not updates_made:
             self.util.rollback_branch()

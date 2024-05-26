@@ -49,8 +49,6 @@ class Docker(Updater):
             updates = True
             dockerfile_lines[i] = new_line
             self.commit_dockerfile(update_file, dockerfile_lines, dependency, version)
-        if not updates:
-            self.util.warn('No %s updates' % self.language)
         return updates
 
     def read_update_file(self, update_file: Path) -> list[str]:

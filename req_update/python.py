@@ -78,8 +78,6 @@ class Python(Updater):
         updates_made = self.update_dependencies_file()
         if updates_made:
             self.install_updates()
-        else:
-            self.util.warn('No %s updates' % self.language)
         return updates_made
 
     def update_dependencies_file(self) -> bool:

@@ -80,36 +80,30 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         setattr(self.node, 'update_unpinned_dependencies', self.mock_unpinned)
         self.mock_pinned = MagicMock()
         setattr(self.node, 'update_pinned_dependencies', self.mock_pinned)
-        self.mock_warn = MagicMock()
-        setattr(self.node.util, 'warn', self.mock_warn)
 
     def test_none(self) -> None:
         self.mock_unpinned.return_value = False
         self.mock_pinned.return_value = False
         updated = self.node.update_dependencies()
         self.assertFalse(updated)
-        self.assertTrue(self.mock_warn.called)
 
     def test_pinned(self) -> None:
         self.mock_unpinned.return_value = False
         self.mock_pinned.return_value = True
         updated = self.node.update_dependencies()
         self.assertTrue(updated)
-        self.assertFalse(self.mock_warn.called)
 
     def test_unpinned(self) -> None:
         self.mock_unpinned.return_value = True
         self.mock_pinned.return_value = False
         updated = self.node.update_dependencies()
         self.assertTrue(updated)
-        self.assertFalse(self.mock_warn.called)
 
     def test_all(self) -> None:
         self.mock_unpinned.return_value = True
         self.mock_pinned.return_value = True
         updated = self.node.update_dependencies()
         self.assertTrue(updated)
-        self.assertFalse(self.mock_warn.called)
 
 
 class TestUpdateUnpinnedDependencies(unittest.TestCase):

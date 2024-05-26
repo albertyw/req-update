@@ -35,8 +35,6 @@ class Node(Updater):
         updated_unpinned = self.update_unpinned_dependencies()
         updated_pinned = self.update_pinned_dependencies()
         updated = updated_unpinned or updated_pinned
-        if not updated:
-            self.util.warn('No %s updates' % self.language)
         return updated
 
     def update_unpinned_dependencies(self) -> bool:

@@ -54,8 +54,6 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         setattr(self.go.util, 'check_repository_cleanliness', self.mock_clean)
         self.mock_log = MagicMock()
         setattr(self.go.util, 'log', self.mock_log)
-        self.mock_warn = MagicMock()
-        setattr(self.go.util, 'warn', self.mock_warn)
 
     def test_update_clean(self) -> None:
         self.mock_clean.return_value = True
@@ -64,7 +62,6 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         calls = self.mock_execute_shell.call_args_list
         self.assertIn('get', calls[0][0][0])
         self.assertIn('tidy', calls[1][0][0])
-        self.assertTrue(self.mock_warn.called)
         self.assertTrue(self.mock_log.called)
 
     def test_update_changed(self) -> None:
@@ -74,5 +71,4 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         calls = self.mock_execute_shell.call_args_list
         self.assertIn('get', calls[0][0][0])
         self.assertIn('tidy', calls[1][0][0])
-        self.assertFalse(self.mock_warn.called)
         self.assertTrue(self.mock_log.called)

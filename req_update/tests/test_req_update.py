@@ -37,6 +37,8 @@ class TestReqUpdateMain(unittest.TestCase):
         self.req_update.updaters = [self.mock_updater]
         self.mock_rollback = MagicMock()
         setattr(self.req_update.util, 'rollback_branch', self.mock_rollback)
+        self.mock_warn = MagicMock()
+        setattr(self.req_update.util, 'warn', self.mock_warn)
 
     def test_main_no_applicable(self) -> None:
         self.mock_updater.check_applicable.return_value = False
@@ -48,6 +50,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.assertFalse(self.mock_updater.update_dependencies.called)
         self.assertFalse(self.mock_create_branch.called)
         self.assertFalse(self.mock_rollback.called)
+        self.assertFalse(self.mock_warn.called)
 
     def test_main_applicable_no_update(self) -> None:
         self.mock_updater.check_applicable.return_value = True
@@ -60,6 +63,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.assertTrue(self.mock_updater.update_dependencies.called)
         self.assertTrue(self.mock_create_branch.called)
         self.assertTrue(self.mock_rollback.called)
+        self.assertTrue(self.mock_warn.called)
 
     def test_main_gitsubmodule_applicable_update(self) -> None:
         self.mock_updater.check_applicable.return_value = True
@@ -72,6 +76,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.assertTrue(self.mock_updater.update_dependencies.called)
         self.assertTrue(self.mock_create_branch.called)
         self.assertFalse(self.mock_rollback.called)
+        self.assertFalse(self.mock_warn.called)
 
 
 class TestGetArgs(unittest.TestCase):

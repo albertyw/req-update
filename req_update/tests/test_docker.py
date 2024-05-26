@@ -23,10 +23,6 @@ class BaseTest(unittest.TestCase):
         self.lines = ['FROM debian:10', 'RUN echo']
         self.update_file = self.add_update_file('Dockerfile', '\n'.join(self.lines))
 
-        self.mock_log = MagicMock()
-        setattr(self.docker.util, 'log', self.mock_log)
-        self.mock_warn = MagicMock()
-        setattr(self.docker.util, 'warn', self.mock_warn)
         self.mock_urlopen = MagicMock()
         self.original_urlopen = docker.request.urlopen  # type:ignore
         setattr(docker.request, 'urlopen', self.mock_urlopen)  # type:ignore
@@ -72,7 +68,6 @@ class TestUpdateDependencies(BaseTest):
             self.mock_commit.call_args_list[0][0],
             ('Docker', 'debian', '12'),
         )
-        self.assertFalse(self.mock_warn.called)
 
     def test_no_update(self) -> None:
         self.mock_urlopen().status = 200
@@ -82,9 +77,6 @@ class TestUpdateDependencies(BaseTest):
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
-        self.assertFalse(self.mock_log.called)
-        self.assertEqual(len(self.mock_warn.call_args_list), 1)
-        self.assertEqual(self.mock_warn.call_args[0][0], 'No Docker updates')
 
     def test_multiple_update(self) -> None:
         with open(self.update_file, 'w') as handle:
@@ -105,7 +97,6 @@ class TestUpdateDependencies(BaseTest):
             self.mock_commit.call_args_list[1][0],
             ('Docker', 'debian', '12'),
         )
-        self.assertFalse(self.mock_warn.called)
 
 
 class TestReadDockerfile(BaseTest):
@@ -145,6 +136,11 @@ class TestAttemptUpdateImage(BaseTest):
 
 
 class TestFindUpdatedVersion(BaseTest):
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_warn = MagicMock()
+        setattr(self.docker.util, 'warn', self.mock_warn)
+
     def test_updates(self) -> None:
         self.mock_urlopen().status = 200
         self.mock_urlopen().read.return_value = json.dumps(
