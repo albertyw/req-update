@@ -32,11 +32,13 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
             stdout=' M util/util.py'
         )
         self.util.dry_run = True
-        self.util.check_repository_cleanliness()
+        clean = self.util.check_repository_cleanliness()
+        self.assertTrue(clean)
 
     def test_clean(self) -> None:
         self.mock_execute_shell.return_error = MagicMock(stdout='')
-        self.util.check_repository_cleanliness()
+        clean = self.util.check_repository_cleanliness()
+        self.assertTrue(clean)
 
     def test_git_error(self) -> None:
         error = subprocess.CalledProcessError(1, 'git')
@@ -48,8 +50,8 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         self.mock_execute_shell.return_value = MagicMock(
             stdout=' M util/util.py'
         )
-        with self.assertRaises(RuntimeError):
-            self.util.check_repository_cleanliness()
+        clean = self.util.check_repository_cleanliness()
+        self.assertFalse(clean)
 
 
 class TestCommitGit(unittest.TestCase):
