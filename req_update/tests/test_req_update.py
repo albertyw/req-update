@@ -25,6 +25,7 @@ class TestReqUpdateMain(unittest.TestCase):
         self.req_update = req_update.ReqUpdate()
         self.mock_get_args = MagicMock()
         setattr(self.req_update, 'get_args', self.mock_get_args)
+        self.req_update.util.ignore_cleanliness = False
         self.mock_check = MagicMock()
         setattr(
             self.req_update.util,

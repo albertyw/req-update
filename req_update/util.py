@@ -43,6 +43,7 @@ class Util:
     def __init__(self) -> None:
         self.push = False
         self.verbose = False
+        self.ignore_cleanliness = True
         self.dry_run = True
         self.branch_exists = False
 

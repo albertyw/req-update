@@ -60,7 +60,8 @@ class ReqUpdate:
         """
         self.get_args()
         branch_created = False
-        self.util.check_repository_cleanliness()
+        if not self.util.ignore_cleanliness:
+            self.util.check_repository_cleanliness()
         updates_made = False
         for updater in self.updaters:
             if self.language:
