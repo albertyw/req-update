@@ -64,7 +64,7 @@ class ReqUpdate:
         updates_made = False
         for updater in self.updaters:
             if self.language:
-                if self.language != updater.__class__.__name__.lower():
+                if self.language != updater.language.lower():
                     continue
             if not updater.check_applicable():
                 if self.language:
