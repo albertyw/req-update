@@ -131,7 +131,7 @@ class ReqUpdate:
         return [u.__name__.lower() for u in UPDATERS]
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         main()
     except subprocess.CalledProcessError:
