@@ -61,7 +61,9 @@ class ReqUpdate:
         self.get_args()
         branch_created = False
         if not self.util.ignore_cleanliness:
-            self.util.check_repository_cleanliness()
+            clean = self.util.check_repository_cleanliness()
+            if not clean:
+                raise RuntimeError('Repository is not clean')
         updates_made = False
         for updater in self.updaters:
             if self.language:

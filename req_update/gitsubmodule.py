@@ -29,10 +29,9 @@ class GitSubmodule(Updater):
             submodule = self.annotate_submodule(submodule)
             version = self.update_submodule(submodule)
             if version:
-                try:
-                    # Not easy to tell if a git submodule has changed
-                    self.util.check_repository_cleanliness()
-                except RuntimeError:
+                # Not easy to tell if a git submodule has changed
+                clean = self.util.check_repository_cleanliness()
+                if not clean:
                     self.util.commit_dependency_update(
                         self.language, str(submodule.path), version
                     )

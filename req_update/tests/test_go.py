@@ -65,7 +65,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         self.assertTrue(self.mock_log.called)
 
     def test_update_changed(self) -> None:
-        self.mock_clean.side_effect = RuntimeError()
+        self.mock_clean.return_value = False
         updated = self.go.update_dependencies()
         self.assertTrue(updated)
         calls = self.mock_execute_shell.call_args_list
