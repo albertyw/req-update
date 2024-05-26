@@ -30,9 +30,7 @@ class Go(Updater):
         command = ['go', 'mod', 'tidy']
         self.util.log('Tidying go packages')
         self.util.execute_shell(command, False)
-        try:
-            self.util.check_repository_cleanliness()
-            return False  # repository is clean so nothing to commit or push
-        except RuntimeError:
+        clean = self.util.check_repository_cleanliness()
+        if not clean:
             self.util.commit_git('Update go packages')
-            return True
+        return not clean

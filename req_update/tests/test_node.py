@@ -129,7 +129,7 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         self.assertFalse(self.mock_commit_git.called)
 
     def test_commit(self) -> None:
-        self.mock_clean.side_effect = RuntimeError()
+        self.mock_clean.return_value = False
         updates = self.node.update_unpinned_dependencies()
         self.assertTrue(updates)
         self.assertTrue(self.mock_execute_shell.called)

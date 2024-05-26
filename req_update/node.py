@@ -41,12 +41,11 @@ class Node(Updater):
         command = ['npm', 'update']
         self.util.log('Updating npm packages')
         self.util.execute_shell(command, False)
-        try:
-            self.util.check_repository_cleanliness()
-            return False  # repository is clean so nothing to commit or push
-        except RuntimeError:
+        clean = self.util.check_repository_cleanliness()
+        if not clean:
             self.util.commit_git('Update npm packages')
             return True
+        return False
 
     def update_pinned_dependencies(self) -> bool:
         packages = self.get_outdated()

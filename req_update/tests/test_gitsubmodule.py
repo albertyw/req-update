@@ -113,7 +113,7 @@ class TestUpdateDependencies(unittest.TestCase):
     def test_updates(self) -> None:
         self.mock_get_submodule_info.return_value = [self.submodule]
         self.mock_update_submodule.return_value = 'v1.2.3'
-        self.mock_check_cleanliness.side_effect = RuntimeError('asdf')
+        self.mock_check_cleanliness.return_value = False
         updates = self.gitsubmodule.update_dependencies()
         self.assertTrue(self.mock_commit.called)
         self.assertTrue(updates)

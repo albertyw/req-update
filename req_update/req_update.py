@@ -60,7 +60,10 @@ class ReqUpdate:
         """
         self.get_args()
         branch_created = False
-        self.util.check_repository_cleanliness()
+        if not self.util.ignore_cleanliness:
+            clean = self.util.check_repository_cleanliness()
+            if not clean:
+                raise RuntimeError('Repository is not clean')
         updates_made = False
         for updater in self.updaters:
             if self.language:
@@ -105,6 +108,12 @@ class ReqUpdate:
             help='Push commits individually to remote origin',
         )
         parser.add_argument(
+            '-i',
+            '--ignore-cleanliness',
+            action='store_true',
+            help='Ignore checking if the repository is clean',
+        )
+        parser.add_argument(
             '-d',
             '--dryrun',
             action='store_true',
@@ -125,6 +134,7 @@ class ReqUpdate:
         self.language = args.language
         self.util.push = args.push
         self.util.verbose = args.verbose
+        self.util.ignore_cleanliness = args.ignore_cleanliness
         self.util.dry_run = args.dryrun
         return args
 
