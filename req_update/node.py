@@ -67,7 +67,7 @@ class Node(Updater):
         return packages
 
     def update_package(
-        self, package_name: str, package: dict[str, str]
+        self, package_name: str, package: dict[str, str],
     ) -> bool:
         self.util.log('Updating dependency: %s' % package_name)
         with open('package.json', 'r') as handle:
@@ -99,12 +99,12 @@ class Node(Updater):
         success = self.install_dependencies()
         if not success:
             self.util.warn(
-                'Dependency conflict; rolling back: %s' % package_name
+                'Dependency conflict; rolling back: %s' % package_name,
             )
             self.util.reset_changes()
             return False
         self.util.check_major_version_update(
-            package_name, old_version, new_version
+            package_name, old_version, new_version,
         )
         self.util.commit_dependency_update(self.language, package_name, new_version)
         return True

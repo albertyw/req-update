@@ -114,7 +114,7 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_clean = MagicMock()
         setattr(
-            self.node.util, 'check_repository_cleanliness', self.mock_clean
+            self.node.util, 'check_repository_cleanliness', self.mock_clean,
         )
         self.mock_commit_git = MagicMock()
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
@@ -275,7 +275,7 @@ class TestUpdatePackage(unittest.TestCase):
         setattr(self.node, 'install_dependencies', mock_install_dependencies)
         mock_install_dependencies.return_value = False
         updated = self.node.update_package(
-            'varsnap', MOCK_NPM_OUTDATED['varsnap']
+            'varsnap', MOCK_NPM_OUTDATED['varsnap'],
         )
         self.assertFalse(updated)
         self.assertTrue(mock_install_dependencies.called)

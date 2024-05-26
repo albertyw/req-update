@@ -11,7 +11,7 @@ from req_update import python, util
 
 
 PIP_OUTDATED = [
-    {'name': 'varsnap', 'version': '1.0.0', 'latest_version': '1.2.3'}
+    {'name': 'varsnap', 'version': '1.0.0', 'latest_version': '1.2.3'},
 ]
 
 

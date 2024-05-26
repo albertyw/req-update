@@ -26,14 +26,14 @@ class GitSubmodule(Updater):
         clean = True
         for submodule in submodules:
             self.util.log('Checking dependency: %s' % submodule.path)
-            submodule = self.annotate_submodule(submodule)
-            version = self.update_submodule(submodule)
+            annotated_submodule = self.annotate_submodule(submodule)
+            version = self.update_submodule(annotated_submodule)
             if version:
                 # Not easy to tell if a git submodule has changed
                 clean = self.util.check_repository_cleanliness()
                 if not clean:
                     self.util.commit_dependency_update(
-                        self.language, str(submodule.path), version
+                        self.language, str(annotated_submodule.path), version,
                     )
                     clean = False
         return not clean

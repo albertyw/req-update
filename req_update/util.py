@@ -74,7 +74,7 @@ class Util:
         self.push_dependency_update()
 
     def commit_dependency_update(
-        self, language: str, dependency: str, version: str
+        self, language: str, dependency: str, version: str,
     ) -> None:
         """Create a commit with a dependency update"""
         commit_message = COMMIT_MESSAGE.format(
@@ -142,7 +142,7 @@ class Util:
         return False
 
     def check_major_version_update(
-        self, dependency: str, old_version: str, new_version: str
+        self, dependency: str, old_version: str, new_version: str,
     ) -> Optional[bool]:
         """
         Try to parse versions as semver and compare major version numbers.
@@ -167,7 +167,7 @@ class Util:
             return False
         self.warn(
             'Warning: Major version change on %s: %s updated to %s'
-            % (dependency, old_version, new_version)
+            % (dependency, old_version, new_version),
         )
         return True
 
@@ -184,7 +184,7 @@ class Util:
             self.log(' '.join(command))
         if self.dry_run and not readonly:
             return subprocess.CompletedProcess(
-                command, 0, stdout='', stderr=''
+                command, 0, stdout='', stderr='',
             )
         try:
             result = subprocess.run(

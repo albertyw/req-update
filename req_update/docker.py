@@ -111,7 +111,7 @@ class Docker(Updater):
         update_file: Path,
         dockerfile: list[str],
         dependency: str,
-        version: str
+        version: str,
     ) -> None:
         if not self.util.dry_run:
             with open(update_file, 'w') as handle:

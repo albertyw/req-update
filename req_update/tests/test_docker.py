@@ -65,7 +65,7 @@ class TestUpdateDependencies(BaseTest):
     def test_update(self) -> None:
         self.mock_urlopen().status = 200
         self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '12'}]}
+            {'results': [{'name': '12'}]},
         )
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
@@ -79,7 +79,7 @@ class TestUpdateDependencies(BaseTest):
     def test_no_update(self) -> None:
         self.mock_urlopen().status = 200
         self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '10'}]}
+            {'results': [{'name': '10'}]},
         )
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
@@ -90,7 +90,7 @@ class TestUpdateDependencies(BaseTest):
             handle.write('FROM debian:10\nFROM debian:11')
         self.mock_urlopen().status = 200
         self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '12'}]}
+            {'results': [{'name': '12'}]},
         )
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
@@ -151,7 +151,7 @@ class TestFindUpdatedVersion(BaseTest):
     def test_updates(self) -> None:
         self.mock_urlopen().status = 200
         self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '12'}]}
+            {'results': [{'name': '12'}]},
         )
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '12')

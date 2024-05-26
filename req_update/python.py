@@ -47,7 +47,7 @@ class Python(Updater):
         command = ['pip', '--version']
         try:
             result = self.util.execute_shell(
-                command, True, suppress_output=True
+                command, True, suppress_output=True,
             )
         except (subprocess.CalledProcessError, FileNotFoundError):
             # Cannot find pip
@@ -189,7 +189,7 @@ class Python(Updater):
             if line == new_line:
                 continue
             self.util.check_major_version_update(
-                dependency, old_version, version
+                dependency, old_version, version,
             )
             lines[i] = new_line
             return True

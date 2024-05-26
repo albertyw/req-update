@@ -29,7 +29,7 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
 
     def test_dry_run(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(
-            stdout=' M util/util.py'
+            stdout=' M util/util.py',
         )
         self.util.dry_run = True
         clean = self.util.check_repository_cleanliness()
@@ -48,7 +48,7 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
 
     def test_unclean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(
-            stdout=' M util/util.py'
+            stdout=' M util/util.py',
         )
         clean = self.util.check_repository_cleanliness()
         self.assertFalse(clean)
@@ -237,19 +237,19 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
 
     def test_check_non_major_update(self) -> None:
         result = self.util.check_major_version_update(
-            'varsnap', '1.0.0', '1.2.3'
+            'varsnap', '1.0.0', '1.2.3',
         )
         self.assertFalse(result)
         self.assertFalse(self.mock_log.called)
         result = self.util.check_major_version_update(
-            'varsnap', '1.0.0', '1.0.3'
+            'varsnap', '1.0.0', '1.0.3',
         )
         self.assertFalse(result)
         self.assertFalse(self.mock_log.called)
 
     def test_check_major_update(self) -> None:
         result = self.util.check_major_version_update(
-            'varsnap', '1.0.0', '2.0.0'
+            'varsnap', '1.0.0', '2.0.0',
         )
         self.assertTrue(result)
         self.assertTrue(self.mock_log.called)
@@ -260,44 +260,44 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
 
     def test_semver_not_three_part(self) -> None:
         result = self.util.check_major_version_update(
-            'varsnap', 'asdf', '2.0.0'
+            'varsnap', 'asdf', '2.0.0',
         )
         self.assertEqual(result, None)
         self.assertFalse(self.mock_log.called)
         result = self.util.check_major_version_update(
-            'varsnap', '1.0', '2.0.0'
+            'varsnap', '1.0', '2.0.0',
         )
         self.assertEqual(result, None)
         self.assertFalse(self.mock_log.called)
         result = self.util.check_major_version_update(
-            'varsnap', '1.0.0', '2.0'
+            'varsnap', '1.0.0', '2.0',
         )
         self.assertEqual(result, None)
         self.assertFalse(self.mock_log.called)
 
     def test_semver_not_integer(self) -> None:
         result = self.util.check_major_version_update(
-            'varsnap', 'a.0.0', '2.0.0'
+            'varsnap', 'a.0.0', '2.0.0',
         )
         self.assertEqual(result, None)
         self.assertFalse(self.mock_log.called)
         result = self.util.check_major_version_update(
-            'varsnap', '1.0.0', 'a.0.0'
+            'varsnap', '1.0.0', 'a.0.0',
         )
         self.assertEqual(result, None)
         self.assertFalse(self.mock_log.called)
 
     def test_semver_range(self) -> None:
         result = self.util.check_major_version_update(
-            'sinon', '~13.0.0', '~14.0.0'
+            'sinon', '~13.0.0', '~14.0.0',
         )
         self.assertTrue(result)
         result = self.util.check_major_version_update(
-            'sinon', '^13.0.0', '^14.0.0'
+            'sinon', '^13.0.0', '^14.0.0',
         )
         self.assertTrue(result)
         result = self.util.check_major_version_update(
-            'sinon', '^13.0.0', '^13.1.0'
+            'sinon', '^13.0.0', '^13.1.0',
         )
         self.assertFalse(result)
 

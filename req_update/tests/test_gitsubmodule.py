@@ -72,7 +72,7 @@ class TestUpdateDependencies(unittest.TestCase):
         )
         self.mock_update_submodule = MagicMock()
         setattr(
-            self.gitsubmodule, 'update_submodule', self.mock_update_submodule
+            self.gitsubmodule, 'update_submodule', self.mock_update_submodule,
         )
         self.mock_check_cleanliness = MagicMock()
         setattr(
@@ -152,7 +152,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
 
     def test_get_info(self) -> None:
         def execute_shell_returns(
-            *args: List[Any], **kwargs: Dict[str, Any]
+            *args: List[Any], **kwargs: Dict[str, Any],
         ) -> MagicMock:
             stdout = None
             if args[0] == ['git', 'fetch', '-tp']:
@@ -198,7 +198,7 @@ class TestAnnotateSubmodule(unittest.TestCase):
 
     def test_info_no_tag(self) -> None:
         def execute_shell_returns(
-            *args: List[Any], **kwargs: Dict[str, Any]
+            *args: List[Any], **kwargs: Dict[str, Any],
         ) -> MagicMock:
             stdout = None
             if args[0] == ['git', 'fetch', '-tp']:
@@ -287,7 +287,7 @@ class TestVersionInfo(unittest.TestCase):
     def test_find_commit(self) -> None:
         info = GitSubmodule.get_version_info(MOCK_COMMIT_DATA, '')
         self.assertEqual(
-            info.version_name, 'fc9ab12365ace68f77cc9ac303bbf239d56601db'
+            info.version_name, 'fc9ab12365ace68f77cc9ac303bbf239d56601db',
         )
         self.assertEqual(info.version_date, MOCK_COMMIT_DATE)
 
@@ -306,13 +306,13 @@ class TestUpdateSubmodule(unittest.TestCase):
         now = datetime.datetime.now()
         old = now - datetime.timedelta(days=60)
         self.new_tag_version = VersionInfo(
-            version_name='new_tag', version_date=now
+            version_name='new_tag', version_date=now,
         )
         self.old_tag_version = VersionInfo(
-            version_name='old_tag', version_date=old
+            version_name='old_tag', version_date=old,
         )
         self.commit_version = VersionInfo(
-            version_name='commit', version_date=now
+            version_name='commit', version_date=now,
         )
 
     def test_update_submodule_none(self) -> None:
