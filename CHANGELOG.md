@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.6.0 (2024-05-26)
+------------------
+
+ - Change check_repository_cleanliness to return a bool rather than raise an exception
+ - Add a ignore-cleanliness CLI flag
+ - Fix update warnings in dry-mode
+ - Update dependencies
+
+
 2.5.1 (2024-02-20)
 ------------------
 
