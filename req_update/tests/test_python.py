@@ -320,6 +320,25 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
         self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
+    def test_remove_spacing(self) -> None:
+        with open(self.tempfile_requirements.name, 'w') as handle:
+            handle.write('a==1.0      # qwer')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('"a==1.0",      # qwer')
+        updated = self.python.write_dependency_update('a', '2.0')
+        self.assertTrue(updated)
+        with open(self.tempfile_requirements.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(lines[0].strip('\n'), 'a==2.0    # qwer')
+        with open(self.tempfile_pyproject.name, 'r') as handle:
+            lines = handle.readlines()
+            self.assertEqual(
+                lines[0].strip("\n"),
+                '"a==2.0", # qwer',
+            )
+        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
+        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+
     def test_no_spacing_on_unmatching_lines(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
             handle.write('varsnap==1.0 # qwer\n# asdf')
