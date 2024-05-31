@@ -194,6 +194,8 @@ class Python(Updater):
         for i, line in enumerate(lines):
             if '#' not in line:
                 continue
+            if line_regex.search(line) is None:
+                continue
             new_line = line
             while new_line.find('#') != comment_alignment:
                 if new_line.find('#') < comment_alignment:
