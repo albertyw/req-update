@@ -380,3 +380,41 @@ class TestInstallUpdates(unittest.TestCase):
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
         self.assertEqual(self.mock_execute_shell.mock_calls[0][1][0][3], '.')
         self.assertEqual(self.mock_execute_shell.mock_calls[1][1][0][3], '.[test]')
+
+
+class TestGetCommentAlignment(unittest.TestCase):
+    def test_get_alignment_simple(self) -> None:
+        alignment = python.Python.get_comment_alignment([
+            'abcd==0.0.1    # qwer',
+        ], python.REQUIREMENTS)
+        self.assertEqual(alignment, 20)
+
+    def test_get_alignment_long_comment(self) -> None:
+        alignment = python.Python.get_comment_alignment([
+            'qwer==0.0.1                 # qwer',
+        ], python.REQUIREMENTS)
+        self.assertEqual(alignment, 20)
+
+    def test_get_alignment_no_inline_comment(self) -> None:
+        alignment = python.Python.get_comment_alignment([
+            'abcd==0.0.1',
+            '# asdf',
+        ], python.REQUIREMENTS)
+        self.assertEqual(alignment, 0)
+
+    def test_get_alignment_indentation(self) -> None:
+        alignment = python.Python.get_comment_alignment([
+            '    "abcdefghijk==0.0.1",  # asdf',
+        ], python.PYPROJECT)
+        self.assertEqual(alignment, 30)
+
+    def test_get_alignment_max(self) -> None:
+        alignment = python.Python.get_comment_alignment([
+            'a==1.0.0  # asdf',
+        ], python.REQUIREMENTS)
+        self.assertEqual(alignment, 10)
+        alignment = python.Python.get_comment_alignment([
+            'a==1.0.0  # asdf',
+            'qwer==1.0.0  # qwer',
+        ], python.REQUIREMENTS)
+        self.assertEqual(alignment, 20)
