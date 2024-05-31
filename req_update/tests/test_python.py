@@ -228,11 +228,14 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
-            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3    # qwer')
+            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3      # qwer')
         with open(self.tempfile_pyproject.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
-            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",    # qwer')
+            self.assertEqual(
+                lines[1].strip("\n"),
+                '    "varsnap==1.2.3",         # qwer',
+            )
         self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
         self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
@@ -246,11 +249,14 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
-            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3  # qwer')
+            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3      # qwer')
         with open(self.tempfile_pyproject.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
-            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",  # qwer')
+            self.assertEqual(
+                lines[1].strip("\n"),
+                '    "varsnap==1.2.3",         # qwer',
+            )
         self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
         self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 
@@ -282,7 +288,7 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
-            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3         # qwer')
+            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3      # qwer')
         with open(self.tempfile_pyproject.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
@@ -303,11 +309,14 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         with open(self.tempfile_requirements.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip('\n'), 'abcd==0.0.1')
-            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3     # qwer')
+            self.assertEqual(lines[1].strip('\n'), 'varsnap==1.2.3      # qwer')
         with open(self.tempfile_pyproject.name, 'r') as handle:
             lines = handle.readlines()
             self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
-            self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",    # qwer')
+            self.assertEqual(
+                lines[1].strip("\n"),
+                '    "varsnap==1.2.3",         # qwer',
+            )
         self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
         self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
 

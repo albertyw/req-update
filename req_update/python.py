@@ -157,6 +157,7 @@ class Python(Updater):
         elif file_type == PYPROJECT:
             line_regex = PYTHON_PYPROJECT_LINE_REGEX
         dependency = dependency.replace('_', '-')
+        updated = False
         for i, line in enumerate(lines):
             match = line_regex.match(line.strip())
             if not match:
@@ -167,23 +168,16 @@ class Python(Updater):
                 continue
             old_version = match.group('version')
             old_spacer = match.group('spacer')
-            if old_spacer:
-                spacing = len(old_version) + len(old_spacer) - len(version)
-                if spacing <= 1:
-                    spacing = 10 - len(version) % 10 + 1
-                spacer = ' ' * (spacing - 1) + '#'
-            else:
-                spacer = ''
             if file_type == PYPROJECT:
-                spacer = ',' + spacer[1:]
+                old_spacer = ',' + old_spacer[1:]
             if file_type == REQUIREMENTS:
                 new_line = line_regex.sub(
-                    r'\g<1>\g<2>%s%s' % (version, spacer),
+                    r'\g<1>\g<2>%s%s' % (version, old_spacer),
                     line,
                 )
             elif file_type == PYPROJECT:
                 new_line = line_regex.sub(
-                    r'"\g<1>\g<2>%s"%s' % (version, spacer),
+                    r'"\g<1>\g<2>%s"%s' % (version, old_spacer),
                     line,
                 )
             if line == new_line:
@@ -192,8 +186,22 @@ class Python(Updater):
                 dependency, old_version, version,
             )
             lines[i] = new_line
-            return True
-        return False
+            updated = True
+        if not updated:
+            return updated
+        # Vertically align comments
+        comment_alignment = Python.get_comment_alignment(lines, file_type)
+        for i, line in enumerate(lines):
+            if '#' not in line:
+                continue
+            new_line = line
+            while new_line.find('#') != comment_alignment:
+                if new_line.find('#') < comment_alignment:
+                    new_line = new_line.replace('#', ' #')
+                else:
+                    new_line = new_line.replace(' #', '#')
+            lines[i] = new_line
+        return updated
 
     def install_updates(self) -> None:
         """Install requirements updates"""
