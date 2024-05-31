@@ -224,3 +224,26 @@ class Python(Updater):
                     command = ['pip', 'install', '-e', '.[%s]' % optional]
                     self.util.execute_shell(command, False)
             self.util.log('Installing updated packages in %s' % updated_file)
+
+    @staticmethod
+    def get_comment_alignment(lines: list[str], file_type: str) -> int:
+        max_length = 0
+        for line in lines:
+            if '#' not in line:
+                continue
+            length = 1 # One whitespace before comments
+            if file_type == REQUIREMENTS:
+                match = PYTHON_REQUIREMENTS_LINE_REGEX.search(line)
+            elif file_type == PYPROJECT:
+                match = PYTHON_PYPROJECT_LINE_REGEX.search(line)
+                length += 3 # Account for additional quotes and comma
+            if not match:
+                continue
+            length += match.start() # Account for indentation
+            length += len(match.group(1) + match.group(2) + match.group(3))
+            if length > max_length:
+                max_length = length
+        alignment = max_length
+        if alignment % 10 != 0:
+            alignment += 10 - alignment % 10
+        return alignment
