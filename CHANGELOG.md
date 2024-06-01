@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.7.0 (2024-06-01)
+------------------
+
+ - Support updating github actions
+ - Vertically align comments for python updates
+ - Update dependencies
+
+
 2.6.0 (2024-05-26)
 ------------------
 
