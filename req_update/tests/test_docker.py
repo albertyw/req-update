@@ -55,7 +55,7 @@ class TestCheckApplicable(BaseTest):
         command = ['git', 'rm', '--force', str(self.update_file)]
         self.docker.util.execute_shell(command, False)
         self.assertFalse(self.docker.check_applicable())
-        self.add_update_file(self.docker.UPDATE_FILE, '')
+        self.add_update_file('Dockerfile', '')
         self.assertTrue(self.docker.check_applicable())
         os.chdir('/')
         self.assertFalse(self.docker.check_applicable())
