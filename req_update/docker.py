@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 from pathlib import Path
+import re
 import subprocess
 from urllib import request
 from urllib.error import HTTPError
@@ -9,7 +10,7 @@ from req_update.util import Updater
 
 
 class Docker(Updater):
-    UPDATE_FILE = 'Dockerfile'
+    UPDATE_FILE = re.compile(r'Dockerfile$')
     LINE_HEADER = 'FROM'
     DEPENDENCY_VERSION_SEPARATOR = ':'
 
@@ -23,7 +24,7 @@ class Docker(Updater):
         except subprocess.CalledProcessError:
             return []
         files = [Path(f) for f in shell.stdout.split('\n')]
-        files = [f for f in files if f.name == self.UPDATE_FILE]
+        files = [f for f in files if self.UPDATE_FILE.match(str(f))]
         return files
 
     def update_dependencies(self) -> bool:
