@@ -27,16 +27,21 @@ class GithubWorkflow(Docker):
         try:
             response = urlopen(request)
         except HTTPError:
+            self.util.warn('Cannot read %s from api.github.com' % dependency)
             return ''
         if not response or int(response.status/100) != 2:
             self.util.warn('Cannot read %s from api.github.com' % dependency)
             return ''
-        tags = json.loads(response.read())
+        try:
+            tags = json.loads(response.read())
+        except json.JSONDecodeError:
+            self.util.warn('Cannot read %s from api.github.com' % dependency)
+            return ''
         try:
             tag = tags[-1]['ref'].removeprefix('refs/tags/')
         except (IndexError, KeyError):
             return ''
-        if tag == original_version:
-            return ''
-        else:
+        if self.util.compare_versions(original_version, tag):
             return str(tag)
+        else:
+            return ''
