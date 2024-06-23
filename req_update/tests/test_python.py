@@ -1,6 +1,7 @@
 from __future__ import annotations
 import copy
 import json
+from pathlib import Path
 import random
 import subprocess
 import tempfile
@@ -167,7 +168,7 @@ class TestEditRequirements(unittest.TestCase):
 
     def test_edit_requirements(self) -> None:
         filename = self.tempfile.name
-        with python.Python.edit_requirements(filename, False) as lines:
+        with python.Python.edit_requirements(Path(filename), False) as lines:
             lines.append('asdf\n')
             lines.append('qwer\n')
         with open(filename, 'r') as handle:
@@ -176,7 +177,7 @@ class TestEditRequirements(unittest.TestCase):
 
     def test_edit_requirements_not_found(self) -> None:
         filename = str(random.randint(10**10, 10**11))
-        with python.Python.edit_requirements(filename, False):
+        with python.Python.edit_requirements(Path(filename), False):
             pass
         with self.assertRaises(FileNotFoundError):
             open(filename, 'r')
@@ -186,10 +187,10 @@ class TestWriteDependencyUpdate(unittest.TestCase):
     def setUp(self) -> None:
         self.tempfile_requirements = tempfile.NamedTemporaryFile()
         self.original_reqfiles = python.REQUIREMENTS_FILES
-        python.REQUIREMENTS_FILES = [self.tempfile_requirements.name]
+        python.REQUIREMENTS_FILES = [Path(self.tempfile_requirements.name)]
         self.tempfile_pyproject = tempfile.NamedTemporaryFile()
         self.original_pyprojectfiles = python.PYPROJECT_FILES
-        python.PYPROJECT_FILES = [self.tempfile_pyproject.name]
+        python.PYPROJECT_FILES = [Path(self.tempfile_pyproject.name)]
         u = util.Util()
         self.python = python.Python(u)
         self.python.util.dry_run = False
@@ -215,8 +216,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             lines = handle.readlines()
             self.assertEqual(lines[0].strip("\n"), '    "abcd==0.0.1",')
             self.assertEqual(lines[1].strip("\n"), '    "varsnap==1.2.3",')
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
     def test_write_dependency_update(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
@@ -236,8 +237,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
                 lines[1].strip("\n"),
                 '    "varsnap==1.2.3",         # qwer',
             )
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
     def test_write_dependency_update_aligned(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
@@ -257,8 +258,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
                 lines[1].strip("\n"),
                 '    "varsnap==1.2.3",         # qwer',
             )
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
     def test_write_dependency_update_no_op(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
@@ -296,8 +297,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
                 lines[1].strip("\n"),
                 '    "varsnap==1.2.3",         # qwer',
             )
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
     def test_add_spacing(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
@@ -317,8 +318,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
                 lines[1].strip("\n"),
                 '    "varsnap==1.2.3",         # qwer',
             )
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
     def test_remove_spacing(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
@@ -336,8 +337,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
                 lines[0].strip("\n"),
                 '"a==2.0", # qwer',
             )
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
     def test_no_spacing_on_unmatching_lines(self) -> None:
         with open(self.tempfile_requirements.name, 'w') as handle:
@@ -357,8 +358,8 @@ class TestWriteDependencyUpdate(unittest.TestCase):
                 '    "varsnap==1.2.3",         # qwer',
             )
             self.assertEqual(lines[1].strip("\n"), '    # asdf')
-        self.assertIn(self.tempfile_requirements.name, self.python.updated_files)
-        self.assertIn(self.tempfile_pyproject.name, self.python.updated_files)
+        self.assertIn(Path(self.tempfile_requirements.name), self.python.updated_files)
+        self.assertIn(Path(self.tempfile_pyproject.name), self.python.updated_files)
 
 
 
@@ -372,7 +373,7 @@ class TestInstallUpdates(unittest.TestCase):
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
         self.tempfile_pyproject = tempfile.NamedTemporaryFile()
         self.original_pyprojectfiles = python.PYPROJECT_FILES
-        python.PYPROJECT_FILES = [self.tempfile_pyproject.name]
+        python.PYPROJECT_FILES = [Path(self.tempfile_pyproject.name)]
 
     def tearDown(self) -> None:
         self.tempfile_pyproject.close()
@@ -384,7 +385,7 @@ class TestInstallUpdates(unittest.TestCase):
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 0)
 
     def test_install_requirements_updates(self) -> None:
-        self.python.updated_files.add('requirements.txt')
+        self.python.updated_files.add(Path('requirements.txt'))
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
         log_value = self.mock_log.mock_calls[0][1]
@@ -394,8 +395,8 @@ class TestInstallUpdates(unittest.TestCase):
         self.assertEqual('requirements.txt', command[0][3])
 
     def test_install_multiple_requirements_updates(self) -> None:
-        self.python.updated_files.add('requirements-test.txt')
-        self.python.updated_files.add('requirements.txt')
+        self.python.updated_files.add(Path('requirements-test.txt'))
+        self.python.updated_files.add(Path('requirements.txt'))
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 2)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)
@@ -409,7 +410,7 @@ class TestInstallUpdates(unittest.TestCase):
         )
         with open(self.tempfile_pyproject.name, 'w') as handle:
             handle.write(pyproject)
-        self.python.updated_files.add(self.tempfile_pyproject.name)
+        self.python.updated_files.add(Path(self.tempfile_pyproject.name))
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 1)
@@ -424,7 +425,7 @@ class TestInstallUpdates(unittest.TestCase):
        )
         with open(self.tempfile_pyproject.name, 'w') as handle:
             handle.write(pyproject)
-        self.python.updated_files.add(self.tempfile_pyproject.name)
+        self.python.updated_files.add(Path(self.tempfile_pyproject.name))
         self.python.install_updates()
         self.assertEqual(len(self.mock_log.mock_calls), 1)
         self.assertEqual(len(self.mock_execute_shell.mock_calls), 2)

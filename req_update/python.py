@@ -2,6 +2,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 import json
 import os
+from pathlib import Path
 import re
 import subprocess
 from typing import Iterator
@@ -29,17 +30,17 @@ PYTHON_PYPROJECT_LINE_REGEX = re.compile('"%s%s%s"%s' % (
     PYTHON_PACKAGE_SPACER_REGEX,
 ))
 REQUIREMENTS_FILES = [
-    'requirements.txt',
-    'requirements-test.txt',
+    Path('requirements.txt'),
+    Path('requirements-test.txt'),
 ]
 PYPROJECT_FILES = [
-    'pyproject.toml',
+    Path('pyproject.toml'),
 ]
 
 
 class Python(Updater):
     def __init__(self, util: Util) -> None:
-        self.updated_files: set[str] = set([])
+        self.updated_files: set[Path] = set([])
         super().__init__(util)
 
     def check_applicable(self) -> bool:
@@ -64,7 +65,7 @@ class Python(Updater):
 
         # Make sure there's at least one requirements files
         for f in REQUIREMENTS_FILES + PYPROJECT_FILES:
-            if f in os.listdir('.'):
+            if str(f) in os.listdir('.'):
                 break
         else:
             return False
@@ -107,7 +108,7 @@ class Python(Updater):
 
     @staticmethod
     @contextmanager
-    def edit_requirements(file_name: str, dry_run: bool) -> Iterator[list[str]]:
+    def edit_requirements(file_name: Path, dry_run: bool) -> Iterator[list[str]]:
         """
         This yields lines from a file, which will be written back into
         the file after yielding
@@ -209,7 +210,7 @@ class Python(Updater):
         """Install requirements updates"""
         for updated_file in self.updated_files:
             if updated_file in REQUIREMENTS_FILES:
-                command = ['pip', 'install', '-r', updated_file]
+                command = ['pip', 'install', '-r', str(updated_file)]
                 self.util.execute_shell(command, False)
             elif updated_file in PYPROJECT_FILES:
                 command = ['pip', 'install', '-e', '.']
