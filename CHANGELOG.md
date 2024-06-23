@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.7.1 (2024-06-23)
+------------------
+
+ - Allow python upgrade to find files anywhere in repository
+ - Update dependencies
+
+
 2.7.0 (2024-06-01)
 ------------------
 
