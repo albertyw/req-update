@@ -137,7 +137,7 @@ class Python(Updater):
     def write_dependency_update(self, dependency: str, version: str) -> bool:
         """Given a dependency, update it to a given version"""
         updated = False
-        for reqfile in REQUIREMENTS_FILES:
+        for reqfile in self.get_update_files(file_type=REQUIREMENTS):
             with Python.edit_requirements(reqfile, self.util.dry_run) as lines:
                 updated_file = self.write_dependency_update_lines(
                     dependency, version, lines, REQUIREMENTS,
@@ -145,7 +145,7 @@ class Python(Updater):
                 if updated_file:
                     self.updated_files.add(reqfile)
                     updated = True
-        for pyproject in PYPROJECT_FILES:
+        for pyproject in self.get_update_files(file_type=PYPROJECT):
             with Python.edit_requirements(pyproject, self.util.dry_run) as lines:
                 updated_file = self.write_dependency_update_lines(
                     dependency, version, lines, PYPROJECT,

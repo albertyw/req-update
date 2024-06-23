@@ -196,6 +196,10 @@ class TestWriteDependencyUpdate(unittest.TestCase):
         u = util.Util()
         self.python = python.Python(u)
         self.python.util.dry_run = False
+        self.mock_get_update_files = MagicMock()
+        setattr(self.python, 'get_update_files', self.mock_get_update_files)
+        self.mock_get_update_files.return_value = \
+            python.REQUIREMENTS_FILES + python.PYPROJECT_FILES
 
     def tearDown(self) -> None:
         self.tempfile_requirements.close()
