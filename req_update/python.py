@@ -43,6 +43,13 @@ class Python(Updater):
         self.updated_files: set[Path] = set([])
         super().__init__(util)
 
+    def get_update_files(self) -> list[Path]:
+        files: list[Path] = []
+        for f in REQUIREMENTS_FILES + PYPROJECT_FILES:
+            if str(f) in os.listdir('.'):
+                files.append(Path(f))
+        return files
+
     def check_applicable(self) -> bool:
         # Make sure pip is recent enough
         command = ['pip', '--version']
@@ -64,10 +71,7 @@ class Python(Updater):
             return False
 
         # Make sure there's at least one requirements files
-        for f in REQUIREMENTS_FILES + PYPROJECT_FILES:
-            if str(f) in os.listdir('.'):
-                break
-        else:
+        if not self.get_update_files():
             return False
         return True
 
