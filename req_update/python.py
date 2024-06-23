@@ -1,7 +1,6 @@
 from __future__ import annotations
 from contextlib import contextmanager
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -45,16 +44,19 @@ class Python(Updater):
         super().__init__(util)
 
     def get_update_files(self, file_type: str='') -> list[Path]:
-        files: list[Path] = []
-        if file_type == '' or file_type == REQUIREMENTS:
-            for f in REQUIREMENTS_FILES:
-                if str(f) in os.listdir('.'):
-                    files.append(Path(f))
-        if file_type == '' or file_type == PYPROJECT:
-            for f in PYPROJECT_FILES:
-                if str(f) in os.listdir('.'):
-                    files.append(Path(f))
-        return files
+        command = ['git', 'ls-files']
+        try:
+            shell = self.util.execute_shell(command, True)
+        except subprocess.CalledProcessError:
+            return []
+        files = [Path(f) for f in shell.stdout.split('\n')]
+        requirements_files = [f for f in files if Path(f.name) in REQUIREMENTS_FILES]
+        pyproject_files = [f for f in files if Path(f.name) in PYPROJECT_FILES]
+        if file_type == REQUIREMENTS:
+            return requirements_files
+        if file_type == PYPROJECT:
+            return pyproject_files
+        return requirements_files + pyproject_files
 
     def check_applicable(self) -> bool:
         # Make sure pip is recent enough

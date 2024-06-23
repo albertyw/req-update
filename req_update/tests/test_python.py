@@ -25,8 +25,9 @@ class TestCheckApplicable(unittest.TestCase):
 
     def test_applicable(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='pip 21.3.1')
-        files = self.python.get_update_files()
-        self.assertTrue(len(files) > 0)
+        mock_get_update_files = MagicMock()
+        setattr(self.python, 'get_update_files', mock_get_update_files)
+        mock_get_update_files.return_value = ['requirements.txt']
         applicable = self.python.check_applicable()
         self.assertTrue(applicable)
 
@@ -101,6 +102,9 @@ class TestUpdateDependenciesFile(unittest.TestCase):
                 return MagicMock(stdout=json.dumps(PIP_OUTDATED))
             raise ValueError()  # pragma: no cover
 
+        mock_get_update_files = MagicMock()
+        setattr(self.python, 'get_update_files', mock_get_update_files)
+        mock_get_update_files.return_value = ['requirements.txt']
         self.mock_execute_shell.side_effect = execute_shell_returns
         mock_commit = MagicMock()
         setattr(self.python.util, 'commit_dependency_update', mock_commit)
