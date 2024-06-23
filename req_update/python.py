@@ -43,11 +43,16 @@ class Python(Updater):
         self.updated_files: set[Path] = set([])
         super().__init__(util)
 
-    def get_update_files(self) -> list[Path]:
+    def get_update_files(self, file_type: str='') -> list[Path]:
         files: list[Path] = []
-        for f in REQUIREMENTS_FILES + PYPROJECT_FILES:
-            if str(f) in os.listdir('.'):
-                files.append(Path(f))
+        if file_type == '' or file_type == REQUIREMENTS:
+            for f in REQUIREMENTS_FILES:
+                if str(f) in os.listdir('.'):
+                    files.append(Path(f))
+        if file_type == '' or file_type == PYPROJECT:
+            for f in PYPROJECT_FILES:
+                if str(f) in os.listdir('.'):
+                    files.append(Path(f))
         return files
 
     def check_applicable(self) -> bool:

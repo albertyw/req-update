@@ -25,6 +25,8 @@ class TestCheckApplicable(unittest.TestCase):
 
     def test_applicable(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='pip 21.3.1')
+        files = self.python.get_update_files()
+        self.assertTrue(len(files) > 0)
         applicable = self.python.check_applicable()
         self.assertTrue(applicable)
 
