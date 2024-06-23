@@ -16,6 +16,49 @@ PIP_OUTDATED = [
 ]
 
 
+class TestGetUpdateFiles(unittest.TestCase):
+    def setUp(self) -> None:
+        u = util.Util()
+        self.python = python.Python(u)
+        self.mock_execute_shell = MagicMock()
+        setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
+
+    def test_get_update_files(self) -> None:
+        self.mock_execute_shell.return_value = \
+            MagicMock(stdout='pyproject.toml\nrequirements.txt\nrequirements-test.txt')
+        files = self.python.get_update_files()
+        self.assertEqual(len(files), 3)
+        self.assertIn(Path('pyproject.toml'), files)
+        self.assertIn(Path('requirements.txt'), files)
+        self.assertIn(Path('requirements-test.txt'), files)
+
+    def test_get_update_files_requirements(self) -> None:
+        self.mock_execute_shell.return_value = \
+            MagicMock(stdout='pyproject.toml\nrequirements.txt\nrequirements-test.txt')
+        files = self.python.get_update_files(python.REQUIREMENTS)
+        self.assertEqual(len(files), 2)
+        self.assertIn(Path('requirements.txt'), files)
+        self.assertIn(Path('requirements-test.txt'), files)
+
+    def test_get_update_files_pyproject(self) -> None:
+        self.mock_execute_shell.return_value = \
+            MagicMock(stdout='pyproject.toml\nrequirements.txt\nrequirements-test.txt')
+        files = self.python.get_update_files(python.PYPROJECT)
+        self.assertEqual(len(files), 1)
+        self.assertIn(Path('pyproject.toml'), files)
+
+    def test_get_update_files_no_files(self) -> None:
+        self.mock_execute_shell.return_value = MagicMock(stdout='')
+        files = self.python.get_update_files()
+        self.assertEqual(len(files), 0)
+
+    def test_get_update_files_error(self) -> None:
+        error = subprocess.CalledProcessError(1, 'error')
+        self.mock_execute_shell.side_effect = error
+        files = self.python.get_update_files()
+        self.assertEqual(len(files), 0)
+
+
 class TestCheckApplicable(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()
