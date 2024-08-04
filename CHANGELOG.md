@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.7.2 (2024-08-04)
+------------------
+
+ - Fix bug with checking if git submodule has been updated
+ - Update dependencies
+ - Remove deprecated pyup
+
+
 2.7.1 (2024-06-23)
 ------------------
 
