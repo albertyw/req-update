@@ -23,7 +23,7 @@ class GitSubmodule(Updater):
 
     def update_dependencies(self) -> bool:
         submodules = self.get_submodule_info()
-        clean = True
+        all_clean = True
         for submodule in submodules:
             self.util.log('Checking dependency: %s' % submodule.path)
             annotated_submodule = self.annotate_submodule(submodule)
@@ -35,8 +35,8 @@ class GitSubmodule(Updater):
                     self.util.commit_dependency_update(
                         self.language, str(annotated_submodule.path), version,
                     )
-                    clean = False
-        return not clean
+                    all_clean = False
+        return not all_clean
 
     # TODO: Make this a method on Submodule
     def get_submodule_info(self) -> List[Submodule]:
