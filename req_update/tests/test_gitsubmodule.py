@@ -118,6 +118,14 @@ class TestUpdateDependencies(unittest.TestCase):
         self.assertTrue(self.mock_commit.called)
         self.assertTrue(updates)
 
+    def test_clean_after_updates(self) -> None:
+        self.mock_get_submodule_info.return_value = [self.submodule, self.submodule]
+        self.mock_update_submodule.return_value = 'v1.2.3'
+        self.mock_check_cleanliness.side_effect = [False, True]
+        updates = self.gitsubmodule.update_dependencies()
+        self.assertTrue(self.mock_commit.called)
+        self.assertTrue(updates)
+
 
 class TestGetSubmoduleInfo(unittest.TestCase):
     def setUp(self) -> None:
