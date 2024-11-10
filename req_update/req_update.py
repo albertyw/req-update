@@ -21,7 +21,7 @@ from req_update.python import Python  # NOQA
 from req_update.util import Updater, Util  # NOQA
 
 
-VERSION = (2, 7, 2)
+VERSION = (2, 7, 3)
 __version__ = '.'.join(map(str, VERSION))
 
 
