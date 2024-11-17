@@ -180,8 +180,7 @@ class Util:
         ignore_exit_code: bool = False,
     ) -> SubprocessOutput:
         """Helper method to execute commands in a shell and return output"""
-        if self.verbose:
-            self.debug(' '.join(command))
+        self.debug(' '.join(command))
         if self.dry_run and not readonly:
             return subprocess.CompletedProcess(
                 command, 0, stdout='', stderr='',
@@ -220,6 +219,8 @@ class Util:
 
     def debug(self, data: str) -> None:
         """Helper method for debug-level logs"""
+        if not self.verbose:
+            return
         if not Util.is_no_color():
             data = f'\033[37m{data}\033[0m'  # color text gray
         return self._log(data)
