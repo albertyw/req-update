@@ -107,7 +107,7 @@ class TestUpdateDependencies(unittest.TestCase):
         self.mock_install = MagicMock()
         setattr(self.python, 'install_updates', self.mock_install)
         self.mock_log = MagicMock()
-        setattr(self.python.util, 'log', self.mock_log)
+        setattr(self.python.util, '_log', self.mock_log)
 
     def test_updates_made(self) -> None:
         self.mock_update.return_value = True
@@ -129,7 +129,7 @@ class TestUpdateDependenciesFile(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
         self.mock_log = MagicMock()
-        setattr(self.python.util, 'log', self.mock_log)
+        setattr(self.python.util, '_log', self.mock_log)
 
     def test_update_dependencies_file_clean(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(stdout='[]')
@@ -461,7 +461,7 @@ class TestInstallUpdates(unittest.TestCase):
         u = util.Util()
         self.python = python.Python(u)
         self.mock_log = MagicMock()
-        setattr(self.python.util, 'log', self.mock_log)
+        setattr(self.python.util, '_log', self.mock_log)
         self.mock_execute_shell = MagicMock()
         setattr(self.python.util, 'execute_shell', self.mock_execute_shell)
         self.tempfile_pyproject = tempfile.NamedTemporaryFile()

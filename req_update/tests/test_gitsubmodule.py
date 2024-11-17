@@ -87,7 +87,7 @@ class TestUpdateDependencies(unittest.TestCase):
             self.mock_commit,
         )
         self.mock_log = MagicMock()
-        setattr(self.gitsubmodule.util, 'log', self.mock_log)
+        setattr(self.gitsubmodule.util, '_log', self.mock_log)
 
     def test_no_submodule(self) -> None:
         self.mock_get_submodule_info.return_value = []

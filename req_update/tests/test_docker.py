@@ -47,7 +47,7 @@ class TestCheckApplicable(BaseTest):
     def setUp(self) -> None:
         super().setUp()
         self.mock_log = MagicMock()
-        setattr(self.docker.util, 'log', self.mock_log)
+        setattr(self.docker.util, '_log', self.mock_log)
         self.mock_warn = MagicMock()
         setattr(self.docker.util, 'warn', self.mock_warn)
 
