@@ -39,7 +39,7 @@ class Node(Updater):
 
     def update_unpinned_dependencies(self) -> bool:
         command = ['npm', 'update']
-        self.util.log('Updating npm packages')
+        self.util.info('Updating npm packages')
         self.util.execute_shell(command, False)
         clean = self.util.check_repository_cleanliness()
         if not clean:
@@ -69,7 +69,7 @@ class Node(Updater):
     def update_package(
         self, package_name: str, package: dict[str, str],
     ) -> bool:
-        self.util.log('Updating dependency: %s' % package_name)
+        self.util.info('Updating dependency: %s' % package_name)
         with open('package.json', 'r') as handle:
             package_json_string = handle.read()
         package_json = json.loads(package_json_string)
@@ -151,7 +151,7 @@ class Node(Updater):
         except subprocess.CalledProcessError as error:
             if 'Could not resolve dependency' in error.stderr:
                 return False
-            self.util.log(error.stdout)
+            self.util.info(error.stdout)
             self.util.warn(error.stderr)
             raise
         return True

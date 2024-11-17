@@ -25,7 +25,7 @@ class TestCheckRepositoryCleanliness(unittest.TestCase):
         self.util.dry_run = False
         self.mock_execute_shell = MagicMock()
         setattr(self.util, 'execute_shell', self.mock_execute_shell)
-        setattr(self.util, 'log', self.mock_log)
+        setattr(self.util, '_log', self.mock_log)
 
     def test_dry_run(self) -> None:
         self.mock_execute_shell.return_value = MagicMock(
@@ -58,7 +58,7 @@ class TestCommitGit(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
         self.mock_log = MagicMock()
-        setattr(self.util, 'log', self.mock_log)
+        setattr(self.util, '_log', self.mock_log)
         self.mock_execute_shell = MagicMock()
         setattr(self.util, 'execute_shell', self.mock_execute_shell)
 
@@ -164,7 +164,7 @@ class TestPushDependencyUpdate(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
         self.mock_log = MagicMock()
-        setattr(self.util, 'log', self.mock_log)
+        setattr(self.util, '_log', self.mock_log)
         self.mock_execute_shell = MagicMock()
         setattr(self.util, 'execute_shell', self.mock_execute_shell)
 
@@ -233,7 +233,7 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
         self.mock_log = MagicMock()
-        setattr(self.util, 'log', self.mock_log)
+        setattr(self.util, '_log', self.mock_log)
 
     def test_check_non_major_update(self) -> None:
         result = self.util.check_major_version_update(
@@ -307,7 +307,7 @@ class TestExecuteShell(unittest.TestCase):
         self.util = util.Util()
         self.util.dry_run = False
         self.mock_log = MagicMock()
-        setattr(self.util, 'log', self.mock_log)
+        setattr(self.util, '_log', self.mock_log)
 
     def test_ls(self) -> None:
         result = self.util.execute_shell(['ls'], True)
@@ -397,5 +397,5 @@ class TestLog(unittest.TestCase):
 
     def test_log(self) -> None:
         with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
-            self.util.log('asdf')
+            self.util.info('asdf')
             self.assertEqual(mock_out.getvalue(), 'asdf\n')

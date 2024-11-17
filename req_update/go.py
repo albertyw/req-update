@@ -25,10 +25,10 @@ class Go(Updater):
         Return if updates were made
         """
         command = ['go', 'get', '-u', 'all']
-        self.util.log('Updating go packages')
+        self.util.info('Updating go packages')
         self.util.execute_shell(command, False)
         command = ['go', 'mod', 'tidy']
-        self.util.log('Tidying go packages')
+        self.util.info('Tidying go packages')
         self.util.execute_shell(command, False)
         clean = self.util.check_repository_cleanliness()
         if not clean:

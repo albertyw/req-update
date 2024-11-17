@@ -53,7 +53,7 @@ class TestUpdateInstallDependencies(unittest.TestCase):
         self.mock_clean = MagicMock()
         setattr(self.go.util, 'check_repository_cleanliness', self.mock_clean)
         self.mock_log = MagicMock()
-        setattr(self.go.util, 'log', self.mock_log)
+        setattr(self.go.util, '_log', self.mock_log)
 
     def test_update_clean(self) -> None:
         self.mock_clean.return_value = True

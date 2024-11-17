@@ -25,7 +25,7 @@ class GitSubmodule(Updater):
         submodules = self.get_submodule_info()
         all_clean = True
         for submodule in submodules:
-            self.util.log('Checking dependency: %s' % submodule.path)
+            self.util.info('Checking dependency: %s' % submodule.path)
             annotated_submodule = self.annotate_submodule(submodule)
             version = self.update_submodule(annotated_submodule)
             if version:

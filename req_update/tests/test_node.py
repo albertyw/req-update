@@ -119,7 +119,7 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         self.mock_commit_git = MagicMock()
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
         self.mock_log = MagicMock()
-        setattr(self.node.util, 'log', self.mock_log)
+        setattr(self.node.util, '_log', self.mock_log)
 
     def test_install_no_updates(self) -> None:
         updates = self.node.update_unpinned_dependencies()
@@ -186,7 +186,7 @@ class TestUpdatePackage(unittest.TestCase):
         u = util.Util()
         self.node = node.Node(u)
         self.mock_log = MagicMock()
-        setattr(self.node.util, 'log', self.mock_log)
+        setattr(self.node.util, '_log', self.mock_log)
         self.temp_dir = tempfile.TemporaryDirectory()
         self.original_cwd = os.getcwd()
         os.chdir(self.temp_dir.name)
@@ -306,7 +306,7 @@ class TestInstallDependencies(unittest.TestCase):
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_log = MagicMock()
-        setattr(self.node.util, 'log', self.mock_log)
+        setattr(self.node.util, '_log', self.mock_log)
         self.mock_warn = MagicMock()
         setattr(self.node.util, 'warn', self.mock_warn)
 

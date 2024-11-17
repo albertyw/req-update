@@ -102,7 +102,7 @@ class Python(Updater):
         clean = True
         for outdated in outdated_list:
             dependency = outdated['name']
-            self.util.log('Checking dependency: %s' % dependency)
+            self.util.info('Checking dependency: %s' % dependency)
             version = outdated['latest_version']
             written = self.write_dependency_update(dependency, version)
             if written:
@@ -223,7 +223,7 @@ class Python(Updater):
         for updated_file in self.updated_requirements_files:
             command = ['pip', 'install', '-r', str(updated_file)]
             self.util.execute_shell(command, False)
-            self.util.log('Installing updated packages in %s' % updated_file)
+            self.util.info('Installing updated packages in %s' % updated_file)
         for updated_file in self.updated_pyproject_files:
             command = ['pip', 'install', '-e', '.']
             self.util.execute_shell(command, False)
@@ -246,7 +246,7 @@ class Python(Updater):
                 optional = match.group(1)
                 command = ['pip', 'install', '-e', '.[%s]' % optional]
                 self.util.execute_shell(command, False)
-            self.util.log('Installing updated packages in %s' % updated_file)
+            self.util.info('Installing updated packages in %s' % updated_file)
 
     @staticmethod
     def get_comment_alignment(lines: list[str], file_type: str) -> int:

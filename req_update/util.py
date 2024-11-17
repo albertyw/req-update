@@ -68,7 +68,7 @@ class Util:
 
     def commit_git(self, commit_message: str) -> None:
         """Create a git commit of all changed files"""
-        self.log(commit_message)
+        self.info(commit_message)
         command = ['git', 'commit', '-am', commit_message]
         self.execute_shell(command, False)
         self.push_dependency_update()
@@ -115,7 +115,7 @@ class Util:
         """Git push any commits to remote"""
         if not self.push:
             return
-        self.log('Pushing commit to git remote')
+        self.info('Pushing commit to git remote')
         command = ['git', 'push', '-u', 'origin']
         self.execute_shell(command, False)
 
@@ -180,8 +180,7 @@ class Util:
         ignore_exit_code: bool = False,
     ) -> SubprocessOutput:
         """Helper method to execute commands in a shell and return output"""
-        if self.verbose:
-            self.log(' '.join(command))
+        self.debug(' '.join(command))
         if self.dry_run and not readonly:
             return subprocess.CompletedProcess(
                 command, 0, stdout='', stderr='',
@@ -198,7 +197,7 @@ class Util:
             if ignore_exit_code:
                 return error
             if not suppress_output:
-                self.log(error.stdout)
+                self.info(error.stdout)
                 self.warn(error.stderr)
             raise
         return result
@@ -211,9 +210,21 @@ class Util:
     def warn(self, data: str) -> None:
         """Helper method for warn-level logs"""
         if not Util.is_no_color():
-            data = f'\033[93m{data}\033[0m'
-        return self.log(data)
+            data = f'\033[93m{data}\033[0m'  # color text yellow
+        return self._log(data)
 
-    def log(self, data: str) -> None:
+    def info(self, data: str) -> None:
+        """Helper method for debug-level logs"""
+        return self._log(data)
+
+    def debug(self, data: str) -> None:
+        """Helper method for debug-level logs"""
+        if not self.verbose:
+            return
+        if not Util.is_no_color():
+            data = f'\033[37m{data}\033[0m'  # color text gray
+        return self._log(data)
+
+    def _log(self, data: str) -> None:
         """Helper method for taking care of logging statements"""
         print(data)

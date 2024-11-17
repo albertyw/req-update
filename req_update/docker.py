@@ -108,8 +108,16 @@ class Docker(Updater):
             if self.util.compare_versions(new_version, version):
                 new_version = version
         if new_version == original_version:
+            self.util.debug(
+                'No updates found for %s at %s' %
+                    (dependency, original_version),
+            )
             return ''
         else:
+            self.util.debug(
+                'Found update for %s from %s to %s' %
+                    (dependency, original_version, new_version),
+            )
             return new_version
 
     def commit_dockerfile(self,
