@@ -24,6 +24,7 @@ class GithubWorkflow(Docker):
         request = Request(url)
         for key, value in GITHUB_API_HEADERS.items():
             request.add_header(key, value)
+        self.util.debug('Checking github tags for %s' % dependency)
         try:
             response = urlopen(request)
         except HTTPError:
@@ -42,6 +43,13 @@ class GithubWorkflow(Docker):
         except (IndexError, KeyError):
             return ''
         if self.util.compare_versions(original_version, tag):
+            self.util.debug(
+                'Found update for %s from %s to %s' %
+                    (dependency, original_version, tag),
+            )
             return str(tag)
         else:
+            self.util.debug(
+                'No updates found for %s at %s' % (dependency, original_version),
+            )
             return ''
