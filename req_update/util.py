@@ -49,6 +49,7 @@ class Util:
         self.ignore_cleanliness = True
         self.dry_run = True
         self.branch_exists = False
+        self.request_cache: dict[str, Any] = {}
 
     def check_repository_cleanliness(self) -> bool:
         """
@@ -237,6 +238,8 @@ class Util:
         Makes an HTTP request given a URL and headers, returns the json-parsed result
         Caches the results based on URL
         """
+        if url in self.request_cache:
+            return self.request_cache[url]
         request = Request(url)
         for key, value in headers.items():
             request.add_header(key, value)
@@ -251,4 +254,5 @@ class Util:
                 None,
                 )
         result = json.loads(response.read())
+        self.request_cache[url] = result
         return result
