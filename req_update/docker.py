@@ -1,9 +1,7 @@
 from __future__ import annotations
-import json
 from pathlib import Path
 import re
 import subprocess
-from urllib import request
 from urllib.error import HTTPError
 
 from req_update.util import Updater
@@ -93,16 +91,16 @@ class Docker(Updater):
             '/content/v1/repositories/public/%s/%s/tags?page_size=500'
             % (namespace, dependency_name)
         )
-        response = None
         try:
-            response = request.urlopen(url)
+            data = self.util.cached_request(url, {})
         except HTTPError:
-            pass
-        if not response or int(response.status/100) != 2:
             self.util.warn('Cannot read %s from hub.docker.com' % dependency)
             return ''
-        data = json.loads(response.read())
-        available_versions = [tag['name'] for tag in data['results']]
+        try:
+            available_versions = [tag['name'] for tag in data['results']]
+        except (IndexError, KeyError):
+            self.util.warn('Cannot read %s from hub.docker.com' % dependency)
+            return ''
         new_version = original_version
         for version in available_versions:
             if self.util.compare_versions(new_version, version):

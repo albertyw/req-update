@@ -1,9 +1,12 @@
 from __future__ import annotations
+import json
 import os
 from pathlib import Path
 import re
 import subprocess
-from typing import Optional, Union
+from typing import Any, Optional, Union
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 
 BRANCH_NAME = 'dep-update'
@@ -46,6 +49,7 @@ class Util:
         self.ignore_cleanliness = True
         self.dry_run = True
         self.branch_exists = False
+        self.request_cache: dict[str, Any] = {}
 
     def check_repository_cleanliness(self) -> bool:
         """
@@ -228,3 +232,27 @@ class Util:
     def _log(self, data: str) -> None:
         """Helper method for taking care of logging statements"""
         print(data)
+
+    def cached_request(self, url: str, headers: dict[str, str]) -> Any:
+        """
+        Makes an HTTP request given a URL and headers, returns the json-parsed result
+        Caches the results based on URL
+        """
+        if url in self.request_cache:
+            return self.request_cache[url]
+        request = Request(url)
+        for key, value in headers.items():
+            request.add_header(key, value)
+        self.debug('Checking %s' % url)
+        response = urlopen(request)
+        if int(response.status/100) != 2:
+            raise HTTPError(
+                url,
+                response.status,
+                'Error status',
+                response.getheaders(),
+                None,
+                )
+        result = json.loads(response.read())
+        self.request_cache[url] = result
+        return result

@@ -1,5 +1,4 @@
 from __future__ import annotations
-import json
 import os
 from pathlib import Path
 import tempfile
@@ -23,16 +22,14 @@ class BaseTest(unittest.TestCase):
         self.lines = ['FROM debian:10', 'RUN echo']
         self.update_file = self.add_update_file('Dockerfile', '\n'.join(self.lines))
 
-        self.mock_urlopen = MagicMock()
-        self.original_urlopen = docker.request.urlopen  # type:ignore
-        setattr(docker.request, 'urlopen', self.mock_urlopen)  # type:ignore
+        self.mock_request = MagicMock()
+        setattr(u, 'cached_request', self.mock_request)
         self.mock_commit = MagicMock()
         setattr(self.docker.util, 'commit_dependency_update', self.mock_commit)
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
         os.chdir(self.original_cwd)
-        setattr(docker.request, 'urlopen', self.original_urlopen)  # type:ignore
 
     def add_update_file(self, relative_path: str, contents: str) -> Path:
         absolute_path = Path(os.getcwd()) / relative_path
@@ -63,10 +60,7 @@ class TestCheckApplicable(BaseTest):
 
 class TestUpdateDependencies(BaseTest):
     def test_update(self) -> None:
-        self.mock_urlopen().status = 200
-        self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '12'}]},
-        )
+        self.mock_request.return_value = {'results': [{'name': '12'}]}
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
@@ -77,10 +71,7 @@ class TestUpdateDependencies(BaseTest):
         )
 
     def test_no_update(self) -> None:
-        self.mock_urlopen().status = 200
-        self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '10'}]},
-        )
+        self.mock_request.return_value = {'results': [{'name': '10'}]}
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
@@ -88,10 +79,7 @@ class TestUpdateDependencies(BaseTest):
     def test_multiple_update(self) -> None:
         with open(self.update_file, 'w') as handle:
             handle.write('FROM debian:10\nFROM debian:11')
-        self.mock_urlopen().status = 200
-        self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '12'}]},
-        )
+        self.mock_request.return_value = {'results': [{'name': '12'}]}
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
@@ -149,36 +137,23 @@ class TestFindUpdatedVersion(BaseTest):
         setattr(self.docker.util, 'warn', self.mock_warn)
 
     def test_updates(self) -> None:
-        self.mock_urlopen().status = 200
-        self.mock_urlopen().read.return_value = json.dumps(
-            {'results': [{'name': '12'}]},
-        )
+        self.mock_request.return_value = {'results': [{'name': '12'}]}
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '12')
-        self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
-        self.assertTrue(self.mock_urlopen().read.called)
-
-    def test_warns_on_error(self) -> None:
-        self.mock_urlopen().status = 404
-        version = self.docker.find_updated_version('debian', '10')
-        self.assertEqual(version, '')
-        self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
-        self.assertFalse(self.mock_urlopen().read.called)
-        self.assertTrue(self.mock_warn.called)
+        self.assertIn('library/debian', self.mock_request.call_args[0][0])
 
     def test_warns_on_exception(self) -> None:
-        self.mock_urlopen.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
+        self.mock_request.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '')
-        self.assertIn('library/debian', self.mock_urlopen.call_args[0][0])
+        self.assertIn('library/debian', self.mock_request.call_args[0][0])
         self.assertTrue(self.mock_warn.called)
 
     def test_namespaced_library(self) -> None:
-        self.mock_urlopen().status = 404
+        self.mock_request.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
         version = self.docker.find_updated_version('albertyw/ssh-client', '10')
         self.assertEqual(version, '')
-        self.assertIn('albertyw/ssh-client', self.mock_urlopen.call_args[0][0])
-        self.assertFalse(self.mock_urlopen().read.called)
+        self.assertIn('albertyw/ssh-client', self.mock_request.call_args[0][0])
         self.assertTrue(self.mock_warn.called)
 
     def test_skips_latest(self) -> None:
