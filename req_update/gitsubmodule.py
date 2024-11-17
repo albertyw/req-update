@@ -131,7 +131,6 @@ class GitSubmodule(Updater):
         return version
 
 
-# TODO: After python 3.7 support is dropped, switch this to a TypedDict
 class Submodule:
     def __init__(self, path: Path) -> None:
         self.path: Path = path
@@ -139,7 +138,6 @@ class Submodule:
         self.remote_commit: Optional[VersionInfo] = None
 
 
-# TODO: After python 3.7 support is dropped, switch this to a TypedDict
 class VersionInfo(NamedTuple):
     version_name: str
     version_date: datetime.datetime
