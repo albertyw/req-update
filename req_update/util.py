@@ -211,9 +211,19 @@ class Util:
     def warn(self, data: str) -> None:
         """Helper method for warn-level logs"""
         if not Util.is_no_color():
-            data = f'\033[93m{data}\033[0m'
+            data = f'\033[93m{data}\033[0m'  # color text yellow
         return self.log(data)
 
-    def log(self, data: str) -> None:
+    def info(self, data: str) -> None:
+        """Helper method for debug-level logs"""
+        return self.log(data)
+
+    def debug(self, data: str) -> None:
+        """Helper method for debug-level logs"""
+        if not Util.is_no_color():
+            data = f'\033[37m{data}\033[0m'  # color text gray
+        return self.log(data)
+
+    def _log(self, data: str) -> None:
         """Helper method for taking care of logging statements"""
         print(data)
