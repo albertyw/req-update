@@ -149,6 +149,13 @@ class TestFindUpdatedVersion(BaseTest):
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
         self.assertTrue(self.mock_warn.called)
 
+    def test_warns_on_unparseable(self) -> None:
+        self.mock_request.return_value = {}
+        version = self.docker.find_updated_version('debian', '10')
+        self.assertEqual(version, '')
+        self.assertIn('library/debian', self.mock_request.call_args[0][0])
+        self.assertTrue(self.mock_warn.called)
+
     def test_namespaced_library(self) -> None:
         self.mock_request.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
         version = self.docker.find_updated_version('albertyw/ssh-client', '10')
