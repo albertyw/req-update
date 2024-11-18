@@ -97,8 +97,8 @@ class Docker(Updater):
         # https://hub.docker.com/v2/repositories/library/debian/tags
         # Documentation: https://docs.docker.com/reference/api/hub/latest/#tag/repositories/paths/
         url = (
-            'https://registry.hub.docker.com/api'
-            '/content/v1/repositories/public/%s/%s/tags?page_size=100'
+            'https://hub.docker.com/'
+            'v2/repositories/%s/%s/tags?page_size=100'
             % (namespace, dependency_name)
         )
         try:
