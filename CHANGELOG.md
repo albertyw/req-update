@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+2.7.4 (2024-11-17)
+------------------
+
+ - Drop support for python 3.7 and 3.8
+ - Improve logging
+ - Cache network requests for speed
+ - Improve ability for docker/drone update to find newer versions
+ - Update dependencies
+
+
 2.7.3 (2024-11-10)
 ------------------
 
