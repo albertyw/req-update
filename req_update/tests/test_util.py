@@ -1,10 +1,12 @@
 from __future__ import annotations
 import io
+import json
 import os
 from pathlib import Path
 import subprocess
 import unittest
 from unittest.mock import MagicMock, patch
+from urllib.error import HTTPError
 
 from req_update import util
 
@@ -440,3 +442,54 @@ class TestLog(unittest.TestCase):
         with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
             self.util.info('asdf')
             self.assertEqual(mock_out.getvalue(), 'asdf\n')
+
+
+class TestCachedRequest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_urlopen = MagicMock()
+        self.original_urlopen = util.urlopen  # type: ignore
+        setattr(util, 'urlopen', self.mock_urlopen)
+
+    def tearDown(self) -> None:
+        setattr(util, 'urlopen', self.original_urlopen)
+
+    def test_cached_request(self) -> None:
+        mock_response_content = {'asdf': 'qwer'}
+        url = 'https://www.albertyw.com'
+        self.mock_urlopen.return_value = MagicMock(
+            status=200,
+            read=lambda: json.dumps(mock_response_content).encode('utf-8'),
+        )
+        result = self.util.cached_request(url, {})
+        self.assertEqual(result, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        result2 = self.util.cached_request(url, {})
+        self.assertEqual(result2, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        self.assertEqual(self.util.request_cache[url], mock_response_content)
+
+    def test_error(self) -> None:
+        url = 'https://www.albertyw.com'
+        self.mock_urlopen.return_value = MagicMock(
+            status=404,
+        )
+        with self.assertRaises(HTTPError):
+            self.util.cached_request(url, {})
+
+    def test_headers(self) -> None:
+        mock_response_content = {'asdf': 'qwer'}
+        url = 'https://www.albertyw.com'
+        self.mock_urlopen.return_value = MagicMock(
+            status=200,
+            read=lambda: json.dumps(mock_response_content).encode('utf-8'),
+        )
+        result = self.util.cached_request(url, {'header': 'value'})
+        self.assertEqual(result, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        self.assertEqual(self.mock_urlopen.call_args[0][0].headers['Header'], 'value')
+
+        result2 = self.util.cached_request(url, {'header2': 'value2'})
+        self.assertEqual(result2, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        self.assertEqual(self.util.request_cache[url], mock_response_content)
