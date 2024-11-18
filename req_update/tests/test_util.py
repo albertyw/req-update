@@ -375,7 +375,7 @@ class TestWarn(unittest.TestCase):
     def tearDown(self) -> None:
         if self.original_env is not None:
             os.environ['NO_COLOR'] = self.original_env  # pragma: no cover
-        elif 'NO_COLOR' in os.environ:
+        elif os.environ.get('NO_COLOR') is not None:
             del os.environ['NO_COLOR']
 
     def test_warn(self) -> None:
@@ -406,13 +406,13 @@ class TestInfo(unittest.TestCase):
 class TestDebug(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
-        self.original_env = os.getenv('DEBUG', None)
+        self.original_env = os.getenv('NO_COLOR', None)
 
     def tearDown(self) -> None:
         if self.original_env is not None:
-            os.environ['DEBUG'] = self.original_env
-        elif 'DEBUG' in os.environ:
-            del os.environ['DEBUG']
+            os.environ['NO_COLOR'] = self.original_env  # pragma: no cover
+        elif os.environ.get('NO_COLOR') is not None:
+            del os.environ['NO_COLOR']
 
     def test_debug(self) -> None:
         with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
