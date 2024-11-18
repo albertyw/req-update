@@ -1,10 +1,12 @@
 from __future__ import annotations
 import io
+import json
 import os
 from pathlib import Path
 import subprocess
 import unittest
 from unittest.mock import MagicMock, patch
+from urllib.error import HTTPError
 
 from req_update import util
 
@@ -391,6 +393,47 @@ class TestWarn(unittest.TestCase):
             self.assertEqual(mock_out.getvalue(), 'asdf\n')
 
 
+class TestInfo(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+
+    def test_info(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.util.info('asdf')
+            self.assertEqual(mock_out.getvalue(), 'asdf\n')
+
+
+class TestDebug(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.original_env = os.getenv('DEBUG', None)
+
+    def tearDown(self) -> None:
+        if self.original_env is not None:
+            os.environ['DEBUG'] = self.original_env
+        elif 'DEBUG' in os.environ:
+            del os.environ['DEBUG']
+
+    def test_debug(self) -> None:
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.util.debug('asdf')
+            self.assertEqual(mock_out.getvalue(), '')
+
+    def test_debug_verbose(self) -> None:
+        self.util.verbose = True
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.util.debug('asdf')
+            self.assertIn('asdf', mock_out.getvalue())
+            self.assertNotEqual(mock_out.getvalue(), 'asdf\n')
+
+    def test_debug_verbose_no_color(self) -> None:
+        os.environ['NO_COLOR'] = 'true'
+        self.util.verbose = True
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
+            self.util.debug('asdf')
+            self.assertEqual(mock_out.getvalue(), 'asdf\n')
+
+
 class TestLog(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
@@ -399,3 +442,54 @@ class TestLog(unittest.TestCase):
         with patch('sys.stdout', new_callable=io.StringIO) as mock_out:
             self.util.info('asdf')
             self.assertEqual(mock_out.getvalue(), 'asdf\n')
+
+
+class TestCachedRequest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+        self.mock_urlopen = MagicMock()
+        self.original_urlopen = util.urlopen  # type: ignore
+        setattr(util, 'urlopen', self.mock_urlopen)
+
+    def tearDown(self) -> None:
+        setattr(util, 'urlopen', self.original_urlopen)
+
+    def test_cached_request(self) -> None:
+        mock_response_content = {'asdf': 'qwer'}
+        url = 'https://www.albertyw.com'
+        self.mock_urlopen.return_value = MagicMock(
+            status=200,
+            read=lambda: json.dumps(mock_response_content).encode('utf-8'),
+        )
+        result = self.util.cached_request(url, {})
+        self.assertEqual(result, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        result2 = self.util.cached_request(url, {})
+        self.assertEqual(result2, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        self.assertEqual(self.util.request_cache[url], mock_response_content)
+
+    def test_error(self) -> None:
+        url = 'https://www.albertyw.com'
+        self.mock_urlopen.return_value = MagicMock(
+            status=404,
+        )
+        with self.assertRaises(HTTPError):
+            self.util.cached_request(url, {})
+
+    def test_headers(self) -> None:
+        mock_response_content = {'asdf': 'qwer'}
+        url = 'https://www.albertyw.com'
+        self.mock_urlopen.return_value = MagicMock(
+            status=200,
+            read=lambda: json.dumps(mock_response_content).encode('utf-8'),
+        )
+        result = self.util.cached_request(url, {'header': 'value'})
+        self.assertEqual(result, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        self.assertEqual(self.mock_urlopen.call_args[0][0].headers['Header'], 'value')
+
+        result2 = self.util.cached_request(url, {'header2': 'value2'})
+        self.assertEqual(result2, mock_response_content)
+        self.mock_urlopen.assert_called_once()
+        self.assertEqual(self.util.request_cache[url], mock_response_content)
