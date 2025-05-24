@@ -27,8 +27,8 @@ dynamic = ["version", "readme"]
 [project.optional-dependencies]
 test = [
     # Testing
-    "coverage==7.6.12",       # Test coverage
-    "ruff==0.9.10",           # Python linter
+    "coverage==7.8.2",        # Test coverage
+    "ruff==0.11.11",          # Python linter
 
     # Types
     "mypy==1.15.0",           # Static typing
