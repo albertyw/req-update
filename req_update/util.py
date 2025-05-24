@@ -175,6 +175,29 @@ class Util:
         )
         return True
 
+    def generate_next_versions(self, current: str) -> list[str]:
+        """
+        Given a version string, generate a list of next versions
+        Assume the current version is semver or a series of incremented numbers
+        """
+        # Parse the version string
+        version_regex = re.compile(r"([0-9]+)")
+        matches = version_regex.split(current)
+        versions: list[str] = []
+        i = len(matches) - 1
+        while i >= 0:
+            match = matches[i]
+            if match.isdigit():
+                next_version = "".join(
+                    matches[:i]
+                    + [str(int(match) + 1)]
+                    + matches[i + 1:],
+                )
+                versions.append(next_version)
+                matches[i] = "0"
+            i -= 1
+        return versions
+
     def execute_shell(
         self,
         command: list[str],
