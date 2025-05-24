@@ -9,6 +9,14 @@ from unittest.mock import MagicMock
 from req_update import docker, util
 
 
+def debian_side_effect(url: str, params: dict[str, str]) -> bool:
+    if '11' in url:
+        return True
+    if '12' in url:
+        return True
+    raise HTTPError(url, 404, 'Not Found', None, None)  # type:ignore
+
+
 class BaseTest(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()
@@ -60,7 +68,7 @@ class TestCheckApplicable(BaseTest):
 
 class TestUpdateDependencies(BaseTest):
     def test_update(self) -> None:
-        self.mock_request.return_value = {'results': [{'name': '12'}]}
+        self.mock_request.side_effect = debian_side_effect
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
@@ -71,7 +79,7 @@ class TestUpdateDependencies(BaseTest):
         )
 
     def test_no_update(self) -> None:
-        self.mock_request.return_value = {'results': [{'name': '10'}]}
+        self.mock_request.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
@@ -79,7 +87,7 @@ class TestUpdateDependencies(BaseTest):
     def test_multiple_update(self) -> None:
         with open(self.update_file, 'w') as handle:
             handle.write('FROM debian:10\nFROM debian:11')
-        self.mock_request.return_value = {'results': [{'name': '12'}]}
+        self.mock_request.side_effect = debian_side_effect
         self.docker.update_dependencies()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
@@ -137,7 +145,7 @@ class TestFindUpdatedVersion(BaseTest):
         setattr(self.docker.util, 'warn', self.mock_warn)
 
     def test_updates(self) -> None:
-        self.mock_request.return_value = {'results': [{'name': '12'}]}
+        self.mock_request.side_effect = debian_side_effect
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '12')
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
@@ -148,22 +156,13 @@ class TestFindUpdatedVersion(BaseTest):
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '')
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
-        self.assertTrue(self.mock_warn.called)
         self.assertEqual(self.docker.known_versions['debian'], '10')
-
-    def test_warns_on_unparseable(self) -> None:
-        self.mock_request.return_value = {}
-        version = self.docker.find_updated_version('debian', '10')
-        self.assertEqual(version, '')
-        self.assertIn('library/debian', self.mock_request.call_args[0][0])
-        self.assertTrue(self.mock_warn.called)
 
     def test_namespaced_library(self) -> None:
         self.mock_request.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
         version = self.docker.find_updated_version('albertyw/ssh-client', '10')
         self.assertEqual(version, '')
         self.assertIn('albertyw/ssh-client', self.mock_request.call_args[0][0])
-        self.assertTrue(self.mock_warn.called)
         self.assertEqual(self.docker.known_versions['albertyw/ssh-client'], '10')
 
     def test_skips_latest(self) -> None:

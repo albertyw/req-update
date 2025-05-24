@@ -91,29 +91,9 @@ class Docker(Updater):
             else:
                 namespace = 'library'
                 dependency_name = dependency
-            # Both seem to work:
-            # https://registry.hub.docker.com/api/content/v1/repositories/public/library/debian/tags
-            # https://hub.docker.com/v2/repositories/library/debian/tags
-            # Documentation: https://docs.docker.com/reference/api/hub/latest/#tag/repositories/paths/
-            url = (
-                'https://hub.docker.com/'
-                'v2/repositories/%s/%s/tags?page_size=100'
-                % (namespace, dependency_name)
+            new_version = self._check_new_versions(
+                namespace, dependency_name, original_version,
             )
-            try:
-                data = self.util.cached_request(url, {})
-            except HTTPError:
-                self.util.warn('Cannot read %s from hub.docker.com' % dependency)
-                data = {'results': []}
-            try:
-                available_versions = [tag['name'] for tag in data['results']]
-            except (IndexError, KeyError):
-                self.util.warn('Cannot read %s from hub.docker.com' % dependency)
-                return ''
-            new_version = original_version
-            for version in available_versions:
-                if self.util.compare_versions(new_version, version):
-                    new_version = version
             self.known_versions[dependency] = new_version
         if new_version == original_version:
             self.util.debug(
@@ -127,6 +107,27 @@ class Docker(Updater):
                     (dependency, original_version, new_version),
             )
             return new_version
+
+    def _check_new_versions(
+        self, namespace: str, dependency_name: str, version: str,
+    ) -> str:
+        new_versions = self.util.generate_next_versions(version)
+        for new_version in new_versions:
+            # Both seem to work:
+            # https://registry.hub.docker.com/api/content/v1/repositories/public/library/debian/tags
+            # https://hub.docker.com/v2/repositories/library/debian/tags
+            # Documentation: https://docs.docker.com/reference/api/hub/latest/#tag/repositories/paths/
+            url = (
+                'https://hub.docker.com/'
+                'v2/repositories/%s/%s/tags/%s'
+                % (namespace, dependency_name, new_version)
+            )
+            try:
+                self.util.cached_request(url, {})
+            except HTTPError:
+                continue
+            return self._check_new_versions(namespace, dependency_name, new_version)
+        return version
 
     def commit_dockerfile(self,
         update_file: Path,
