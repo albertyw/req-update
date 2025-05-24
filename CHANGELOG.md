@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.7.5 (2025-05-24)
+------------------
+
+ - Improve finding newer versions of docker/drone dependencies
+ - Update dependencies
+
+
 2.7.4 (2024-11-17)
 ------------------
 
