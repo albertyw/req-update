@@ -304,6 +304,27 @@ class TestCheckMajorVersionUpdate(unittest.TestCase):
         self.assertFalse(result)
 
 
+class TestGenerateNextVersions(unittest.TestCase):
+    def setUp(self) -> None:
+        self.util = util.Util()
+
+    def test_generate_next_versions(self) -> None:
+        tests: dict[str, list[str]] = {
+            '1.0.0': ['1.0.1', '1.1.0', '2.0.0'],
+            '1.2.3': ['1.2.4', '1.3.0', '2.0.0'],
+            '1.0.0-alpha': ['1.0.1-alpha', '1.1.0-alpha', '2.0.0-alpha'],
+            '1.0.0-alpha.1': [
+                '1.0.0-alpha.2', '1.0.1-alpha.0',
+                '1.1.0-alpha.0', '2.0.0-alpha.0',
+            ],
+            'satantime/puppeteer-node:23-bookworm-slim': [
+                'satantime/puppeteer-node:24-bookworm-slim',
+            ],
+        }
+        for version, next_versions in tests.items():
+            result = self.util.generate_next_versions(version)
+            self.assertEqual(result, next_versions)
+
 class TestExecuteShell(unittest.TestCase):
     def setUp(self) -> None:
         self.util = util.Util()
