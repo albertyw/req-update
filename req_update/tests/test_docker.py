@@ -141,7 +141,7 @@ class TestFindUpdatedVersion(BaseTest):
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '12')
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
-        self.assertEqual(self.docker.known_versions['debian'], set(['10']))
+        self.assertEqual(self.docker.known_versions['debian'], '12')
 
     def test_warns_on_exception(self) -> None:
         self.mock_request.side_effect = HTTPError('url', 404, 'msg', None, None) # type:ignore
@@ -149,7 +149,7 @@ class TestFindUpdatedVersion(BaseTest):
         self.assertEqual(version, '')
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
         self.assertTrue(self.mock_warn.called)
-        self.assertEqual(self.docker.known_versions['debian'], set(['10']))
+        self.assertEqual(self.docker.known_versions['debian'], '10')
 
     def test_warns_on_unparseable(self) -> None:
         self.mock_request.return_value = {}
@@ -164,19 +164,17 @@ class TestFindUpdatedVersion(BaseTest):
         self.assertEqual(version, '')
         self.assertIn('albertyw/ssh-client', self.mock_request.call_args[0][0])
         self.assertTrue(self.mock_warn.called)
-        self.assertEqual(self.docker.known_versions['albertyw/ssh-client'], set(['10']))
+        self.assertEqual(self.docker.known_versions['albertyw/ssh-client'], '10')
 
     def test_skips_latest(self) -> None:
         version = self.docker.find_updated_version('debian', 'latest')
         self.assertEqual(version, '')
 
     def test_uses_known_versions(self) -> None:
-        self.docker.known_versions['debian'] = set(['13'])
-        self.mock_request.return_value = {'results': [{'name': '12'}]}
+        self.docker.known_versions['debian'] = '13'
         version = self.docker.find_updated_version('debian', '10')
         self.assertEqual(version, '13')
-        self.assertIn('library/debian', self.mock_request.call_args[0][0])
-        self.assertEqual(self.docker.known_versions['debian'], set(['10', '13']))
+        self.assertEqual(self.docker.known_versions['debian'], '13')
 
 
 class TestCommitDockerfile(BaseTest):

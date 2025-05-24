@@ -16,7 +16,7 @@ class Docker(Updater):
         super().__init__(util)
         # Cache of known versions for each dependency
         # This is required because hub.docker.com's APIs are limited to 100 items
-        self.known_versions: dict[str, set[str]] = {}
+        self.known_versions: dict[str, str] = {}
 
     def check_applicable(self) -> bool:
         return len(self.get_update_files()) > 0
@@ -83,38 +83,38 @@ class Docker(Updater):
         if original_version == 'latest':
             self.util.warn('Cannot update docker image when using "latest"')
             return ''
-        known_versions = self.known_versions.get(dependency, set())
-        known_versions.add(original_version)
-        self.known_versions[dependency] = known_versions
-        if dependency.count('/') == 1:
-            namespace = dependency.split('/')[0]
-            dependency_name = dependency.split('/')[1]
-        else:
-            namespace = 'library'
-            dependency_name = dependency
-        # Both seem to work:
-        # https://registry.hub.docker.com/api/content/v1/repositories/public/library/debian/tags
-        # https://hub.docker.com/v2/repositories/library/debian/tags
-        # Documentation: https://docs.docker.com/reference/api/hub/latest/#tag/repositories/paths/
-        url = (
-            'https://hub.docker.com/'
-            'v2/repositories/%s/%s/tags?page_size=100'
-            % (namespace, dependency_name)
-        )
-        try:
-            data = self.util.cached_request(url, {})
-        except HTTPError:
-            self.util.warn('Cannot read %s from hub.docker.com' % dependency)
-            return ''
-        try:
-            available_versions = [tag['name'] for tag in data['results']]
-        except (IndexError, KeyError):
-            self.util.warn('Cannot read %s from hub.docker.com' % dependency)
-            return ''
-        new_version = original_version
-        for version in available_versions + list(known_versions):
-            if self.util.compare_versions(new_version, version):
-                new_version = version
+        new_version = self.known_versions.get(dependency, '')
+        if not new_version:
+            if dependency.count('/') == 1:
+                namespace = dependency.split('/')[0]
+                dependency_name = dependency.split('/')[1]
+            else:
+                namespace = 'library'
+                dependency_name = dependency
+            # Both seem to work:
+            # https://registry.hub.docker.com/api/content/v1/repositories/public/library/debian/tags
+            # https://hub.docker.com/v2/repositories/library/debian/tags
+            # Documentation: https://docs.docker.com/reference/api/hub/latest/#tag/repositories/paths/
+            url = (
+                'https://hub.docker.com/'
+                'v2/repositories/%s/%s/tags?page_size=100'
+                % (namespace, dependency_name)
+            )
+            try:
+                data = self.util.cached_request(url, {})
+            except HTTPError:
+                self.util.warn('Cannot read %s from hub.docker.com' % dependency)
+                data = {'results': []}
+            try:
+                available_versions = [tag['name'] for tag in data['results']]
+            except (IndexError, KeyError):
+                self.util.warn('Cannot read %s from hub.docker.com' % dependency)
+                return ''
+            new_version = original_version
+            for version in available_versions:
+                if self.util.compare_versions(new_version, version):
+                    new_version = version
+            self.known_versions[dependency] = new_version
         if new_version == original_version:
             self.util.debug(
                 'No updates found for %s at %s' %
