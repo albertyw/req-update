@@ -6,13 +6,12 @@ authors = [
 description = "Update python, node, go, docker, and other dependencies"
 requires-python = ">=3.9"
 keywords = ["dependencies"]
-license = {text = "MIT"}
+license = "MIT"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Topic :: Software Development :: Version Control",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
