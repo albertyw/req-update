@@ -31,6 +31,7 @@ steps:
     image: python:3.13
     commands:
       - pip install build twine
+      - rm -rf tmp
       - python -m build
       - twine check --strict dist/*
 
@@ -45,6 +46,7 @@ steps:
     image: python:3.13
     commands:
       - pip install build twine
+      - rm -rf tmp
       - python -m build
       - twine upload dist/*
     when:
