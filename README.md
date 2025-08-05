@@ -5,8 +5,8 @@
 ![PyPI - License](https://img.shields.io/pypi/l/req-update)
 
 [![Build Status](https://drone.albertyw.com/api/badges/albertyw/req-update/status.svg)](https://drone.albertyw.com/albertyw/req-update)
-[![Code Climate](https://codeclimate.com/github/albertyw/req-update/badges/gpa.svg)](https://codeclimate.com/github/albertyw/req-update)
-[![Test Coverage](https://codeclimate.com/github/albertyw/req-update/badges/coverage.svg)](https://codeclimate.com/github/albertyw/req-update/coverage)
+[![Maintainability](https://qlty.sh/gh/albertyw/projects/req-update/maintainability.svg)](https://qlty.sh/gh/albertyw/projects/req-update)
+[![Code Coverage](https://qlty.sh/gh/albertyw/projects/req-update/coverage.svg)](https://qlty.sh/gh/albertyw/projects/req-update)
 
 `req-update` is a CLI tool to automatically update python, go, node, and git submodule dependencies.
 
