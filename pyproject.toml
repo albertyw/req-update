@@ -4,7 +4,7 @@ authors = [
     {name = "Albert Wang", email = "git@albertyw.com"},
 ]
 description = "Update python, node, go, docker, and other dependencies"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["dependencies"]
 license = "MIT"
 classifiers = [
@@ -13,7 +13,6 @@ classifiers = [
     "Natural Language :: English",
     "Topic :: Software Development :: Version Control",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
