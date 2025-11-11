@@ -138,7 +138,7 @@ class Util:
         num_regex = re.compile(r"\d+")
         current_nums = num_regex.findall(current)
         proposed_nums = num_regex.findall(proposed)
-        for compares in zip(current_nums, proposed_nums):
+        for compares in zip(current_nums, proposed_nums, strict=True):
             if int(compares[0]) < int(compares[1]):
                 return True
             if int(compares[0]) > int(compares[1]):
