@@ -2,9 +2,8 @@ from __future__ import annotations
 from pathlib import Path
 import re
 import subprocess
-from urllib.error import HTTPError
 
-from req_update.util import Updater, Util
+from req_update.util import HTTPError, Updater, Util
 
 
 class Docker(Updater):

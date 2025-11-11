@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import subprocess
 from typing import Any, Optional, Union
-from urllib.error import HTTPError
+import urllib.error
 from urllib.request import Request, urlopen
 
 
@@ -267,7 +267,16 @@ class Util:
         for key, value in headers.items():
             request.add_header(key, value)
         self.debug('Checking %s' % url)
-        response = urlopen(request)
+        try:
+            response = urlopen(request)
+        except urllib.error.HTTPError as error:
+            raise HTTPError(
+                url,
+                error.code,
+                error.reason,
+                error.headers,
+                error.fp,
+            ) from error
         if int(response.status/100) != 2:
             raise HTTPError(
                 url,
@@ -279,3 +288,22 @@ class Util:
         result = json.loads(response.read())
         self.request_cache[url] = result
         return result
+
+
+class HTTPError(RuntimeError):
+    """Custom HTTP error to avoid importing urllib.error"""
+
+    def __init__(
+        self,
+        url: str,
+        code: int,
+        msg: str,
+        hdrs: Any,
+        fp: Optional[Any],
+    ) -> None:
+        super().__init__(f'HTTP Error {code} for url: {url} - {msg}')
+        self.url = url
+        self.code = code
+        self.msg = msg
+        self.hdrs = hdrs
+        self.fp = fp
