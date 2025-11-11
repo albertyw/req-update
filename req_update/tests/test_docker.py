@@ -3,21 +3,17 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from urllib.error import HTTPError
 from unittest.mock import MagicMock
 
 from req_update import docker, util
 
 
-def generate_debian_side_effect() -> tuple[callable[[str, dict[str, str]], bool], HTTPError]:
-    http_error = HTTPError('', 404, 'Not Found', None, None)
-    def debian_side_effect(url: str, params: dict[str, str]) -> bool:
-        if '11' in url:
-            return True
-        if '12' in url:
-            return True
-        raise http_error
-    return debian_side_effect, http_error
+def debian_side_effect(url: str, params: dict[str, str]) -> bool:
+    if '11' in url:
+        return True
+    if '12' in url:
+        return True
+    raise util.HTTPError('', 404, 'Not Found', None, None)
 
 
 class BaseTest(unittest.TestCase):
@@ -71,10 +67,8 @@ class TestCheckApplicable(BaseTest):
 
 class TestUpdateDependencies(BaseTest):
     def test_update(self) -> None:
-        side_effect, http_error = generate_debian_side_effect()
-        self.mock_request.side_effect = side_effect
+        self.mock_request.side_effect = debian_side_effect
         self.docker.update_dependencies()
-        http_error.close()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'RUN echo'])
         self.assertEqual(len(self.mock_commit.call_args_list), 1)
@@ -84,20 +78,16 @@ class TestUpdateDependencies(BaseTest):
         )
 
     def test_no_update(self) -> None:
-        http_error = HTTPError('url', 404, 'msg', None, None) # type:ignore
-        self.mock_request.side_effect = http_error
+        self.mock_request.side_effect = util.HTTPError('url', 404, 'msg', None, None)
         self.docker.update_dependencies()
-        http_error.close()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:10', 'RUN echo'])
 
     def test_multiple_update(self) -> None:
         with open(self.update_file, 'w') as handle:
             handle.write('FROM debian:10\nFROM debian:11')
-        side_effect, http_error = generate_debian_side_effect()
-        self.mock_request.side_effect = side_effect
+        self.mock_request.side_effect = debian_side_effect
         self.docker.update_dependencies()
-        http_error.close()
         lines = self.docker.read_update_file(self.update_file)
         self.assertEqual(lines, ['FROM debian:12', 'FROM debian:12'])
         self.assertEqual(len(self.mock_commit.call_args_list), 2)
@@ -154,28 +144,22 @@ class TestFindUpdatedVersion(BaseTest):
         setattr(self.docker.util, 'warn', self.mock_warn)
 
     def test_updates(self) -> None:
-        side_effect, http_error = generate_debian_side_effect()
-        self.mock_request.side_effect = side_effect
+        self.mock_request.side_effect = debian_side_effect
         version = self.docker.find_updated_version('debian', '10')
-        http_error.close()
         self.assertEqual(version, '12')
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
         self.assertEqual(self.docker.known_versions['debian'], '12')
 
     def test_warns_on_exception(self) -> None:
-        http_error = HTTPError('url', 404, 'msg', None, None) # type:ignore
-        self.mock_request.side_effect = http_error
+        self.mock_request.side_effect = util.HTTPError('url', 404, 'msg', None, None)
         version = self.docker.find_updated_version('debian', '10')
-        http_error.close()
         self.assertEqual(version, '')
         self.assertIn('library/debian', self.mock_request.call_args[0][0])
         self.assertEqual(self.docker.known_versions['debian'], '10')
 
     def test_namespaced_library(self) -> None:
-        http_error = HTTPError('url', 404, 'msg', None, None) # type:ignore
-        self.mock_request.side_effect = http_error
+        self.mock_request.side_effect = util.HTTPError('url', 404, 'msg', None, None)
         version = self.docker.find_updated_version('albertyw/ssh-client', '10')
-        http_error.close()
         self.assertEqual(version, '')
         self.assertIn('albertyw/ssh-client', self.mock_request.call_args[0][0])
         self.assertEqual(self.docker.known_versions['albertyw/ssh-client'], '10')

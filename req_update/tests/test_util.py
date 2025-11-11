@@ -6,7 +6,6 @@ from pathlib import Path
 import subprocess
 import unittest
 from unittest.mock import MagicMock, patch
-from urllib.error import HTTPError
 
 from req_update import util
 
@@ -495,7 +494,7 @@ class TestCachedRequest(unittest.TestCase):
         self.mock_urlopen.return_value = MagicMock(
             status=404,
         )
-        with self.assertRaises(HTTPError):
+        with self.assertRaises(util.HTTPError):
             self.util.cached_request(url, {})
 
     def test_headers(self) -> None:

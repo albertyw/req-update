@@ -1,6 +1,5 @@
 from __future__ import annotations
 import unittest
-from urllib.error import HTTPError
 from unittest.mock import MagicMock
 
 from req_update import githubworkflow, util
@@ -25,7 +24,8 @@ class TestFindUpdatedVersion(unittest.TestCase):
         self.assertFalse(self.mock_warn.called)
 
     def test_http_error(self) -> None:
-        self.mock_request.side_effect = HTTPError('url', 404, 'not found', None, None)  # type: ignore
+        http_error = util.HTTPError('url', 404, 'not found', None, None)
+        self.mock_request.side_effect = http_error
         version = self.githubworkflow.find_updated_version('albertyw/git-browse', '1')
         self.assertEqual(version, '')
         self.assertTrue(self.mock_warn.called)

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import re
-from urllib.error import HTTPError
 
 from req_update.docker import Docker
+from req_update.util import HTTPError
 
 
 GITHUB_API_HEADERS = {

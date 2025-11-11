@@ -5,7 +5,6 @@ from pathlib import Path
 import re
 import subprocess
 from typing import Any, Optional, Union
-from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 
@@ -279,3 +278,22 @@ class Util:
         result = json.loads(response.read())
         self.request_cache[url] = result
         return result
+
+
+class HTTPError(RuntimeError):
+    """Custom HTTP error to avoid importing urllib.error"""
+
+    def __init__(
+        self,
+        url: str,
+        code: int,
+        msg: str,
+        hdrs: Any,
+        fp: Optional[Any],
+    ) -> None:
+        super().__init__(f'HTTP Error {code} for url: {url} - {msg}')
+        self.url = url
+        self.code = code
+        self.msg = msg
+        self.hdrs = hdrs
+        self.fp = fp
