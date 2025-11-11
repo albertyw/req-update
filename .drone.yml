@@ -28,7 +28,7 @@ steps:
     depends_on:
       - Test Python 3.10
       - Test Python 3.14
-    image: python:3.13
+    image: python:3.14
     commands:
       - pip install build twine
       - rm -rf tmp
