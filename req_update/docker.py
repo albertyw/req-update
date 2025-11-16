@@ -123,7 +123,8 @@ class Docker(Updater):
             )
             try:
                 self.util.cached_request(url, {})
-            except HTTPError:
+            except HTTPError as e:
+                self.util.debug('Invalid version: %s' % e)
                 continue
             return self._check_new_versions(namespace, dependency_name, new_version)
         return version
