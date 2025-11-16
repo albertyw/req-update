@@ -264,6 +264,7 @@ class Util:
         if url in self.request_cache:
             return self.request_cache[url]
         request = Request(url)
+        headers['User-Agent'] = 'github.com/albertyw/req-update'
         for key, value in headers.items():
             request.add_header(key, value)
         self.debug('Checking %s' % url)
