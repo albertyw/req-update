@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.7.6 (2025-11-16)
+------------------
+
+ - Set user-agent to fix reading hub.docker.com APIs
+ - Support Python 3.14; Unsupport Python 3.9
+ - Remove file handle leak handling http errors
+ - Update dependencies
+
+
 2.7.5 (2025-05-24)
 ------------------
 
