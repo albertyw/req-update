@@ -190,7 +190,17 @@ class Node(Updater):
         raise ValueError('Cannot compute version')  # pragma: no cover
 
     def install_dependencies(self) -> bool:
-        command = ['npm', 'install']
+        """
+        Run the appropriate package manager install command.
+        Supports npm and pnpm.
+        """
+        if self.check_applicable_npm():
+            command = ['npm', 'install']
+        elif self.check_applicable_pnpm():
+            command = ['pnpm', 'install']
+        else:
+            return False
+
         try:
             result = self.util.execute_shell(
                 command,
