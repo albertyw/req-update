@@ -15,17 +15,43 @@ SEMVER = re.compile(r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0
 
 class Node(Updater):
     def check_applicable(self) -> bool:
-        command = ['which', 'npm']
+        """
+        Determine if this updater should run.
+
+        The updater is applicable if either npm or pnpm are available
+        and the required lockfile exists alongside a package.json.
+        """
+        return self.check_applicable_npm() or self.check_applicable_pnpm()
+
+    def check_applicable_npm(self) -> bool:
+        """
+        Check applicability for npm.
+
+        Returns True if npm is available and both package.json and
+        package-lock.json exist.
+        """
         try:
-            self.util.execute_shell(command, True, suppress_output=True)
+            self.util.execute_shell(['which', 'npm'], True, suppress_output=True)
         except subprocess.CalledProcessError:
-            # Cannot find npm
             return False
+
         files = os.listdir('.')
-        if 'package.json' not in files or 'package-lock.json' not in files:
-            # Cannot find npm config files
+        return 'package.json' in files and 'package-lock.json' in files
+
+    def check_applicable_pnpm(self) -> bool:
+        """
+        Check applicability for pnpm.
+
+        Returns True if pnpm is available and both package.json and
+        pnpm-lock.yaml exist.
+        """
+        try:
+            self.util.execute_shell(['which', 'pnpm'], True, suppress_output=True)
+        except subprocess.CalledProcessError:
             return False
-        return True
+
+        files = os.listdir('.')
+        return 'package.json' in files and 'pnpm-lock.yaml' in files
 
     def update_dependencies(self) -> bool:
         """
