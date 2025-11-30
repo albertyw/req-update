@@ -190,21 +190,67 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
         self.mock_log = MagicMock()
         setattr(self.node.util, '_log', self.mock_log)
+        self.mock_check_applicable_npm = MagicMock()
+        setattr(self.node, 'check_applicable_npm', self.mock_check_applicable_npm)
+        self.mock_check_applicable_pnpm = MagicMock()
+        setattr(self.node, 'check_applicable_pnpm', self.mock_check_applicable_pnpm)
 
-    def test_install_no_updates(self) -> None:
+    def test_install_no_updates_npm(self) -> None:
+        self.mock_clean.return_value = True
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
         updates = self.node.update_unpinned_dependencies()
         self.assertFalse(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertFalse(self.mock_commit_git.called)
+        self.mock_execute_shell.assert_called_with(['npm', 'update'], False)
 
-    def test_commit(self) -> None:
+    def test_install_no_updates_pnpm(self) -> None:
+        self.mock_clean.return_value = True
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        updates = self.node.update_unpinned_dependencies()
+        self.assertFalse(updates)
+        self.assertTrue(self.mock_execute_shell.called)
+        self.assertTrue(self.mock_clean.called)
+        self.assertFalse(self.mock_commit_git.called)
+        self.mock_execute_shell.assert_called_with(['pnpm', 'update'], False)
+
+    def test_commit_npm(self) -> None:
         self.mock_clean.return_value = False
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
         updates = self.node.update_unpinned_dependencies()
         self.assertTrue(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertTrue(self.mock_commit_git.called)
+        self.mock_commit_git.assert_called_with('Update npm packages')
+
+    def test_commit_pnpm(self) -> None:
+        self.mock_clean.return_value = False
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        updates = self.node.update_unpinned_dependencies()
+        self.assertTrue(updates)
+        self.assertTrue(self.mock_execute_shell.called)
+        self.assertTrue(self.mock_clean.called)
+        self.assertTrue(self.mock_commit_git.called)
+        self.mock_commit_git.assert_called_with('Update pnpm packages')
+
+    def test_no_applicable(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = False
+        updates = self.node.update_unpinned_dependencies()
+        self.assertFalse(updates)
+        self.assertFalse(self.mock_execute_shell.called)
+        self.assertFalse(self.mock_clean.called)
+        self.assertFalse(self.mock_commit_git.called)
 
 
 class TestUpdatePinnedDependencies(unittest.TestCase):
