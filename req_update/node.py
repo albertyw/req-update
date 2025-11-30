@@ -15,17 +15,43 @@ SEMVER = re.compile(r'^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0
 
 class Node(Updater):
     def check_applicable(self) -> bool:
-        command = ['which', 'npm']
+        """
+        Determine if this updater should run.
+
+        The updater is applicable if either npm or pnpm are available
+        and the required lockfile exists alongside a package.json.
+        """
+        return self.check_applicable_npm() or self.check_applicable_pnpm()
+
+    def check_applicable_npm(self) -> bool:
+        """
+        Check applicability for npm.
+
+        Returns True if npm is available and both package.json and
+        package-lock.json exist.
+        """
         try:
-            self.util.execute_shell(command, True, suppress_output=True)
+            self.util.execute_shell(['which', 'npm'], True, suppress_output=True)
         except subprocess.CalledProcessError:
-            # Cannot find npm
             return False
+
         files = os.listdir('.')
-        if 'package.json' not in files or 'package-lock.json' not in files:
-            # Cannot find npm config files
+        return 'package.json' in files and 'package-lock.json' in files
+
+    def check_applicable_pnpm(self) -> bool:
+        """
+        Check applicability for pnpm.
+
+        Returns True if pnpm is available and both package.json and
+        pnpm-lock.yaml exist.
+        """
+        try:
+            self.util.execute_shell(['which', 'pnpm'], True, suppress_output=True)
+        except subprocess.CalledProcessError:
             return False
-        return True
+
+        files = os.listdir('.')
+        return 'package.json' in files and 'pnpm-lock.yaml' in files
 
     def update_dependencies(self) -> bool:
         """
@@ -38,12 +64,25 @@ class Node(Updater):
         return updated
 
     def update_unpinned_dependencies(self) -> bool:
-        command = ['npm', 'update']
-        self.util.info('Updating npm packages')
+        """
+        Update unpinned dependencies using the package manager
+        that is applicable (npm or pnpm).
+        """
+        # Determine which package manager to use
+        if self.check_applicable_npm():
+            manager_name = 'npm'
+        elif self.check_applicable_pnpm():
+            manager_name = 'pnpm'
+        else:
+            # No applicable package manager; nothing to do
+            return False
+        command = [manager_name, 'update']
+
+        self.util.info(f'Updating {manager_name} packages')
         self.util.execute_shell(command, False)
         clean = self.util.check_repository_cleanliness()
         if not clean:
-            self.util.commit_git('Update npm packages')
+            self.util.commit_git(f'Update {manager_name} packages')
             return True
         return False
 
@@ -59,7 +98,19 @@ class Node(Updater):
         return any_updated
 
     def get_outdated(self) -> dict[str, dict[str, str]]:
-        command = ['npm', 'outdated', '--json']
+        """
+        Return a mapping of outdated packages for the applicable package manager.
+        Supports both npm and pnpm.
+        """
+        # Determine which package manager to use
+        if self.check_applicable_npm():
+            command = ['npm', 'outdated', '--json']
+        elif self.check_applicable_pnpm():
+            command = ['pnpm', 'outdated', '--json']
+        else:
+            # No applicable package manager; nothing to do
+            return {}
+
         result = self.util.execute_shell(command, True, ignore_exit_code=True)
         packages = json.loads(result.stdout)
         if TYPE_CHECKING:
@@ -139,7 +190,17 @@ class Node(Updater):
         raise ValueError('Cannot compute version')  # pragma: no cover
 
     def install_dependencies(self) -> bool:
-        command = ['npm', 'install']
+        """
+        Run the appropriate package manager install command.
+        Supports npm and pnpm.
+        """
+        if self.check_applicable_npm():
+            command = ['npm', 'install']
+        elif self.check_applicable_pnpm():
+            command = ['pnpm', 'install']
+        else:
+            return False
+
         try:
             result = self.util.execute_shell(
                 command,

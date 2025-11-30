@@ -32,32 +32,6 @@ class TestCheckApplicable(unittest.TestCase):
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
 
     @patch('os.listdir')
-    def test_applicable(self, mock_listdir: MagicMock) -> None:
-        def execute_shell_returns(
-            command: list[str],
-            readonly: bool,
-            suppress_output: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            return MagicMock(stdout='')
-
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        mock_listdir.return_value = ['package.json', 'package-lock.json']
-        applicable = self.node.check_applicable()
-        self.assertTrue(applicable)
-
-    def test_no_npm(self) -> None:
-        def execute_shell_returns(
-            command: list[str],
-            readonly: bool,
-            suppress_output: bool,
-        ) -> subprocess.CompletedProcess[bytes]:
-            raise subprocess.CalledProcessError(1, 'asdf')
-
-        self.mock_execute_shell.side_effect = execute_shell_returns
-        applicable = self.node.check_applicable()
-        self.assertFalse(applicable)
-
-    @patch('os.listdir')
     def test_no_package(self, mock_listdir: MagicMock) -> None:
         def execute_shell_returns(
             command: list[str],
@@ -70,6 +44,100 @@ class TestCheckApplicable(unittest.TestCase):
         mock_listdir.return_value = []
         applicable = self.node.check_applicable()
         self.assertFalse(applicable)
+
+
+class TestCheckApplicableNpm(unittest.TestCase):
+    def setUp(self) -> None:
+        u = util.Util()
+        self.node = node.Node(u)
+        self.mock_execute_shell = MagicMock()
+        setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
+
+    @patch('os.listdir')
+    def test_check_applicable_npm_true(self, mock_listdir: MagicMock) -> None:
+        def execute_shell_returns(
+            command: list[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            return MagicMock(stdout='')
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_listdir.return_value = ['package.json', 'package-lock.json']
+        self.assertTrue(self.node.check_applicable_npm())
+
+    @patch('os.listdir')
+    def test_check_applicable_npm_false_no_npm(self, mock_listdir: MagicMock) -> None:
+        def execute_shell_returns(
+            command: list[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            raise subprocess.CalledProcessError(1, 'asdf')
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_listdir.return_value = ['package.json', 'package-lock.json']
+        self.assertFalse(self.node.check_applicable_npm())
+
+    @patch('os.listdir')
+    def test_check_applicable_npm_false_no_lock(self, mock_listdir: MagicMock) -> None:
+        def execute_shell_returns(
+            command: list[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            return MagicMock(stdout='')
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_listdir.return_value = ['package.json']
+        self.assertFalse(self.node.check_applicable_npm())
+
+
+class TestCheckApplicablePnpm(unittest.TestCase):
+    def setUp(self) -> None:
+        u = util.Util()
+        self.node = node.Node(u)
+        self.mock_execute_shell = MagicMock()
+        setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
+
+    @patch('os.listdir')
+    def test_check_applicable_pnpm_true(self, mock_listdir: MagicMock) -> None:
+        def execute_shell_returns(
+            command: list[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            return MagicMock(stdout='')
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_listdir.return_value = ['package.json', 'pnpm-lock.yaml']
+        self.assertTrue(self.node.check_applicable_pnpm())
+
+    @patch('os.listdir')
+    def test_check_applicable_pnpm_false_no_pnpm(self, mock_listdir: MagicMock) -> None:
+        def execute_shell_returns(
+            command: list[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            raise subprocess.CalledProcessError(1, 'asdf')
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_listdir.return_value = ['package.json', 'pnpm-lock.yaml']
+        self.assertFalse(self.node.check_applicable_pnpm())
+
+    @patch('os.listdir')
+    def test_check_applicable_pnpm_false_no_lock(self, mock_listdir: MagicMock) -> None:
+        def execute_shell_returns(
+            command: list[str],
+            readonly: bool,
+            suppress_output: bool,
+        ) -> subprocess.CompletedProcess[bytes]:
+            return MagicMock(stdout='')
+
+        self.mock_execute_shell.side_effect = execute_shell_returns
+        mock_listdir.return_value = ['package.json']
+        self.assertFalse(self.node.check_applicable_pnpm())
 
 
 class TestUpdateInstallDependencies(unittest.TestCase):
@@ -114,27 +182,75 @@ class TestUpdateUnpinnedDependencies(unittest.TestCase):
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
         self.mock_clean = MagicMock()
         setattr(
-            self.node.util, 'check_repository_cleanliness', self.mock_clean,
+            self.node.util,
+            'check_repository_cleanliness',
+            self.mock_clean,
         )
         self.mock_commit_git = MagicMock()
         setattr(self.node.util, 'commit_git', self.mock_commit_git)
         self.mock_log = MagicMock()
         setattr(self.node.util, '_log', self.mock_log)
+        self.mock_check_applicable_npm = MagicMock()
+        setattr(self.node, 'check_applicable_npm', self.mock_check_applicable_npm)
+        self.mock_check_applicable_pnpm = MagicMock()
+        setattr(self.node, 'check_applicable_pnpm', self.mock_check_applicable_pnpm)
 
-    def test_install_no_updates(self) -> None:
+    def test_install_no_updates_npm(self) -> None:
+        self.mock_clean.return_value = True
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
         updates = self.node.update_unpinned_dependencies()
         self.assertFalse(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertFalse(self.mock_commit_git.called)
+        self.mock_execute_shell.assert_called_with(['npm', 'update'], False)
 
-    def test_commit(self) -> None:
+    def test_install_no_updates_pnpm(self) -> None:
+        self.mock_clean.return_value = True
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        updates = self.node.update_unpinned_dependencies()
+        self.assertFalse(updates)
+        self.assertTrue(self.mock_execute_shell.called)
+        self.assertTrue(self.mock_clean.called)
+        self.assertFalse(self.mock_commit_git.called)
+        self.mock_execute_shell.assert_called_with(['pnpm', 'update'], False)
+
+    def test_commit_npm(self) -> None:
         self.mock_clean.return_value = False
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
         updates = self.node.update_unpinned_dependencies()
         self.assertTrue(updates)
         self.assertTrue(self.mock_execute_shell.called)
         self.assertTrue(self.mock_clean.called)
         self.assertTrue(self.mock_commit_git.called)
+        self.mock_commit_git.assert_called_with('Update npm packages')
+
+    def test_commit_pnpm(self) -> None:
+        self.mock_clean.return_value = False
+        self.mock_execute_shell.return_value = MagicMock()
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        updates = self.node.update_unpinned_dependencies()
+        self.assertTrue(updates)
+        self.assertTrue(self.mock_execute_shell.called)
+        self.assertTrue(self.mock_clean.called)
+        self.assertTrue(self.mock_commit_git.called)
+        self.mock_commit_git.assert_called_with('Update pnpm packages')
+
+    def test_no_applicable(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = False
+        updates = self.node.update_unpinned_dependencies()
+        self.assertFalse(updates)
+        self.assertFalse(self.mock_execute_shell.called)
+        self.assertFalse(self.mock_clean.called)
+        self.assertFalse(self.mock_commit_git.called)
 
 
 class TestUpdatePinnedDependencies(unittest.TestCase):
@@ -172,13 +288,32 @@ class TestGetOutdated(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()
         self.node = node.Node(u)
+        self.mock_check_applicable_npm = MagicMock()
+        setattr(self.node, 'check_applicable_npm', self.mock_check_applicable_npm)
+        self.mock_check_applicable_pnpm = MagicMock()
+        setattr(self.node, 'check_applicable_pnpm', self.mock_check_applicable_pnpm)
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
 
-    def test_get_outdated(self) -> None:
+    def test_get_outdated_npm(self) -> None:
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
         self.mock_execute_shell().stdout = json.dumps(MOCK_NPM_OUTDATED)
         data = self.node.get_outdated()
         self.assertEqual(data, MOCK_NPM_OUTDATED)
+
+    def test_get_outdated_pnpm(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        self.mock_execute_shell().stdout = json.dumps(MOCK_NPM_OUTDATED)
+        data = self.node.get_outdated()
+        self.assertEqual(data, MOCK_NPM_OUTDATED)
+
+    def test_get_outdated_none(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = False
+        data = self.node.get_outdated()
+        self.assertEqual(data, {})
 
 
 class TestUpdatePackage(unittest.TestCase):
@@ -196,6 +331,8 @@ class TestUpdatePackage(unittest.TestCase):
         setattr(self.node.util, 'commit_dependency_update', self.mock_commit)
         setattr(self.node.util, 'execute_shell', MagicMock())
         self.node.util.dry_run = False
+        setattr(self.node, 'check_applicable_npm', MagicMock(return_value=True))
+        setattr(self.node, 'check_applicable_pnpm', MagicMock(return_value=False))
 
     def tearDown(self) -> None:
         os.chdir(self.original_cwd)
@@ -275,7 +412,8 @@ class TestUpdatePackage(unittest.TestCase):
         setattr(self.node, 'install_dependencies', mock_install_dependencies)
         mock_install_dependencies.return_value = False
         updated = self.node.update_package(
-            'varsnap', MOCK_NPM_OUTDATED['varsnap'],
+            'varsnap',
+            MOCK_NPM_OUTDATED['varsnap'],
         )
         self.assertFalse(updated)
         self.assertTrue(mock_install_dependencies.called)
@@ -309,6 +447,38 @@ class TestInstallDependencies(unittest.TestCase):
         setattr(self.node.util, '_log', self.mock_log)
         self.mock_warn = MagicMock()
         setattr(self.node.util, 'warn', self.mock_warn)
+        # Mock applicability checks
+        self.mock_check_applicable_npm = MagicMock()
+        setattr(self.node, 'check_applicable_npm', self.mock_check_applicable_npm)
+        self.mock_check_applicable_pnpm = MagicMock()
+        setattr(self.node, 'check_applicable_pnpm', self.mock_check_applicable_pnpm)
+
+    def test_install_dependencies_npm(self) -> None:
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
+        self.mock_execute_shell.return_value = MagicMock()
+        success = self.node.install_dependencies()
+        self.assertTrue(success)
+        self.mock_execute_shell.assert_called_with(
+            ['npm', 'install'], False, suppress_output=True,
+        )
+
+    def test_install_dependencies_pnpm(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        self.mock_execute_shell.return_value = MagicMock()
+        success = self.node.install_dependencies()
+        self.assertTrue(success)
+        self.mock_execute_shell.assert_called_with(
+            ['pnpm', 'install'], False, suppress_output=True,
+        )
+
+    def test_install_dependencies_none(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = False
+        success = self.node.install_dependencies()
+        self.assertFalse(success)
+        self.assertFalse(self.mock_execute_shell.called)
 
     def test_install_dependencies(self) -> None:
         self.mock_execute_shell.return_value = MagicMock()
