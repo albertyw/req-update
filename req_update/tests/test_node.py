@@ -288,13 +288,32 @@ class TestGetOutdated(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()
         self.node = node.Node(u)
+        self.mock_check_applicable_npm = MagicMock()
+        setattr(self.node, 'check_applicable_npm', self.mock_check_applicable_npm)
+        self.mock_check_applicable_pnpm = MagicMock()
+        setattr(self.node, 'check_applicable_pnpm', self.mock_check_applicable_pnpm)
         self.mock_execute_shell = MagicMock()
         setattr(self.node.util, 'execute_shell', self.mock_execute_shell)
 
-    def test_get_outdated(self) -> None:
+    def test_get_outdated_npm(self) -> None:
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
         self.mock_execute_shell().stdout = json.dumps(MOCK_NPM_OUTDATED)
         data = self.node.get_outdated()
         self.assertEqual(data, MOCK_NPM_OUTDATED)
+
+    def test_get_outdated_pnpm(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        self.mock_execute_shell().stdout = json.dumps(MOCK_NPM_OUTDATED)
+        data = self.node.get_outdated()
+        self.assertEqual(data, MOCK_NPM_OUTDATED)
+
+    def test_get_outdated_none(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = False
+        data = self.node.get_outdated()
+        self.assertEqual(data, {})
 
 
 class TestUpdatePackage(unittest.TestCase):
