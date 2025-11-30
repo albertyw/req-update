@@ -98,7 +98,19 @@ class Node(Updater):
         return any_updated
 
     def get_outdated(self) -> dict[str, dict[str, str]]:
-        command = ['npm', 'outdated', '--json']
+        """
+        Return a mapping of outdated packages for the applicable package manager.
+        Supports both npm and pnpm.
+        """
+        # Determine which package manager to use
+        if self.check_applicable_npm():
+            command = ['npm', 'outdated', '--json']
+        elif self.check_applicable_pnpm():
+            command = ['pnpm', 'outdated', '--json']
+        else:
+            # No applicable package manager; nothing to do
+            return {}
+
         result = self.util.execute_shell(command, True, ignore_exit_code=True)
         packages = json.loads(result.stdout)
         if TYPE_CHECKING:
