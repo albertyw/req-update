@@ -331,6 +331,8 @@ class TestUpdatePackage(unittest.TestCase):
         setattr(self.node.util, 'commit_dependency_update', self.mock_commit)
         setattr(self.node.util, 'execute_shell', MagicMock())
         self.node.util.dry_run = False
+        setattr(self.node, 'check_applicable_npm', MagicMock(return_value=True))
+        setattr(self.node, 'check_applicable_pnpm', MagicMock(return_value=False))
 
     def tearDown(self) -> None:
         os.chdir(self.original_cwd)
@@ -445,6 +447,38 @@ class TestInstallDependencies(unittest.TestCase):
         setattr(self.node.util, '_log', self.mock_log)
         self.mock_warn = MagicMock()
         setattr(self.node.util, 'warn', self.mock_warn)
+        # Mock applicability checks
+        self.mock_check_applicable_npm = MagicMock()
+        setattr(self.node, 'check_applicable_npm', self.mock_check_applicable_npm)
+        self.mock_check_applicable_pnpm = MagicMock()
+        setattr(self.node, 'check_applicable_pnpm', self.mock_check_applicable_pnpm)
+
+    def test_install_dependencies_npm(self) -> None:
+        self.mock_check_applicable_npm.return_value = True
+        self.mock_check_applicable_pnpm.return_value = False
+        self.mock_execute_shell.return_value = MagicMock()
+        success = self.node.install_dependencies()
+        self.assertTrue(success)
+        self.mock_execute_shell.assert_called_with(
+            ['npm', 'install'], False, suppress_output=True,
+        )
+
+    def test_install_dependencies_pnpm(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = True
+        self.mock_execute_shell.return_value = MagicMock()
+        success = self.node.install_dependencies()
+        self.assertTrue(success)
+        self.mock_execute_shell.assert_called_with(
+            ['pnpm', 'install'], False, suppress_output=True,
+        )
+
+    def test_install_dependencies_none(self) -> None:
+        self.mock_check_applicable_npm.return_value = False
+        self.mock_check_applicable_pnpm.return_value = False
+        success = self.node.install_dependencies()
+        self.assertFalse(success)
+        self.assertFalse(self.mock_execute_shell.called)
 
     def test_install_dependencies(self) -> None:
         self.mock_execute_shell.return_value = MagicMock()
