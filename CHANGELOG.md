@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.8.0 (2025-11-30)
+------------------
+
+ - Support pnpm in node update
+ - Update dependencies
+
+
 2.7.6 (2025-11-16)
 ------------------
 
