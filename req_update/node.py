@@ -64,12 +64,25 @@ class Node(Updater):
         return updated
 
     def update_unpinned_dependencies(self) -> bool:
-        command = ['npm', 'update']
-        self.util.info('Updating npm packages')
+        """
+        Update unpinned dependencies using the package manager
+        that is applicable (npm or pnpm).
+        """
+        # Determine which package manager to use
+        if self.check_applicable_npm():
+            manager_name = 'npm'
+        elif self.check_applicable_pnpm():
+            manager_name = 'pnpm'
+        else:
+            # No applicable package manager; nothing to do
+            return False
+        command = [manager_name, 'update']
+
+        self.util.info(f'Updating {manager_name} packages')
         self.util.execute_shell(command, False)
         clean = self.util.check_repository_cleanliness()
         if not clean:
-            self.util.commit_git('Update npm packages')
+            self.util.commit_git(f'Update {manager_name} packages')
             return True
         return False
 
