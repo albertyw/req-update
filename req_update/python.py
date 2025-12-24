@@ -172,6 +172,9 @@ class Python(Updater):
         dependency = dependency.replace('_', '-')
         updated = False
         for i, line in enumerate(lines):
+            if 'req-update: ignore' in line:
+                # Ignore lines with ignore comment
+                continue
             match = line_regex.match(line.strip())
             if not match:
                 continue

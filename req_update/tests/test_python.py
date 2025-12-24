@@ -454,6 +454,13 @@ class TestWriteDependencyUpdate(unittest.TestCase):
             self.python.updated_pyproject_files,
         )
 
+    def test_write_dependency_update_ignore(self) -> None:
+        with open(self.tempfile_requirements.name, 'w') as handle:
+            handle.write('varsnap==1.0.0    # req-update: ignore')
+        with open(self.tempfile_pyproject.name, 'w') as handle:
+            handle.write('    "varsnap==1.0.0",    # req-update: ignore')
+        updated = self.python.write_dependency_update('varsnap', '1.2.3')
+        self.assertFalse(updated)
 
 
 class TestInstallUpdates(unittest.TestCase):
