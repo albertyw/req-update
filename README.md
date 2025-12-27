@@ -17,8 +17,8 @@ create a branch `dep-update`, check for outdated packages, and commit a
 series of commits to update packages.
 
 ```
-$ req_update
-usage: req_update.py [-h] [-l LANGUAGE] [-p] [-d] [-v] [--version]
+$ req_update.py -h
+usage: req_update.py [-h] [-l LANGUAGE] [-p] [-i] [-d] [-v] [--version]
 
 Update python, go, node, and git submodule dependencies for your project with git integration
 
@@ -26,9 +26,11 @@ https://github.com/albertyw/req-update
 
 options:
   -h, --help            show this help message and exit
-  -l LANGUAGE, --language LANGUAGE
-                        Language/package manager to update.  Options are: gitsubmodule, go, node, python
+  -l, --language LANGUAGE
+                        Language/package manager to update.  Options are: docker, drone, githubworkflow, gitsubmodule, go, node, python
   -p, --push            Push commits individually to remote origin
+  -i, --ignore-cleanliness
+                        Ignore checking if the repository is clean
   -d, --dryrun          Dry run
   -v, --verbose         Verbose output
   --version             show program's version number and exit
