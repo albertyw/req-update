@@ -6,7 +6,7 @@ import re
 import subprocess
 from typing import Iterator
 
-from req_update.util import Updater, Util
+from req_update.util import Updater, Util, IGNORE_UPDATE_COMMENT
 
 
 PYPROJECT = 'pyproject'
@@ -172,7 +172,7 @@ class Python(Updater):
         dependency = dependency.replace('_', '-')
         updated = False
         for i, line in enumerate(lines):
-            if 'req-update: ignore' in line:
+            if IGNORE_UPDATE_COMMENT in line:
                 # Ignore lines with ignore comment
                 continue
             match = line_regex.match(line.strip())

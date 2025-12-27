@@ -15,6 +15,7 @@ SubprocessOutput = Union[
     subprocess.CalledProcessError,
     subprocess.CompletedProcess[str],
 ]
+IGNORE_UPDATE_COMMENT = 'req-update: ignore'
 
 
 class Updater:
