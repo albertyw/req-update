@@ -136,6 +136,15 @@ class TestAttemptUpdateImage(BaseTest):
         self.assertTrue(self.mock_find_updated_version.called)
         self.assertEqual(version, '12')
 
+    def test_discards_ignore(self) -> None:
+        new_line, dependency, version = self.docker.attempt_update_image(
+            'FROM debian:12  # req-update: ignore'
+        )
+        self.assertEqual(new_line, 'FROM debian:12  # req-update: ignore')
+        self.assertEqual(dependency, '')
+        self.assertEqual(version, '')
+        self.assertFalse(self.mock_find_updated_version.called)
+
 
 class TestFindUpdatedVersion(BaseTest):
     def setUp(self) -> None:

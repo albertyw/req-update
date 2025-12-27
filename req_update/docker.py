@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 import subprocess
 
-from req_update.util import HTTPError, Updater, Util
+from req_update.util import HTTPError, Updater, Util, IGNORE_UPDATE_COMMENT
 
 
 class Docker(Updater):
@@ -64,6 +64,8 @@ class Docker(Updater):
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
         if not line.strip().startswith(self.LINE_HEADER):
+            return line, '', ''
+        if IGNORE_UPDATE_COMMENT in line:
             return line, '', ''
         base_image = line.split()[1]
         if base_image.count(self.DEPENDENCY_VERSION_SEPARATOR) != 1:
