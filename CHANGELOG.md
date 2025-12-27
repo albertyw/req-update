@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.9.0 (2025-12-26)
+------------------
+
+ - Support ignoring dependencies for req-update by adding `req-update: ignore` to the line
+ - Update dependencies
+
+
 2.8.0 (2025-11-30)
 ------------------
 
