@@ -138,7 +138,7 @@ class TestAttemptUpdateImage(BaseTest):
 
     def test_discards_ignore(self) -> None:
         new_line, dependency, version = self.docker.attempt_update_image(
-            'FROM debian:12  # req-update: ignore'
+            'FROM debian:12  # req-update: ignore',
         )
         self.assertEqual(new_line, 'FROM debian:12  # req-update: ignore')
         self.assertEqual(dependency, '')
