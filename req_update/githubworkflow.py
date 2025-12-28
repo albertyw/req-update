@@ -28,19 +28,25 @@ class GithubWorkflow(Docker):
                 'Cannot read %s from api.github.com: %s' % (dependency, str(e)),
             )
             return ''
+
         try:
-            tag = tags[-1]['ref'].removeprefix('refs/tags/')
-        except (TypeError, IndexError, KeyError) as e:
+            available_versions = [tag['ref'].removeprefix('refs/tags/') for tag in tags]
+        except (TypeError, KeyError) as e:
             self.util.warn(
-                'Cannot read %s from api.github.com: %s' % (dependency, str(e)),
+                'Cannot parse tags for %s from api.github.com: %s' %
+                    (dependency, str(e)),
             )
             return ''
-        if self.util.compare_versions(original_version, tag):
+        most_recent = original_version
+        for version in available_versions:
+            if self.util.compare_versions(most_recent, version):
+                most_recent = version
+        if most_recent != original_version:
             self.util.debug(
                 'Found update for %s from %s to %s' %
-                    (dependency, original_version, tag),
+                    (dependency, original_version, most_recent),
             )
-            return str(tag)
+            return str(most_recent)
         else:
             self.util.debug(
                 'No updates found for %s at %s' % (dependency, original_version),
