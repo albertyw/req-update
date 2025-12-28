@@ -29,7 +29,14 @@ class GithubWorkflow(Docker):
             )
             return ''
 
-        available_versions = [tag['ref'].removeprefix('refs/tags/') for tag in tags]
+        try:
+            available_versions = [tag['ref'].removeprefix('refs/tags/') for tag in tags]
+        except (TypeError, KeyError) as e:
+            self.util.warn(
+                'Cannot parse tags for %s from api.github.com: %s' %
+                    (dependency, str(e)),
+            )
+            return ''
         most_recent = original_version
         for version in available_versions:
             if self.util.compare_versions(most_recent, version):

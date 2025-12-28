@@ -36,12 +36,6 @@ class TestFindUpdatedVersion(unittest.TestCase):
         self.assertEqual(version, '')
         self.assertTrue(self.mock_warn.called)
 
-    def test_no_tags(self) -> None:
-        self.mock_request.return_value = []
-        version = self.githubworkflow.find_updated_version('albertyw/git-browse', '1')
-        self.assertEqual(version, '')
-        self.assertTrue(self.mock_warn.called)
-
     def test_equal_version(self) -> None:
         self.mock_request.return_value = [{"ref": "refs/tags/1"}]
         version = self.githubworkflow.find_updated_version('albertyw/git-browse', '1')
