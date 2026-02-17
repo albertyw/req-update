@@ -58,6 +58,8 @@ class Node(Updater):
         Update dependencies
         Return if updates were made
         """
+        # Have to update unpinned dependencies first so that there to get the
+        # more-likely backwards compatible changes done earlier
         updated_unpinned = self.update_unpinned_dependencies()
         updated_pinned = self.update_pinned_dependencies()
         updated = updated_unpinned or updated_pinned
