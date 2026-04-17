@@ -10,7 +10,11 @@ class TestAttemptUpdateImage(unittest.TestCase):
         u = util.Util()
         self.githubworkflow = githubworkflow.GithubWorkflow(u)
         self.mock_find_updated_version = MagicMock()
-        setattr(self.githubworkflow, 'find_updated_version', self.mock_find_updated_version)
+        setattr(
+            self.githubworkflow,
+            'find_updated_version',
+            self.mock_find_updated_version,
+        )
 
     def test_inline_uses(self) -> None:
         self.mock_find_updated_version.return_value = 'v5'

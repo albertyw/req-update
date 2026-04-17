@@ -91,7 +91,7 @@ class Docker(Updater):
         new_version = self.known_versions.get(dependency, '')
         if not new_version:
             if dependency.count('/') == 1:
-                namespace = dependency.split('/')[0]
+                namespace = dependency.split('/', maxsplit=1)[0]
                 dependency_name = dependency.split('/')[1]
             else:
                 namespace = 'library'
