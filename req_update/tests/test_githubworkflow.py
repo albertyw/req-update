@@ -5,6 +5,38 @@ from unittest.mock import MagicMock
 from req_update import githubworkflow, util
 
 
+class TestAttemptUpdateImage(unittest.TestCase):
+    def setUp(self) -> None:
+        u = util.Util()
+        self.githubworkflow = githubworkflow.GithubWorkflow(u)
+        self.mock_find_updated_version = MagicMock()
+        setattr(self.githubworkflow, 'find_updated_version', self.mock_find_updated_version)
+
+    def test_inline_uses(self) -> None:
+        self.mock_find_updated_version.return_value = 'v5'
+        line = '      - uses: actions/checkout@v4'
+        new_line, dependency, version = self.githubworkflow.attempt_update_image(line)
+        self.assertEqual(new_line, '      - uses: actions/checkout@v5')
+        self.assertEqual(dependency, 'actions/checkout')
+        self.assertEqual(version, 'v5')
+
+    def test_nested_uses(self) -> None:
+        self.mock_find_updated_version.return_value = 'v5'
+        line = '        uses: actions/checkout@v4'
+        new_line, dependency, version = self.githubworkflow.attempt_update_image(line)
+        self.assertEqual(new_line, '        uses: actions/checkout@v5')
+        self.assertEqual(dependency, 'actions/checkout')
+        self.assertEqual(version, 'v5')
+
+    def test_discards_other(self) -> None:
+        line = '      - run: pnpm install'
+        new_line, dependency, version = self.githubworkflow.attempt_update_image(line)
+        self.assertEqual(new_line, line)
+        self.assertEqual(dependency, '')
+        self.assertEqual(version, '')
+        self.assertFalse(self.mock_find_updated_version.called)
+
+
 class TestFindUpdatedVersion(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()

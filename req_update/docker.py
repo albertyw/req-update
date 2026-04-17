@@ -8,7 +8,7 @@ from req_update.util import HTTPError, Updater, Util, IGNORE_UPDATE_COMMENT
 
 class Docker(Updater):
     UPDATE_FILE = re.compile(r'Dockerfile$')
-    LINE_HEADER = 'FROM'
+    LINE_HEADERS = ['FROM']
     DEPENDENCY_VERSION_SEPARATOR = ':'
 
     def __init__(self, util: Util) -> None:
@@ -63,11 +63,15 @@ class Docker(Updater):
         return lines
 
     def attempt_update_image(self, line: str) -> tuple[str, str, str]:
-        if not line.strip().startswith(self.LINE_HEADER):
-            return line, '', ''
         if IGNORE_UPDATE_COMMENT in line:
             return line, '', ''
-        base_image = line.split()[1]
+        for line_header in self.LINE_HEADERS:
+            if line.strip().startswith(line_header):
+                rest = line.strip()[len(line_header):].split()
+                base_image = rest[0] if rest else ''
+                break
+        else:
+            return line, '', ''
         if base_image.count(self.DEPENDENCY_VERSION_SEPARATOR) != 1:
             return line, base_image, ''
         dependency = base_image.split(self.DEPENDENCY_VERSION_SEPARATOR)[0]

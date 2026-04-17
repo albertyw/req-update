@@ -15,7 +15,7 @@ GITHUB_API_HEADERS = {
 
 class GithubWorkflow(Docker):
     UPDATE_FILE = re.compile(r'^\.github/workflows/.+\.yml$')
-    LINE_HEADER = 'uses:'
+    LINE_HEADERS = ['uses:', '- uses:']
     DEPENDENCY_VERSION_SEPARATOR = '@'
 
     def find_updated_version(self, dependency: str, original_version: str) -> str:
