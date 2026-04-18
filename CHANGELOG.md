@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.9.1 (2026-04-18)
+------------------
+
+ - Fix github workflows
+ - Update dependencies
+
+
 2.9.0 (2025-12-26)
 ------------------
 
