@@ -4,7 +4,7 @@ name: test
 
 steps:
   - name: Test Python 3.10
-    image: python:3.10
+    image: python:3.14
     commands:
       - pip install build
       - python -m build
