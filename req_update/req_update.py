@@ -97,8 +97,8 @@ class ReqUpdate:
             description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter,
         )
-        language_help = 'Language/package manager to update.  Options are: '
-        language_help += ', '.join(ReqUpdate.updater_names())
+        language_help = 'Language/package manager to update.  Options are: \n'
+        language_help += '\n'.join(ReqUpdate.updater_names())
         parser.add_argument(
             '-l',
             '--language',
