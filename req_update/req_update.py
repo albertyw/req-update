@@ -12,6 +12,7 @@ parent_path = current_path.parent.resolve()
 sys.path.insert(0, str(parent_path))
 
 from req_update.docker import Docker  # NOQA
+from req_update.dockercompose import DockerCompose  # NOQA
 from req_update.drone import Drone  # NOQA
 from req_update.githubworkflow import GithubWorkflow  # NOQA
 from req_update.gitsubmodule import GitSubmodule  # NOQA
@@ -32,6 +33,7 @@ DESCRIPTION = (
 )
 UPDATERS: list[type[Updater]] = [
     Docker,
+    DockerCompose,
     Drone,
     GithubWorkflow,
     GitSubmodule,
