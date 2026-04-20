@@ -7,7 +7,7 @@ from req_update.util import HTTPError, Updater, Util, IGNORE_UPDATE_COMMENT
 
 
 class Docker(Updater):
-    UPDATE_FILE = re.compile(r'Dockerfile$')
+    UPDATE_FILE = re.compile(r'(^|/)Dockerfile$')
     LINE_HEADERS = ['FROM']
     DEPENDENCY_VERSION_SEPARATOR = ':'
 
@@ -27,7 +27,7 @@ class Docker(Updater):
         except subprocess.CalledProcessError:
             return []
         files = [Path(f) for f in shell.stdout.split('\n')]
-        files = [f for f in files if self.UPDATE_FILE.match(str(f))]
+        files = [f for f in files if self.UPDATE_FILE.search(str(f))]
         return files
 
     def update_dependencies(self) -> bool:

@@ -43,17 +43,17 @@ class TestUpdateFile(unittest.TestCase):
         self.compose = dockercompose.DockerCompose(u)
 
     def test_matches_docker_compose_yml(self) -> None:
-        self.assertTrue(self.compose.UPDATE_FILE.match('docker-compose.yml'))
+        self.assertTrue(self.compose.UPDATE_FILE.search('docker-compose.yml'))
 
     def test_matches_docker_compose_yaml(self) -> None:
-        self.assertTrue(self.compose.UPDATE_FILE.match('docker-compose.yaml'))
+        self.assertTrue(self.compose.UPDATE_FILE.search('docker-compose.yaml'))
 
     def test_matches_compose_yml(self) -> None:
-        self.assertTrue(self.compose.UPDATE_FILE.match('compose.yml'))
+        self.assertTrue(self.compose.UPDATE_FILE.search('compose.yml'))
 
     def test_matches_override(self) -> None:
         self.assertTrue(
-            self.compose.UPDATE_FILE.match('docker-compose.override.yml'),
+            self.compose.UPDATE_FILE.search('docker-compose.override.yml'),
         )
 
     def test_matches_subdir(self) -> None:
@@ -62,6 +62,6 @@ class TestUpdateFile(unittest.TestCase):
         )
 
     def test_rejects_other(self) -> None:
-        self.assertFalse(self.compose.UPDATE_FILE.match('Dockerfile'))
-        self.assertFalse(self.compose.UPDATE_FILE.match('.drone.yml'))
-        self.assertFalse(self.compose.UPDATE_FILE.match('random.yml'))
+        self.assertFalse(self.compose.UPDATE_FILE.search('Dockerfile'))
+        self.assertFalse(self.compose.UPDATE_FILE.search('.drone.yml'))
+        self.assertFalse(self.compose.UPDATE_FILE.search('random.yml'))
