@@ -5,6 +5,25 @@ from unittest.mock import MagicMock
 from req_update import githubworkflow, util
 
 
+class TestUpdateFile(unittest.TestCase):
+    def setUp(self) -> None:
+        u = util.Util()
+        self.githubworkflow = githubworkflow.GithubWorkflow(u)
+
+    def test_matches_yml(self) -> None:
+        self.assertTrue(
+            self.githubworkflow.UPDATE_FILE.match('.github/workflows/ci.yml'),
+        )
+
+    def test_matches_yaml(self) -> None:
+        self.assertTrue(
+            self.githubworkflow.UPDATE_FILE.match('.github/workflows/ci.yaml'),
+        )
+
+    def test_rejects_other(self) -> None:
+        self.assertFalse(self.githubworkflow.UPDATE_FILE.match('Dockerfile'))
+
+
 class TestAttemptUpdateImage(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()

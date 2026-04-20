@@ -6,5 +6,5 @@ from req_update.docker import Docker
 
 
 class Drone(Docker):
-    UPDATE_FILE = re.compile(r'^\.drone\.yml$')
+    UPDATE_FILE = re.compile(r'^\.drone\.ya?ml$')
     LINE_HEADERS = ['image:']

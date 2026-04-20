@@ -5,6 +5,21 @@ from unittest.mock import MagicMock
 from req_update import drone, util
 
 
+class TestUpdateFile(unittest.TestCase):
+    def setUp(self) -> None:
+        u = util.Util()
+        self.drone = drone.Drone(u)
+
+    def test_matches_yml(self) -> None:
+        self.assertTrue(self.drone.UPDATE_FILE.match('.drone.yml'))
+
+    def test_matches_yaml(self) -> None:
+        self.assertTrue(self.drone.UPDATE_FILE.match('.drone.yaml'))
+
+    def test_rejects_other(self) -> None:
+        self.assertFalse(self.drone.UPDATE_FILE.match('Dockerfile'))
+
+
 class TestAttemptUpdateImage(unittest.TestCase):
     def setUp(self) -> None:
         u = util.Util()

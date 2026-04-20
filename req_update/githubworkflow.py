@@ -14,7 +14,7 @@ GITHUB_API_HEADERS = {
 
 
 class GithubWorkflow(Docker):
-    UPDATE_FILE = re.compile(r'^\.github/workflows/.+\.yml$')
+    UPDATE_FILE = re.compile(r'^\.github/workflows/.+\.ya?ml$')
     LINE_HEADERS = ['uses:', '- uses:']
     DEPENDENCY_VERSION_SEPARATOR = '@'
 
