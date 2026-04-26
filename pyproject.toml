@@ -43,7 +43,7 @@ req_update = "req_update.req_update:main"
 version = {attr = "req_update.req_update.__version__"}
 readme = {file = "README.md", content-type="text/markdown"}
 
-[options.package_data]
+[tool.setuptools.package-data]
 req_update = ["py.typed"]
 
 [tool.ruff]
