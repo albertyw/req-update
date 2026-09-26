@@ -35,6 +35,10 @@ test = [
 
 [project.urls]
 "Homepage" = "https://github.com/albertyw/req-update"
+"Repository" = "https://github.com/albertyw/req-update"
+"Documentation" = "https://github.com/albertyw/req-update/blob/master/README.md"
+"Changelog" = "https://github.com/albertyw/req-update/blob/master/CHANGELOG.md"
+"Issues" = "https://github.com/albertyw/req-update/issues"
 
 [project.scripts]
 req_update = "req_update.req_update:main"
