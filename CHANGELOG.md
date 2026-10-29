@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+2.10.0 (2026-10-28)
+-------------------
+
+ - Support updating docker-compose image versions
+ - Search for Dockerfiles in subdirectories
+ - Support .yaml extension in drone and github workflow file matching
+ - Publish to PyPI using github actions with OIDC
+ - Update dependencies
+
+
 2.9.1 (2026-04-18)
 ------------------
 
